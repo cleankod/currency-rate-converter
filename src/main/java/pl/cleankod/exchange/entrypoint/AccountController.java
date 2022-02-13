@@ -1,9 +1,11 @@
 package pl.cleankod.exchange.entrypoint;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.domain.CurrencyConverter;
 import pl.cleankod.exchange.core.domain.Money;
+import pl.cleankod.exchange.core.gateway.AccountRepository;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -14,6 +16,8 @@ import java.util.Currency;
 @RestController
 @RequestMapping("/accounts")
 public class AccountController {
+
+    private final AccountRepository accountRepository;
 
     private final CurrencyConverter currencyConverter = new CurrencyConverter() {
         private static final BigDecimal PLN_TO_EUR_RATE = BigDecimal.valueOf(4.58d);
@@ -31,22 +35,24 @@ public class AccountController {
         }
     };
 
+    public AccountController(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
+    }
+
     @GetMapping(path = "/{id}")
-    public Account findAccountById(@PathVariable String id, @RequestParam(required = false) String currency) {
-        return new Account(
-                Account.Id.of(id),
-                Account.Number.of("65 1090 1665 0000 0001 0373 7343"),
-                convert(currency, Money.of("123.45", "PLN"))
-        );
+    public ResponseEntity<Account> findAccountById(@PathVariable String id, @RequestParam(required = false) String currency) {
+        return accountRepository.find(Account.Id.of(id))
+                .map(account -> new Account(account.id(), account.number(), convert(currency, account.balance())))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping(path = "/number={number}")
-    public Account findAccountByNumber(@PathVariable String number, @RequestParam(required = false) String currency) {
-        return new Account(
-                Account.Id.of("78743420-8ce9-11ec-b0d0-57b77255c208"),
-                Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8)),
-                convert(currency, Money.of("456.78", "EUR"))
-        );
+    public ResponseEntity<Account> findAccountByNumber(@PathVariable String number, @RequestParam(required = false) String currency) {
+        return accountRepository.find(Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8)))
+                .map(account -> new Account(account.id(), account.number(), convert(currency, account.balance())))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     private Money convert(String currency, Money money) {
