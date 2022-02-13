@@ -1,6 +1,6 @@
 package pl.cleankod
 
-class BaseApplicationSpecification {
+abstract class BaseApplicationSpecification {
   static init = true
 
   @SuppressWarnings('unused')
