@@ -3,7 +3,7 @@ package pl.cleankod.exchange.entrypoint;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.cleankod.exchange.core.domain.Account;
-import pl.cleankod.exchange.core.gateway.CurrencyConverter;
+import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 
@@ -19,7 +19,7 @@ public class AccountController {
 
     private final AccountRepository accountRepository;
 
-    private final CurrencyConverter currencyConverter = new CurrencyConverter() {
+    private final CurrencyConversionService currencyConverter = new CurrencyConversionService() {
         private static final BigDecimal PLN_TO_EUR_RATE = BigDecimal.valueOf(4.58d);
         private static final BigDecimal EUR_TO_PLN_RATE = BigDecimal.valueOf(0.22d);
         @Override
