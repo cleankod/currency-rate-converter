@@ -15,11 +15,16 @@ java {
 }
 
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.3'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
+
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy:3.0.9'
 
     // Use the awesome Spock testing and specification framework even with Java
     testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
+
+    testImplementation 'org.apache.httpcomponents:httpclient:4.5.13'
 }
 
 
