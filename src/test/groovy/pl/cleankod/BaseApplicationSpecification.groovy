@@ -22,9 +22,13 @@ abstract class BaseApplicationSpecification extends Specification {
   }
 
   static <T> T get(String path, Class<T> responseType) {
-    HttpGet httpGet = new HttpGet(baseUrl + path)
-    HttpResponse response = execute(httpGet)
+    HttpResponse response = getResponse(path)
     return transform(response, responseType)
+  }
+
+  static HttpResponse getResponse(String path) {
+    HttpGet httpGet = new HttpGet(baseUrl + path)
+    return execute(httpGet)
   }
 
   static <T> T transform(HttpResponse httpResponse, Class<T> classOfT) {
