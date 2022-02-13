@@ -3,47 +3,57 @@ package pl.cleankod.exchange.entrypoint;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.cleankod.exchange.core.domain.Account;
-import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
-import pl.cleankod.exchange.core.domain.Money;
-import pl.cleankod.exchange.core.gateway.AccountRepository;
+import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
+import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Currency;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/accounts")
 public class AccountController {
 
-    private final AccountRepository accountRepository;
-    private final CurrencyConversionService currencyConversionService;
+    private final FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase;
+    private final FindAccountUseCase findAccountUseCase;
 
-    public AccountController(AccountRepository accountRepository, CurrencyConversionService currencyConversionService) {
-        this.accountRepository = accountRepository;
-        this.currencyConversionService = currencyConversionService;
+    public AccountController(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
+                             FindAccountUseCase findAccountUseCase) {
+        this.findAccountAndConvertCurrencyUseCase = findAccountAndConvertCurrencyUseCase;
+        this.findAccountUseCase = findAccountUseCase;
     }
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<Account> findAccountById(@PathVariable String id, @RequestParam(required = false) String currency) {
-        return accountRepository.find(Account.Id.of(id))
-                .map(account -> new Account(account.id(), account.number(), convert(currency, account.balance())))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return Optional.ofNullable(currency)
+                .map(s ->
+                        findAccountAndConvertCurrencyUseCase.execute(Account.Id.of(id), Currency.getInstance(s))
+                                .map(ResponseEntity::ok)
+                                .orElse(ResponseEntity.notFound().build())
+                )
+                .orElseGet(() ->
+                        findAccountUseCase.execute(Account.Id.of(id))
+                                .map(ResponseEntity::ok)
+                                .orElse(ResponseEntity.notFound().build())
+                );
     }
 
     @GetMapping(path = "/number={number}")
     public ResponseEntity<Account> findAccountByNumber(@PathVariable String number, @RequestParam(required = false) String currency) {
-        return accountRepository.find(Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8)))
-                .map(account -> new Account(account.id(), account.number(), convert(currency, account.balance())))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Account.Number accountNumber = Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8));
+        return Optional.ofNullable(currency)
+                .map(s ->
+                        findAccountAndConvertCurrencyUseCase.execute(accountNumber, Currency.getInstance(s))
+                                .map(ResponseEntity::ok)
+                                .orElse(ResponseEntity.notFound().build())
+                )
+                .orElseGet(() ->
+                        findAccountUseCase.execute(accountNumber)
+                                .map(ResponseEntity::ok)
+                                .orElse(ResponseEntity.notFound().build())
+                );
     }
 
-    private Money convert(String currency, Money money) {
-        if (currency != null) {
-            return money.convert(currencyConversionService, Currency.getInstance(currency));
-        }
-        return money;
-    }
 
 }
