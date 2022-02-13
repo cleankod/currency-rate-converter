@@ -35,7 +35,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         response == new Account(
                 Account.Id.of(accountId),
                 Account.Number.of("65 1090 1665 0000 0001 0373 7343"),
-                Money.of("565.40", currency)
+                Money.of("27.16", currency)
         )
     }
 
@@ -61,13 +61,13 @@ class AccountSpecification extends BaseApplicationSpecification {
         def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
 
         when:
-        Account response = get("/accounts/number=${accountNumberUrlEncoded}", Account)
+        Account response = get("/accounts/number=${accountNumberUrlEncoded}?currency=PLN", Account)
 
         then:
         response == new Account(
                 Account.Id.of("78743420-8ce9-11ec-b0d0-57b77255c208"),
                 Account.Number.of(accountNumberValue),
-                Money.of("456.78", "EUR")
+                Money.of("2092.05", "PLN")
         )
     }
 
