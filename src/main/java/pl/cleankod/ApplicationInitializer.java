@@ -6,6 +6,8 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
+import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
+import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 import pl.cleankod.exchange.entrypoint.AccountController;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionStubService;
@@ -28,8 +30,21 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    AccountController accountController(AccountRepository accountRepository,
-                                        CurrencyConversionService currencyConversionService) {
-        return new AccountController(accountRepository, currencyConversionService);
+    FindAccountUseCase findAccountUseCase(AccountRepository accountRepository) {
+        return new FindAccountUseCase(accountRepository);
+    }
+
+    @Bean
+    FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase(
+            AccountRepository accountRepository,
+            CurrencyConversionService currencyConversionService
+    ) {
+        return new FindAccountAndConvertCurrencyUseCase(accountRepository, currencyConversionService);
+    }
+
+    @Bean
+    AccountController accountController(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
+                                        FindAccountUseCase findAccountUseCase) {
+        return new AccountController(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
     }
 }
