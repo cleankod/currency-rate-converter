@@ -45,12 +45,12 @@ Will produce:
 Black-box testing is mostly used in order to favor refactoring. It is much simpler to completely change the underlying
 implementation of a use case without changing the tests.
 
-# Framework-less tests
+## Framework-less tests
 Only the `BaseApplicationSpecification` contains library-specific code but no framework-specific initialization.
 This approach eases the migration to other potential framework or toolset. The whole specification for the project
 stays the same.
 
-# Framework-less modules' core
+## Framework-less modules' core
 Wherever possible, no Framework-specific or library-specific stuff was used inside the actual modules' core.
 This also eases potential framework change or upgrade. The framework upgrade could also be more seamless for all
 of those changes that are not backwards compatible because framework specific stuff is kept in one place and the
@@ -64,7 +64,7 @@ you can use: `find(Account.Id id)`, `find(Account.Number number)`), encapsulates
 
 Also, value-objects are responsible for a little more than just plain data holding.
 
-## To do
+# To do
 * Circuit-breaker for the NBP API client.
 * Caching the NBP API results.
 * Better error handling, especially of potential errors from NBP API.
