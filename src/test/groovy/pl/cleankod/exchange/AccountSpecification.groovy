@@ -3,12 +3,12 @@ package pl.cleankod.exchange
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import org.apache.http.HttpResponse
 import pl.cleankod.BaseApplicationSpecification
 import pl.cleankod.exchange.core.domain.Account
 import pl.cleankod.exchange.core.domain.Money
 
 import java.nio.charset.StandardCharsets
-
 
 class AccountSpecification extends BaseApplicationSpecification {
 
@@ -84,14 +84,11 @@ class AccountSpecification extends BaseApplicationSpecification {
         def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
 
         when:
-        Account response = get("/accounts/number=${accountNumberUrlEncoded}?currency=PLN", Account)
+        HttpResponse response = getResponse("/accounts/number=${accountNumberUrlEncoded}?currency=PLN")
 
         then:
-        response == new Account(
-                Account.Id.of("78743420-8ce9-11ec-b0d0-57b77255c208"),
-                Account.Number.of(accountNumberValue),
-                Money.of("2092.05", "PLN")
-        )
+        response.getStatusLine().getStatusCode() == 400
+        transformError(response).message() == "Cannot convert currency from EUR to PLN."
     }
 
     def "should not find an account by ID"() {

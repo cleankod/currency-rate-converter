@@ -38,8 +38,7 @@ public class FindAccountAndConvertCurrencyUseCase {
         }
 
         if (!money.currency().equals(targetCurrency)) {
-            //TODO: Custom exception
-            throw new IllegalStateException("Cannot convert from " + money.currency() + " to " + targetCurrency);
+            throw new CurrencyConversionException(money.currency(), targetCurrency);
         }
 
         return money;
