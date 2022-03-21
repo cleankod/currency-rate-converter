@@ -77,3 +77,4 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * Auto generating REST API docs.
 * CI.
 * Integration tests with the real NBP API.
+* Replace Spring Framework with a different one.
