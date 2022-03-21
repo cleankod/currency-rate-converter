@@ -12,11 +12,14 @@ public class FindAccountAndConvertCurrencyUseCase {
 
     private final AccountRepository accountRepository;
     private final CurrencyConversionService currencyConversionService;
+    private final Currency baseCurrency;
 
     public FindAccountAndConvertCurrencyUseCase(AccountRepository accountRepository,
-                                                CurrencyConversionService currencyConversionService) {
+                                                CurrencyConversionService currencyConversionService,
+                                                Currency baseCurrency) {
         this.accountRepository = accountRepository;
         this.currencyConversionService = currencyConversionService;
+        this.baseCurrency = baseCurrency;
     }
 
     public Optional<Account> execute(Account.Id id, Currency targetCurrency) {
@@ -30,6 +33,15 @@ public class FindAccountAndConvertCurrencyUseCase {
     }
 
     private Money convert(Money money, Currency targetCurrency) {
-        return money.convert(currencyConversionService, targetCurrency);
+        if (!baseCurrency.equals(targetCurrency)) {
+            return money.convert(currencyConversionService, targetCurrency);
+        }
+
+        if (!money.currency().equals(targetCurrency)) {
+            //TODO: Custom exception
+            throw new IllegalStateException("Cannot convert from " + money.currency() + " to " + targetCurrency);
+        }
+
+        return money;
     }
 }
