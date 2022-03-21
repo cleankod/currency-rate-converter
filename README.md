@@ -21,22 +21,18 @@ http://localhost:8080/accounts/fa07c538-8ce4-11ec-9ad5-4f5a625cd744?currency=EUR
 
 Sample request by account number:
 ```
-http://localhost:8080/accounts/number=65+1090+1665+0000+0001+0373+7343?currency=PLN
+http://localhost:8080/accounts/number=65+1090+1665+0000+0001+0373+7343?currency=EUR
 ```
 
 Will produce:
 ```json
 {
-    "balance": {
-        "amount": 27.27,
-        "currency": "EUR"
-    },
-    "id": {
-        "value": "fa07c538-8ce4-11ec-9ad5-4f5a625cd744"
-    },
-    "number": {
-        "value": "65 1090 1665 0000 0001 0373 7343"
-    }
+  "balance": {
+    "amount": 27.27,
+    "currency": "EUR"
+  },
+  "id": "fa07c538-8ce4-11ec-9ad5-4f5a625cd744",
+  "number": "65 1090 1665 0000 0001 0373 7343"
 }
 ```
 
@@ -75,4 +71,3 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * Auto generating REST API docs.
 * CI.
 * Integration tests with the real NBP API.
-* Simple value object serialization (to avoid `value` nested field in JSON).
