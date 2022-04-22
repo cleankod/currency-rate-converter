@@ -74,7 +74,7 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * Circuit-breaker for the NBP API client.
 * Better logging with traceability.
 * Test coverage report.
-* Auto generating REST API docs.
+  * DONE, Auto generating REST API docs. 
 * Integration tests with the real NBP API.
 * Replace Spring Framework with a different one.
 * The proposed architecture is not perfect. Suggest improvements.
