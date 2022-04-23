@@ -7,12 +7,13 @@
 
 name: Gradle Package
 
-#on:
-#  release:
-#    types: [created]
 on:
   push:
-    branches: [ testing ]
+    branches: [testing]
+  pull_request:
+    types: [opened, reopened, synchronize]
+  pull_request_review:
+    types: [submitted, edited]
 
 jobs:
   build:
