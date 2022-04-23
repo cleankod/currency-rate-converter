@@ -1,37 +1,65 @@
 plugins {
+    id 'org.springframework.boot' version '3.0.0-M2'
     id 'java'
-
-    // Apply the groovy plugin to also add support for Groovy (needed for Spock)
     id 'groovy'
+}
+
+group = 'pl.cleankod'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
     mavenCentral()
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    maven { url 'https://repo.spring.io/milestone' }
+    maven { url 'https://repo.spring.io/snapshot' }
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.3'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.7'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
-    implementation 'org.springdoc:springdoc-openapi-ui:1.6.4'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.7'
 
     // Use the latest Groovy version for Spock testing
-    testImplementation 'org.codehaus.groovy:groovy:3.0.9'
+    testImplementation 'org.codehaus.groovy:groovy:3.0.10'
 
     // Use the awesome Spock testing and specification framework even with Java
-    testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
+    testImplementation 'org.spockframework:spock-core:2.1-groovy-3.0'
 
     testImplementation 'org.apache.httpcomponents:httpclient:4.5.13'
-    testImplementation 'com.github.tomakehurst:wiremock-jre8:2.27.2'
-}
+    testImplementation 'com.github.tomakehurst:wiremock-jre8:2.33.0'
 
+
+}
 
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+//publishing {
+//    repositories {
+//        maven {
+//            name = "GitHubPackages"
+//            url = uri("https://maven.pkg.github.com/evatikiotis/currency-rate-converter")
+//            credentials {
+//                username = System.getenv("USERNAME")
+//                password = System.getenv("TOKEN")
+//            }
+//        }
+//    }
+//    publications {
+//        maven(MavenPublication) {
+//            groupId = 'pl.cleankod'
+//            artifactId = 'currency-rate-converter'
+//            version = '1.1'
+//            from(components.java)
+//        }
+//    }
+//}
