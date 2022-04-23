@@ -12,7 +12,7 @@ name: Gradle Package
 #    types: [created]
 on:
   push:
-    branches: [ feature/continous-integration-CI ]
+    branches: [ testing ]
 
 jobs:
   build:
