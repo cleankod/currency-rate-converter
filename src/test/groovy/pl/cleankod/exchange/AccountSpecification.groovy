@@ -112,4 +112,5 @@ class AccountSpecification extends BaseApplicationSpecification {
         then:
         response.getStatusLine().getStatusCode() == 404
     }
+
 }
