@@ -8,8 +8,6 @@
 name: Gradle Package
 
 on:
-  push:
-    branches: [testing]
   pull_request:
     types: [opened, reopened, synchronize]
   pull_request_review:
