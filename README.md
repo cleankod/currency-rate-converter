@@ -1,3 +1,7 @@
+![branches coverage](.github/badges/branches.svg)
+![jacoco analysis](.github/badges/jacoco.svg)
+
+[![Gradle Package](https://github.com/evatikiotis/currency-rate-converter/actions/workflows/gradle-package.yml/badge.svg?branch=feature%2Fcontinous-integration-CI&event=push)](https://github.com/evatikiotis/currency-rate-converter/actions/workflows/gradle-package.yml)
 # About
 This is an example project that calculates the amount balance to a given currency.
 

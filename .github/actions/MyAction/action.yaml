@@ -1,0 +1,10 @@
+name: My Custom Action
+description: This is a custom action
+
+
+runs:
+  using: "composite"
+  steps:
+  - name: echooo
+    shell: bash
+    run: echo ooooleee
