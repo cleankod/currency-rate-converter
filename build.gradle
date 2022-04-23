@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '3.0.0-M2'
     id 'java'
     id 'groovy'
+    id 'jacoco'
 }
 
 group = 'pl.cleankod'
@@ -39,8 +40,27 @@ dependencies {
 
 }
 
-tasks.named('test') {
+test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport // report is always generated after tests run
+}
+
+jacocoTestReport {
+    dependsOn test // tests are required to run before generating the report
+}
+
+jacoco {
+    toolVersion = "0.8.7"
+    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        csv.required = true
+        html.required = true
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
 }
 
 //publishing {
