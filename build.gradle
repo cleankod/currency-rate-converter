@@ -4,9 +4,9 @@ plugins {
     id 'groovy'
     id 'jacoco'
 }
-
+apply from: 'version.gradle'
 group = 'pl.cleankod'
-version = '0.0.1-SNAPSHOT'
+version = loadVersion().getVersion()
 sourceCompatibility = '17'
 
 configurations {
@@ -60,6 +60,10 @@ jacocoTestReport {
         csv.required = true
         html.required = true
     }
+}
+
+task printVersion {
+    println project.version
 }
 
 //publishing {

@@ -9,8 +9,7 @@ name: Gradle Package
 
 on:
   push:
-    branches:
-      - develop
+    branches: [feature/**,develop]
   pull_request:
     types: [opened, reopened, synchronize]
   pull_request_review:
@@ -18,18 +17,35 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/MyAction
     - uses: ./.github/actions/BuildAction
-    - uses: ./.github/actions/JacocoBadge
-    - uses: ./.github/actions/TestAndCoverageReportAction
+#    - uses: ./.github/actions/JacocoBadge
+#    - uses: ./.github/actions/TestAndCoverageReportAction
 
+    - name: Get artifact name
+      id: get_artifact_name
+      run: |
+        artifactName=$(./gradlew printVersion | grep '[0-9].[0-9].[0-9]-SNAPSHOT')
+        echo $artifactName
+        echo "##[set-output name=artifactName;]${artifactName}"
 
     - name: Step 3 - Use the Upload Artifact GitHub Action
       uses: actions/upload-artifact@v2
       with:
-        name: artifact
-        path: build/libs/currency-rate-converter-0.0.1-SNAPSHOT.jar
+        name: "currency-rate-converter-${{ steps.get_artifact_name.outputs.artifactName }}.jar"
+        path: "build/libs/currency-rate-converter-${{ steps.get_artifact_name.outputs.artifactName }}.jar"
+
+  create_and_publish_docker_image:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/download-artifact@v3
+      with:
+        name: currency-rate-converter-2.0.0-SNAPSHOT.jar
+
+    - name: Display structure of downloaded files
+      run: ls -R
