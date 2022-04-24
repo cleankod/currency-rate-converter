@@ -22,6 +22,7 @@ import pl.cleankod.exchange.entrypoint.AccountController;
 import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
+import pl.cleankod.exchange.provider.CurrencyConversionNbpServiceWithCircuitBraker;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class ApplicationInitializer {
 
     @Bean
     CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
-        return new CurrencyConversionNbpService(exchangeRatesNbpClient);
+        return new CurrencyConversionNbpServiceWithCircuitBraker(exchangeRatesNbpClient);
     }
 
     @Bean
