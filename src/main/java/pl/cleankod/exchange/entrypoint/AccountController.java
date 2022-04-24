@@ -1,7 +1,10 @@
 package pl.cleankod.exchange.entrypoint;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpResponseFactory;
+import io.micronaut.http.HttpStatus;
+import io.micronaut.http.annotation.*;
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
@@ -11,8 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Currency;
 import java.util.Optional;
 
-@RestController
-@RequestMapping("/accounts")
+@Controller("/accounts")
 public class AccountController {
 
     private final FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase;
@@ -24,36 +26,34 @@ public class AccountController {
         this.findAccountUseCase = findAccountUseCase;
     }
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<Account> findAccountById(@PathVariable String id, @RequestParam(required = false) String currency) {
+    @Get("/{id}")
+    public HttpResponse<Account> findAccountById(@PathVariable String id, @Nullable @QueryValue String currency) {
         return Optional.ofNullable(currency)
                 .map(s ->
                         findAccountAndConvertCurrencyUseCase.execute(Account.Id.of(id), Currency.getInstance(s))
-                                .map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build())
+                                .map(HttpResponseFactory.INSTANCE::ok)
+                                .orElseGet(() -> HttpResponseFactory.INSTANCE.status(HttpStatus.NOT_FOUND))
                 )
                 .orElseGet(() ->
                         findAccountUseCase.execute(Account.Id.of(id))
-                                .map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build())
+                                .map(HttpResponseFactory.INSTANCE::ok)
+                                .orElseGet(() -> HttpResponseFactory.INSTANCE.status(HttpStatus.NOT_FOUND))
                 );
     }
 
-    @GetMapping(path = "/number={number}")
-    public ResponseEntity<Account> findAccountByNumber(@PathVariable String number, @RequestParam(required = false) String currency) {
+    @Get("/number={number}")
+    public HttpResponse<Account> findAccountByNumber(@PathVariable String number, @Nullable @QueryValue String currency) {
         Account.Number accountNumber = Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8));
         return Optional.ofNullable(currency)
                 .map(s ->
                         findAccountAndConvertCurrencyUseCase.execute(accountNumber, Currency.getInstance(s))
-                                .map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build())
+                                .map(HttpResponseFactory.INSTANCE::ok)
+                                .orElseGet(() -> HttpResponseFactory.INSTANCE.status(HttpStatus.NOT_FOUND))
                 )
                 .orElseGet(() ->
                         findAccountUseCase.execute(accountNumber)
-                                .map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build())
+                                .map(HttpResponseFactory.INSTANCE::ok)
+                                .orElseGet(() -> HttpResponseFactory.INSTANCE.status(HttpStatus.NOT_FOUND))
                 );
     }
-
-
 }

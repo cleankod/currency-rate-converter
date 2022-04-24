@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-
+    id 'io.micronaut.minimal.application' version '3.3.2'
     // Apply the groovy plugin to also add support for Groovy (needed for Spock)
     id 'groovy'
 }
@@ -14,20 +14,39 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+micronaut {
+    version '3.4.2'
+}
+
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.3'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
+    annotationProcessor 'io.micronaut:micronaut-http-validation'
+    annotationProcessor 'io.micronaut:micronaut-inject-java'
+    annotationProcessor 'io.micronaut:micronaut-validation'
+    annotationProcessor 'io.micronaut.openapi:micronaut-openapi'
+
+    implementation 'io.micronaut:micronaut-inject'
+    implementation 'io.swagger.core.v3:swagger-annotations'
+    implementation 'io.micronaut:micronaut-validation'
+    implementation 'io.micronaut:micronaut-runtime'
+    implementation 'io.micronaut:micronaut-http-server-netty'
+    implementation 'io.micronaut:micronaut-http-client'
+    implementation 'ch.qos.logback:logback-classic'
+
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
 
+    testAnnotationProcessor 'io.micronaut:micronaut-inject-java'
+
+    testImplementation "io.micronaut.test:micronaut-test-spock"
+
     // Use the latest Groovy version for Spock testing
-    testImplementation 'org.codehaus.groovy:groovy:3.0.9'
+    testImplementation 'org.codehaus.groovy:groovy:3.0.10'
 
     // Use the awesome Spock testing and specification framework even with Java
-    testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
+    testImplementation 'org.spockframework:spock-core:2.1-groovy-3.0'
 
     testImplementation 'org.apache.httpcomponents:httpclient:4.5.13'
-    testImplementation 'com.github.tomakehurst:wiremock-jre8:2.27.2'
+    testImplementation 'com.github.tomakehurst:wiremock-jre8:2.33.0'
 }
 
 

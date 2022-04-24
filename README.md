@@ -76,5 +76,5 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * Test coverage report.
 * Auto generating REST API docs.
 * Integration tests with the real NBP API.
-* Replace Spring Framework with a different one.
+* Replace Spring Framework with a different one. ✔️
 * The proposed architecture is not perfect. Suggest improvements.
