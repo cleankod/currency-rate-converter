@@ -70,7 +70,7 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ghcr.io/evatikiotis/currency-rate-converter:1.0
+        tags: ghcr.io/evatikiotis/currency-rate-converter:1.1
 
 
 
