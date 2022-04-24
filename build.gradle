@@ -32,10 +32,13 @@ dependencies {
     implementation 'io.micronaut:micronaut-http-server-netty'
     implementation 'io.micronaut:micronaut-http-client'
     implementation 'ch.qos.logback:logback-classic'
+    implementation 'io.micronaut.cache:micronaut-cache-caffeine'
 
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
     implementation 'io.github.openfeign:feign-hystrix:11.8'
+
+    compileOnly 'io.micronaut:micronaut-aop'
 
     testAnnotationProcessor 'io.micronaut:micronaut-inject-java'
 

@@ -70,7 +70,7 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * Move parameter-specific logic outside the controller.
 * Replace exceptions with `Result` (`either`) which improves the overall methods API readability and forces error handling. Look into [cleankod/architecture-archetype](https://github.com/cleankod/architecture-archetype) as a starting point.
 * Better error handling, especially of potential errors from NBP API.
-* Caching the NBP API results.
+* Caching the NBP API results. ✔
 * Circuit-breaker for the NBP API client. ✔
   Added Hystrix implementation of the client Feign with fallback
 * Better logging with traceability. ✔ Added logback and generated request id

@@ -1,6 +1,7 @@
 package pl.cleankod.exchange
 
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.http.Fault
 import org.apache.http.HttpResponse
@@ -30,6 +31,10 @@ class AccountSpecification extends BaseApplicationSpecification {
                 get("/exchangerates/rates/A/EUR/2022-02-08")
                         .willReturn(ok(body))
         )
+    }
+
+    void setup() {
+        wireMockServer.resetRequests()
     }
 
     def cleanupSpec() {
@@ -69,7 +74,7 @@ class AccountSpecification extends BaseApplicationSpecification {
 
     def "should return a readable message if NBP service is not available"() {
         given:
-        wireMockServer.stubFor(
+        def stub = wireMockServer.stubFor(
                 get("/exchangerates/rates/A/EUR/2022-02-08")
                         .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
         )
@@ -85,6 +90,27 @@ class AccountSpecification extends BaseApplicationSpecification {
                 Account.Id.of(accountId),
                 Account.Number.of(PLN_ACCOUNT_NUMBER)
         )
+        wireMockServer.removeStub(stub)
+    }
+
+    def "should request NBP service only once"() {
+        given:
+        def accountId = PLN_ACCOUNT_ID
+        def currency = "EUR"
+
+        when:
+        Account response1 = get("/accounts/${accountId}?currency=${currency}", Account)
+        Account response2 = get("/accounts/${accountId}?currency=${currency}", Account)
+
+        then:
+        wireMockServer.verify(exactly(1),
+                getRequestedFor(urlEqualTo("/exchangerates/rates/A/EUR/2022-02-08")))
+        response1 == new Account(
+                Account.Id.of(accountId),
+                Account.Number.of(PLN_ACCOUNT_NUMBER),
+                Money.of("27.16", currency)
+        )
+        response1 == response2
     }
 
     def "should return an account by number"() {

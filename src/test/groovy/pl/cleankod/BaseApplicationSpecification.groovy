@@ -1,6 +1,7 @@
 package pl.cleankod
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.micronaut.cache.CacheManager
 import io.micronaut.context.env.Environment
 import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
@@ -23,11 +24,21 @@ abstract class BaseApplicationSpecification extends Specification {
   private EmbeddedServer embeddedServer
   @Shared
   private String baseUrl
+  @Shared
+  @Inject
+  private CacheManager cacheManager
 
   @SuppressWarnings('unused')
   def setupSpec() {
     baseUrl = "http://${embeddedServer.host}:${embeddedServer.port}"
     println(baseUrl)
+  }
+
+  void setup() {
+    println("!!!!!!")
+    cacheManager.getCacheNames().stream()
+            .map(cache -> cacheManager.getCache(cache))
+            .forEach(cache -> cache.invalidateAll())
   }
 
   def <T> T get(String path, Class<T> responseType) {
