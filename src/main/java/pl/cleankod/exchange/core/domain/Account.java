@@ -6,6 +6,9 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 public record Account(Id id, Number number, Money balance) {
+    public Account(Id id, Number number) {
+        this(id, number, null);
+    }
 
     public record Id(UUID value) {
         public Id {

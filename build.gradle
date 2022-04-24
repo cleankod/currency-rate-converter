@@ -35,6 +35,7 @@ dependencies {
 
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
+    implementation 'io.github.openfeign:feign-hystrix:11.8'
 
     testAnnotationProcessor 'io.micronaut:micronaut-inject-java'
 

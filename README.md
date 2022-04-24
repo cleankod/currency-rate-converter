@@ -71,8 +71,9 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * Replace exceptions with `Result` (`either`) which improves the overall methods API readability and forces error handling. Look into [cleankod/architecture-archetype](https://github.com/cleankod/architecture-archetype) as a starting point.
 * Better error handling, especially of potential errors from NBP API.
 * Caching the NBP API results.
-* Circuit-breaker for the NBP API client.
-* Better logging with traceability.
+* Circuit-breaker for the NBP API client. ✔
+  Added Hystrix implementation of the client Feign with fallback
+* Better logging with traceability. ✔ Added logback and generated request id
 * Test coverage report. ✔ (Added plugin jacoco, report can be found in the folder build/reports/jacoco)
 * Auto generating REST API docs. ✔
   (The openapi specification is available after application start on address http://localhost:8080/swagger/currency-rate-converter-0.1.yml)

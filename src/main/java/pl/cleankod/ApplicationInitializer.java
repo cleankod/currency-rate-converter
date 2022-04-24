@@ -2,6 +2,8 @@ package pl.cleankod;
 
 import feign.Feign;
 import feign.httpclient.ApacheHttpClient;
+import feign.hystrix.FallbackFactory;
+import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import io.micronaut.context.annotation.Bean;
@@ -21,8 +23,10 @@ import pl.cleankod.exchange.entrypoint.GlobalExceptionHandler;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
+import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
 
 import java.util.Currency;
+import java.util.Optional;
 
 @OpenAPIDefinition(
         info = @Info(
@@ -45,11 +49,12 @@ public class ApplicationInitializer {
 
     @Bean
     ExchangeRatesNbpClient exchangeRatesNbpClient(@Property(name = "provider.nbp-api.base-url") String nbpApiBaseUrl) {
-        return Feign.builder()
+        FallbackFactory<ExchangeRatesNbpClient> fallbackFactory = cause -> (table, currency) -> null;
+        return HystrixFeign.builder()
                 .client(new ApacheHttpClient())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
-                .target(ExchangeRatesNbpClient.class, nbpApiBaseUrl);
+                .target(ExchangeRatesNbpClient.class, nbpApiBaseUrl, fallbackFactory);
     }
 
     @Bean
