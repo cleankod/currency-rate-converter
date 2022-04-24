@@ -73,8 +73,16 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * Caching the NBP API results.
 * Circuit-breaker for the NBP API client.
 * Better logging with traceability.
-* Test coverage report.
-* Auto generating REST API docs.
-* Integration tests with the real NBP API.
+* Test coverage report. ✔ (Added plugin jacoco, report can be found in the folder build/reports/jacoco)
+* Auto generating REST API docs. ✔
+  (The openapi specification is available after application start on address http://localhost:8080/swagger/currency-rate-converter-0.1.yml)
+* Integration tests with the real NBP API. ✔
 * Replace Spring Framework with a different one. ✔️
-* The proposed architecture is not perfect. Suggest improvements.
+  (Replaced with micronaut framework.)
+* The proposed architecture is not perfect. Suggest improvements. ✔
+
+## Suggested improvements
+
+* Classes FindAccountAndConvertCurrencyUseCase and FindAccountUseCase should be renamed to not contain verb in the name.
+* Class Money doesn't need method convert.
+* Separate the conversion service and NBP client

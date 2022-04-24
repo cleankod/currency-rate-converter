@@ -1,2 +1,8 @@
 provider.nbp-api.base-url: http://api.nbp.pl/api
 app.base-currency: PLN
+micronaut:
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
