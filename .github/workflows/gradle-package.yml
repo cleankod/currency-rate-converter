@@ -46,6 +46,7 @@ jobs:
     - uses: actions/download-artifact@v3
       with:
         name: currency-rate-converter-2.0.0-SNAPSHOT.jar
+        path: ~/build/libs
 
     - name: Display structure of downloaded files
       run: ls -R
