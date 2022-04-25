@@ -3,6 +3,8 @@ package pl.cleankod.exchange.provider;
 import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
+import pl.cleankod.exchange.provider.nbp.command.FetchRatesCommand;
+import pl.cleankod.exchange.provider.nbp.exceptions.NbpAPIException;
 import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
 
 import java.math.BigDecimal;
@@ -18,7 +20,14 @@ public class CurrencyConversionNbpService implements CurrencyConversionService {
 
     @Override
     public Money convert(Money money, Currency targetCurrency) {
-        RateWrapper rateWrapper = exchangeRatesNbpClient.fetch("A", targetCurrency.getCurrencyCode());
+        FetchRatesCommand fetchRatesCommand = new FetchRatesCommand(
+                "nbpClient",
+                exchangeRatesNbpClient,
+                targetCurrency);
+        RateWrapper rateWrapper = fetchRatesCommand.execute();
+        if (rateWrapper == null) {
+            throw new NbpAPIException();
+        }
         BigDecimal midRate = rateWrapper.rates().get(0).mid();
         BigDecimal calculatedRate = money.amount().divide(midRate, RoundingMode.HALF_UP);
         return new Money(calculatedRate, targetCurrency);
