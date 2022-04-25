@@ -26,6 +26,11 @@ public class AccountController {
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<Account> findAccountById(@PathVariable String id, @RequestParam(required = false) String currency) {
+//        try {
+//            Currency.getInstance("EURO");
+//        } catch (IllegalArgumentException ex) {
+//            throw ex;
+//        }
         return Optional.ofNullable(currency)
                 .map(s ->
                         findAccountAndConvertCurrencyUseCase.execute(Account.Id.of(id), Currency.getInstance(s))
