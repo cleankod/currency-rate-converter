@@ -7,6 +7,8 @@ import org.apache.http.HttpResponse
 import pl.cleankod.BaseApplicationSpecification
 import pl.cleankod.exchange.core.domain.Account
 import pl.cleankod.exchange.core.domain.Money
+import pl.cleankod.exchange.entrypoint.model.ApiError
+import pl.cleankod.exchange.provider.nbp.exceptions.NbpAPIException
 
 import java.nio.charset.StandardCharsets
 
@@ -100,6 +102,21 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         then:
         response.getStatusLine().getStatusCode() == 404
+    }
+
+    def "should handle NBP API error"() {
+        given:
+        wireMockServer.stubFor(
+                WireMock.get("/exchangerates/rates/A/EUR/2022-02-08")
+                        .willReturn(WireMock.serviceUnavailable())
+        )
+        def accountId = "fa07c538-8ce4-11ec-9ad5-4f5a625cd744"
+        def currency = "EUR"
+
+        when:
+        ApiError apiError = get("/accounts/${accountId}?currency=${currency}", ApiError)
+        then:
+        apiError.message() == NbpAPIException.message
     }
 
     def "should not find an account by number"() {

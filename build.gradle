@@ -4,9 +4,9 @@ plugins {
     id 'groovy'
     id 'jacoco'
 }
-
+apply from: 'version.gradle'
 group = 'pl.cleankod'
-version = '0.0.1-SNAPSHOT'
+version = loadVersion().getVersion()
 sourceCompatibility = '17'
 
 configurations {
@@ -22,7 +22,11 @@ repositories {
 }
 
 dependencies {
+
+    implementation 'org.springframework.boot:spring-boot-starter-actuator:2.6.7'
     implementation 'org.springframework.boot:spring-boot-starter-web:2.6.7'
+
+    implementation 'com.netflix.hystrix:hystrix-core:1.5.18'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
@@ -60,6 +64,10 @@ jacocoTestReport {
         csv.required = true
         html.required = true
     }
+}
+
+task printVersion {
+    println project.version
 }
 
 //publishing {
