@@ -25,24 +25,28 @@ abstract class BaseApplicationSpecification extends Specification {
     @SuppressWarnings('unused')
     def setupSpec() {
         if (init) {
-            SimpleModule module = new SimpleModule()
-            module.setDeserializerModifier(new BeanDeserializerModifier() {
-                @Override
-                JsonDeserializer<?> modifyDeserializer(
-                        DeserializationConfig config, BeanDescription beanDesc, JsonDeserializer<?> deserializer) {
-                    if (beanDesc.getBeanClass() == Account.class) {
-                        return new AccountDeserializer()
-                    } else if (beanDesc.getBeanClass() == ApiError.class) {
-                        return new ApiErrorDeserializer()
-                    }
-                    return deserializer
-                }
-            })
-
-            objectMapper.registerModule(module)
+            registerCustomDeserializers()
             ApplicationInitializer.main(new String[0])
             init = false
         }
+    }
+
+    void registerCustomDeserializers() {
+        SimpleModule module = new SimpleModule()
+        module.setDeserializerModifier(new BeanDeserializerModifier() {
+            @Override
+            JsonDeserializer<?> modifyDeserializer(
+                    DeserializationConfig config, BeanDescription beanDesc, JsonDeserializer<?> deserializer) {
+                if (beanDesc.getBeanClass() == Account.class) {
+                    return new AccountDeserializer()
+                } else if (beanDesc.getBeanClass() == ApiError.class) {
+                    return new ApiErrorDeserializer()
+                }
+                return deserializer
+            }
+        })
+
+        objectMapper.registerModule(module)
     }
 
     static <T> T get(String path, Class<T> responseType) {
