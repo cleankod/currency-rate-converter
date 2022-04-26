@@ -1,7 +1,5 @@
-name: My Custom Action
-description: This is a custom action
-
-
+name: Build Action
+description: builds the application artifact
 runs:
   using: "composite"
   steps:

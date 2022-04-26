@@ -1,7 +1,6 @@
 name: My Custom Action
 description: This is a custom action
 
-
 runs:
   using: "composite"
   steps:

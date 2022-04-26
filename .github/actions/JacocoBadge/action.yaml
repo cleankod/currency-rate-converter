@@ -1,4 +1,4 @@
-name: My Custom Action
+name: Get Generated Jacoco reports and generate badge
 description: This is a custom action
 
 

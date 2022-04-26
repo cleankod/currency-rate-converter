@@ -20,7 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/actions/MyAction
       - uses: ./.github/actions/BuildAction
       - uses: ./.github/actions/JacocoBadge
       - uses: ./.github/actions/TestAndCoverageReportAction
@@ -47,30 +46,24 @@ jobs:
         with:
           name: currency-rate-converter-2.0.0-SNAPSHOT.jar
           path: ./build/libs
-
-      - name: Display structure of downloaded files
-        run: ls -R
-
       - name: Log in to the Container registry
-        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        uses: docker/login-action@v1
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
       - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        uses: docker/build-push-action@v2
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/evatikiotis/currency-rate-converter:1.1
+          tags: "ghcr.io/${{ github.actor }}/currency-rate-converter:1.1"
+
+
+
+
 
 
 
