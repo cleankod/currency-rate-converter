@@ -30,4 +30,11 @@ public class ExceptionHandlerAdvice {
     protected ResponseEntity<ApiError> handleNbpAPIException(NbpAPIException ex) {
         return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
     }
+
+    @ExceptionHandler({
+            Exception.class
+    })
+    protected ResponseEntity<ApiError> handleIllegalArgumentExcheption(Exception ex) {
+        return ResponseEntity.internalServerError().body(new ApiError("Technical Error. Please try again later"));
+    }
 }
