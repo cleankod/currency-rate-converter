@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
+import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyFooUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 import pl.cleankod.exchange.entrypoint.AccountController;
@@ -64,9 +65,15 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    AccountController accountController(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
-                                        FindAccountUseCase findAccountUseCase) {
-        return new AccountController(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
+    FindAccountAndConvertCurrencyFooUseCase findAccountAndConvertCurrencyFooUseCase(
+            FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
+            FindAccountUseCase findAccountUseCase) {
+
+        return new FindAccountAndConvertCurrencyFooUseCase(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
+    }
+    @Bean
+    AccountController accountController(FindAccountAndConvertCurrencyFooUseCase findAccountAndConvertCurrencyFooUseCase) {
+        return new AccountController(findAccountAndConvertCurrencyFooUseCase);
     }
 
     @Bean
