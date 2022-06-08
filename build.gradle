@@ -21,7 +21,12 @@ dependencies {
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
 
-    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui
+    //circuit breaker
+    implementation 'org.springframework.boot:spring-boot-starter-aop:2.7.0'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator:2.7.0'
+    implementation "io.github.resilience4j:resilience4j-spring-boot2:1.5.0"
+
+    //documentation
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
 
     // Use the latest Groovy version for Spock testing
