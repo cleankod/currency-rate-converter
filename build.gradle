@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-
+    id 'jacoco'
     // Apply the groovy plugin to also add support for Groovy (needed for Spock)
     id 'groovy'
 }
