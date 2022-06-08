@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    // Test coverage report.
     id 'jacoco'
     // Apply the groovy plugin to also add support for Groovy (needed for Spock)
     id 'groovy'
@@ -19,6 +20,9 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
+
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
 
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy:3.0.9'
