@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase;
 import pl.cleankod.exchange.entrypoint.model.AccountDto;
+import pl.cleankod.exchange.entrypoint.model.AccountNumber;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -28,7 +29,7 @@ public class AccountController {
     }
 
     @GetMapping(path = "/number={number}")
-    ResponseEntity<AccountDto> findAccountByNumber(@PathVariable String number, @RequestParam(required = false) Currency currency) {
+    ResponseEntity<AccountDto> findAccountByNumber(@PathVariable @AccountNumber String number, @RequestParam(required = false) Currency currency) {
         Account.Number accountNumber = Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8));
 
         return findAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase.findAccountByAccountNumber(currency, accountNumber)
