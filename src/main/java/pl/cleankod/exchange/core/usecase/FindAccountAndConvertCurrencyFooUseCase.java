@@ -17,17 +17,21 @@ public class FindAccountAndConvertCurrencyFooUseCase {
         this.findAccountUseCase = findAccountUseCase;
     }
 
-    public Optional<AccountDto> findAccountById(String currency, String id) {
-        return Optional.ofNullable(currency)
-                .map(fulfilledCurrency -> findAccountAndConvertCurrencyUseCase.execute(Account.Id.of(id), Currency.getInstance(fulfilledCurrency)))
-                .orElseGet(() -> findAccountUseCase.execute(Account.Id.of(id)))
-                .map(account -> new AccountDto(account.id().value(), account.number().value(), new MoneyDto(account.balance().amount(), account.balance().currency())));
+    public Optional<AccountDto> findAccountById(Currency currency, String id) {
+        if (currency != null) {
+            return findAccountAndConvertCurrencyUseCase.execute(Account.Id.of(id), currency).map(this::toAccountDto);
+        }
+        return findAccountUseCase.execute(Account.Id.of(id)).map(this::toAccountDto);
     }
 
-    public Optional<AccountDto> findAccountByAccountNumber(String currency, Account.Number accountNumber) {
-        return Optional.ofNullable(currency)
-                .map(fulfilledCurrency -> findAccountAndConvertCurrencyUseCase.execute(accountNumber, Currency.getInstance(fulfilledCurrency)))
-                .orElseGet(() -> findAccountUseCase.execute(accountNumber))
-                .map(account -> new AccountDto(account.id().value(), account.number().value(), new MoneyDto(account.balance().amount(), account.balance().currency())));
+    public Optional<AccountDto> findAccountByAccountNumber(Currency currency, Account.Number accountNumber) {
+        if (currency != null) {
+            return findAccountAndConvertCurrencyUseCase.execute(accountNumber, currency).map(this::toAccountDto);
+        }
+        return findAccountUseCase.execute(accountNumber).map(this::toAccountDto);
+    }
+
+    private AccountDto toAccountDto(Account account) {
+        return new AccountDto(account.id().value(), account.number().value(), new MoneyDto(account.balance().amount(), account.balance().currency()));
     }
 }
