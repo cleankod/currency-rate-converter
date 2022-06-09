@@ -3,7 +3,7 @@ package pl.cleankod.exchange.entrypoint;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.cleankod.exchange.core.domain.Account;
-import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyFooUseCase;
+import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase;
 import pl.cleankod.exchange.entrypoint.model.AccountDto;
 
 import java.net.URLDecoder;
@@ -14,15 +14,15 @@ import java.util.Currency;
 @RequestMapping("/accounts")
 public class AccountController {
 
-    private final FindAccountAndConvertCurrencyFooUseCase findAccountAndConvertCurrencyFooUseCase;
+    private final FindAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase findAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase;
 
-    public AccountController(FindAccountAndConvertCurrencyFooUseCase findAccountAndConvertCurrencyFooUseCase) {
-        this.findAccountAndConvertCurrencyFooUseCase = findAccountAndConvertCurrencyFooUseCase;
+    public AccountController(FindAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase findAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase) {
+        this.findAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase = findAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase;
     }
 
     @GetMapping(path = "/{id}")
     ResponseEntity<AccountDto> findAccountById(@PathVariable String id, @RequestParam(required = false) Currency currency) {
-        return findAccountAndConvertCurrencyFooUseCase.findAccountById(currency, id)
+        return findAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase.findAccountById(currency, id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -31,7 +31,7 @@ public class AccountController {
     ResponseEntity<AccountDto> findAccountByNumber(@PathVariable String number, @RequestParam(required = false) Currency currency) {
         Account.Number accountNumber = Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8));
 
-        return findAccountAndConvertCurrencyFooUseCase.findAccountByAccountNumber(currency, accountNumber)
+        return findAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase.findAccountByAccountNumber(currency, accountNumber)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

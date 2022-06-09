@@ -7,12 +7,12 @@ import pl.cleankod.exchange.entrypoint.model.MoneyDto;
 import java.util.Currency;
 import java.util.Optional;
 
-public class FindAccountAndConvertCurrencyFooUseCase {
+public class FindAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase {
 
     private final FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase;
     private final FindAccountUseCase findAccountUseCase;
 
-    public FindAccountAndConvertCurrencyFooUseCase(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase, FindAccountUseCase findAccountUseCase) {
+    public FindAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase, FindAccountUseCase findAccountUseCase) {
         this.findAccountAndConvertCurrencyUseCase = findAccountAndConvertCurrencyUseCase;
         this.findAccountUseCase = findAccountUseCase;
     }
