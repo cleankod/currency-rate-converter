@@ -19,15 +19,15 @@ public class FindAccountAndConvertCurrencyFooUseCase {
 
     public Optional<AccountDto> findAccountById(String currency, String id) {
         return Optional.ofNullable(currency)
-                .map(s -> findAccountAndConvertCurrencyUseCase.execute(Account.Id.of(id), Currency.getInstance(s)))
+                .map(fulfilledCurrency -> findAccountAndConvertCurrencyUseCase.execute(Account.Id.of(id), Currency.getInstance(fulfilledCurrency)))
                 .orElseGet(() -> findAccountUseCase.execute(Account.Id.of(id)))
-                .map(s -> new AccountDto(s.id().value(), s.number().value(), new MoneyDto(s.balance().amount(), s.balance().currency())));
+                .map(account -> new AccountDto(account.id().value(), account.number().value(), new MoneyDto(account.balance().amount(), account.balance().currency())));
     }
 
     public Optional<AccountDto> findAccountByAccountNumber(String currency, Account.Number accountNumber) {
         return Optional.ofNullable(currency)
-                .map(s -> findAccountAndConvertCurrencyUseCase.execute(accountNumber, Currency.getInstance(s)))
+                .map(fulfilledCurrency -> findAccountAndConvertCurrencyUseCase.execute(accountNumber, Currency.getInstance(fulfilledCurrency)))
                 .orElseGet(() -> findAccountUseCase.execute(accountNumber))
-                .map(s -> new AccountDto(s.id().value(), s.number().value(), new MoneyDto(s.balance().amount(), s.balance().currency())));
+                .map(account -> new AccountDto(account.id().value(), account.number().value(), new MoneyDto(account.balance().amount(), account.balance().currency())));
     }
 }
