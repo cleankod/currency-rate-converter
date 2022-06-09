@@ -18,6 +18,7 @@ import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 import pl.cleankod.exchange.entrypoint.AccountController;
 import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
+import pl.cleankod.exchange.entrypoint.configuration.ControllersLoggingAspect;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.configuration.ExchangeRatesNbpClientLoggingAspect;
@@ -88,7 +89,12 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    ExchangeRatesNbpClientLoggingAspect loggingAspect() {
+    ExchangeRatesNbpClientLoggingAspect nbpClientLoggingAspect() {
         return new ExchangeRatesNbpClientLoggingAspect();
+    }
+
+    @Bean
+    ControllersLoggingAspect controllersLoggingAspect() {
+        return new ControllersLoggingAspect();
     }
 }
