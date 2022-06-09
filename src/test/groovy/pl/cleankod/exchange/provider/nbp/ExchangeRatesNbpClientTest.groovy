@@ -14,7 +14,7 @@ class ExchangeRatesNbpClientTest extends RealNbpSpecification {
         def result = currencyConversionService.convert(Currency.getInstance(targetCurrency))
 
         then:
-        result.rate() == 4.5274
+        result.rate() == rate
 
         where:
         targetCurrency || rate

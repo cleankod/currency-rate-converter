@@ -10,6 +10,14 @@ import java.util.Currency;
 
 public record Money(BigDecimal amount, Currency currency) {
 
+    public Money {
+        Preconditions.requireNonNull(amount);
+        Preconditions.requireNonNull(currency);
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new MoneyCanNotBeLowerThenZeroException("Money can not be lower then zero!");
+        }
+    }
+
     public static Money of(BigDecimal amount, Currency currency) {
         Preconditions.requireNonNull(amount);
         Preconditions.requireNonNull(currency);
@@ -27,14 +35,14 @@ public record Money(BigDecimal amount, Currency currency) {
             return convertTo(targetCurrency, midRate);
         }
 
-        if (!currency().equals(targetCurrency)) {
-            throw new CurrencyConversionException(currency(), targetCurrency);
+        if (!currency.equals(targetCurrency)) {
+            throw new CurrencyConversionException(currency, targetCurrency);
         }
 
         return this;
     }
 
     private Money convertTo(Currency targetCurrency, RateWrapper.MidRate midRate) {
-        return new Money(amount().divide(midRate.rate(), RoundingMode.HALF_UP), targetCurrency);
+        return new Money(amount.divide(midRate.rate(), RoundingMode.HALF_UP), targetCurrency);
     }
 }
