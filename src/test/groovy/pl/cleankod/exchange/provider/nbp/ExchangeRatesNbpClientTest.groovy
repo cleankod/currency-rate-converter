@@ -11,7 +11,7 @@ class ExchangeRatesNbpClientTest extends RealNbpSpecification {
     //I know that I shouldn't make parameterized test there, but I wanted to try it :D
     def "should return rate wrapper for currency"() {
         when:
-        def result = currencyConversionService.convert(Currency.getInstance(targetCurrency))
+        def result = currencyConversionService.getMidRate(Currency.getInstance(targetCurrency), Currency.getInstance("PLN"))
 
         then:
         result.rate() == rate
@@ -20,5 +20,6 @@ class ExchangeRatesNbpClientTest extends RealNbpSpecification {
         targetCurrency || rate
         "EUR"          || 4.5274
         "GBP"          || 5.3792
+        "PLN" || 1
     }
 }

@@ -23,14 +23,14 @@ public class FindAccountAndConvertCurrencyUseCase {
     }
 
     public Optional<Account> execute(Account.Id id, Currency targetCurrency) {
-        RateWrapper.MidRate midRate = currencyConversionService.convert(targetCurrency);
+        RateWrapper.MidRate midRate = currencyConversionService.getMidRate(targetCurrency, baseCurrency);
 
         return accountRepository.find(id)
                 .map(account -> new Account(account.id(), account.number(), account.balance().convert(targetCurrency, baseCurrency, midRate)));
     }
 
     public Optional<Account> execute(Account.Number number, Currency targetCurrency) {
-        RateWrapper.MidRate midRate = currencyConversionService.convert(targetCurrency);
+        RateWrapper.MidRate midRate = currencyConversionService.getMidRate(targetCurrency, baseCurrency);
 
         return accountRepository.find(number)
                 .map(account -> new Account(account.id(), account.number(), account.balance().convert(targetCurrency, baseCurrency, midRate)));
