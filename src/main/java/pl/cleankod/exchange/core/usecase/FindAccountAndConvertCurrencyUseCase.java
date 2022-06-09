@@ -1,9 +1,9 @@
 package pl.cleankod.exchange.core.usecase;
 
 import pl.cleankod.exchange.core.domain.Account;
-import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
+import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
 
 import java.util.Currency;
 import java.util.Optional;
@@ -23,26 +23,16 @@ public class FindAccountAndConvertCurrencyUseCase {
     }
 
     public Optional<Account> execute(Account.Id id, Currency targetCurrency) {
+        RateWrapper.MidRate midRate = currencyConversionService.convert(targetCurrency);
+
         return accountRepository.find(id)
-                .map(account -> new Account(account.id(), account.number(), convert(account.balance(), targetCurrency)));
+                .map(account -> new Account(account.id(), account.number(), account.balance().convert(targetCurrency, baseCurrency, midRate)));
     }
 
     public Optional<Account> execute(Account.Number number, Currency targetCurrency) {
+        RateWrapper.MidRate midRate = currencyConversionService.convert(targetCurrency);
+
         return accountRepository.find(number)
-                .map(account -> new Account(account.id(), account.number(), convert(account.balance(), targetCurrency)));
-    }
-
-    // TODO AP: I think this logic should be somehow encapsulated in money.
-    //maybe incase of future business req. its worth using specification + policy?
-    private Money convert(Money money, Currency targetCurrency) {
-        if (!baseCurrency.equals(targetCurrency)) {
-            return money.convert(currencyConversionService, targetCurrency);
-        }
-
-        if (!money.currency().equals(targetCurrency)) {
-            throw new CurrencyConversionException(money.currency(), targetCurrency);
-        }
-
-        return money;
+                .map(account -> new Account(account.id(), account.number(), account.balance().convert(targetCurrency, baseCurrency, midRate)));
     }
 }

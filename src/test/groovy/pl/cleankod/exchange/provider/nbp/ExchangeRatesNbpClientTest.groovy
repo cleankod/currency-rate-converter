@@ -1,7 +1,6 @@
 package pl.cleankod.exchange.provider.nbp
 
 import org.springframework.beans.factory.annotation.Autowired
-import pl.cleankod.exchange.core.domain.Money
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService
 
 class ExchangeRatesNbpClientTest extends RealNbpSpecification {
@@ -12,14 +11,14 @@ class ExchangeRatesNbpClientTest extends RealNbpSpecification {
     //I know that I shouldn't make parameterized test there, but I wanted to try it :D
     def "should return rate wrapper for currency"() {
         when:
-        def result = currencyConversionService.convert(new Money(10.0.toBigDecimal(), Currency.getInstance(initCurrency)), Currency.getInstance(targetCurrency))
+        def result = currencyConversionService.convert(Currency.getInstance(targetCurrency))
 
         then:
-        result.amount() == expectedAmount
-        result.currency().getCurrencyCode() == targetCurrency
+        result.rate() == 4.5274
 
         where:
-        initCurrency || targetCurrency || expectedAmount
-        "PLN"        || "EUR"          || 2.2
+        targetCurrency || rate
+        "EUR"          || 4.5274
+        "GBP"          || 5.3792
     }
 }
