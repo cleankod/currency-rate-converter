@@ -13,10 +13,20 @@ public class ExceptionHandlerAdvice {
 
     @ExceptionHandler({
             CurrencyConversionException.class,
-            IllegalArgumentException.class
     })
     protected ResponseEntity<ApiError> handleBadRequest(CurrencyConversionException ex) {
         return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
+    }
+
+    @ExceptionHandler({
+            IllegalArgumentException.class
+    })
+    protected ResponseEntity<ApiError> handleIllegalArgumentException(IllegalArgumentException ex) {
+        if (ex.getMessage() != null) {
+            return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
+        }
+
+        return ResponseEntity.badRequest().body(new ApiError("Unknown error. Please try again later."));
     }
 
     @ExceptionHandler({

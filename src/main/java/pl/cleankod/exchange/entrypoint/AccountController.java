@@ -1,6 +1,5 @@
 package pl.cleankod.exchange.entrypoint;
 
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.cleankod.exchange.core.domain.Account;
@@ -21,7 +20,6 @@ public class AccountController {
     }
 
     @GetMapping(path = "/{id}")
-    @CircuitBreaker(name = "NBP", fallbackMethod = "fallback")
     ResponseEntity<AccountDto> findAccountById(@PathVariable String id, @RequestParam(required = false) String currency) {
         return findAccountAndConvertCurrencyFooUseCase.findAccountById(currency, id)
                 .map(ResponseEntity::ok)
@@ -37,7 +35,4 @@ public class AccountController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    public ResponseEntity<AccountDto> fallback(String id, String currency, Throwable e) {
-        return ResponseEntity.ok(null);
-    }
 }
