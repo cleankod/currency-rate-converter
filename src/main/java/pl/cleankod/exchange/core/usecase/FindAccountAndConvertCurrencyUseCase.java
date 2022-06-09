@@ -32,6 +32,8 @@ public class FindAccountAndConvertCurrencyUseCase {
                 .map(account -> new Account(account.id(), account.number(), convert(account.balance(), targetCurrency)));
     }
 
+    // TODO AP: I think this logic should be somehow encapsulated in money.
+    //maybe incase of future business req. its worth using specification + policy?
     private Money convert(Money money, Currency targetCurrency) {
         if (!baseCurrency.equals(targetCurrency)) {
             return money.convert(currencyConversionService, targetCurrency);
