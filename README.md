@@ -78,3 +78,23 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * Integration tests with the real NBP API.
 * Replace Spring Framework with a different one.
 * The proposed architecture is not perfect. Suggest improvements.
+
+# Undone:
+
+* Replace Spring Framework with a different one.
+* Replace exceptions with `Result` (`either`) which improves the overall methods API readability and forces error
+  handling. Look into [cleankod/architecture-archetype](https://github.com/cleankod/architecture-archetype) as a
+  starting point.
+
+# Suggestions:
+
+* Move bean declarations out of ApplicationInitialize.
+* Maybe I'm missing something, but bullet point "Rounding when calculating the amount" looks like it's resolved
+* I would remove static methods in Money - I don't see real reason of having them
+* I would add archunit library to make sure that syntax in CurrencyConversionNbpService.getMidRate and
+  CurrencyConversionNbpService.fallback is the same
+* I would add at least one e2e test with happy path
+
+#### Api documentation: [swagger] (http://localhost:8080/swagger-ui/index.html)
+
+#### Test coverage report: in gradle.verification task, please run jococoTestReport

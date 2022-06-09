@@ -8,7 +8,6 @@ class ExchangeRatesNbpClientTest extends RealNbpSpecification {
     @Autowired
     private CurrencyConversionService currencyConversionService;
 
-    //I know that I shouldn't make parameterized test there, but I wanted to try it :D
     def "should return rate wrapper for currency"() {
         when:
         def result = currencyConversionService.getMidRate(Currency.getInstance(targetCurrency), Currency.getInstance("PLN"))

@@ -23,16 +23,33 @@ public class FindAccountAndConvertCurrencyUseCase {
     }
 
     public Optional<Account> execute(Account.Id id, Currency targetCurrency) {
-        RateWrapper.MidRate midRate = currencyConversionService.getMidRate(targetCurrency, baseCurrency);
-
         return accountRepository.find(id)
-                .map(account -> new Account(account.id(), account.number(), account.balance().convert(targetCurrency, baseCurrency, midRate)));
+                .map(account ->
+                        {
+                            RateWrapper.MidRate midRate = findMidRateFor(targetCurrency, account);
+                            return new Account(
+                                    account.id(),
+                                    account.number(),
+                                    account.balance().convert(baseCurrency, midRate)
+                            );
+                        }
+                );
     }
 
     public Optional<Account> execute(Account.Number number, Currency targetCurrency) {
-        RateWrapper.MidRate midRate = currencyConversionService.getMidRate(targetCurrency, baseCurrency);
-
         return accountRepository.find(number)
-                .map(account -> new Account(account.id(), account.number(), account.balance().convert(targetCurrency, baseCurrency, midRate)));
+                .map(account -> {
+                            RateWrapper.MidRate midRate = findMidRateFor(targetCurrency, account);
+                            return new Account(
+                                    account.id(),
+                                    account.number(),
+                                    account.balance().convert(baseCurrency, midRate)
+                            );
+                        }
+                );
+    }
+
+    private RateWrapper.MidRate findMidRateFor(Currency targetCurrency, Account account) {
+        return currencyConversionService.getMidRate(targetCurrency, account.balance().currency());
     }
 }

@@ -1,6 +1,7 @@
 package pl.cleankod.exchange.entrypoint;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase;
@@ -13,6 +14,7 @@ import java.util.Currency;
 
 @RestController
 @RequestMapping("/accounts")
+@Validated
 public class AccountController {
 
     private final FindAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase findAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase;

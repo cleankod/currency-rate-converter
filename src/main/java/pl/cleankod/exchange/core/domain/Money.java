@@ -30,19 +30,19 @@ public record Money(BigDecimal amount, Currency currency) {
         return new Money(new BigDecimal(amount), Currency.getInstance(currency));
     }
 
-    public Money convert(Currency targetCurrency, Currency baseCurrency, RateWrapper.MidRate midRate) {
-        if (!baseCurrency.equals(targetCurrency)) {
-            return convertTo(targetCurrency, midRate);
+    public Money convert(Currency baseCurrency, RateWrapper.MidRate midRate) {
+        if (!baseCurrency.equals(midRate.currency())) {
+            return convertTo(midRate);
         }
 
-        if (!currency.equals(targetCurrency)) {
-            throw new CurrencyConversionException(currency, targetCurrency);
+        if (!currency.equals(midRate.currency())) {
+            throw new CurrencyConversionException(currency, midRate.currency());
         }
 
         return this;
     }
 
-    private Money convertTo(Currency targetCurrency, RateWrapper.MidRate midRate) {
-        return new Money(amount.divide(midRate.rate(), RoundingMode.HALF_UP), targetCurrency);
+    private Money convertTo(RateWrapper.MidRate midRate) {
+        return new Money(amount.divide(midRate.rate(), RoundingMode.HALF_UP), midRate.currency());
     }
 }

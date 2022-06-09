@@ -51,8 +51,10 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
-        return new CurrencyConversionNbpService(exchangeRatesNbpClient);
+    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient,
+                                                        Environment environment) {
+        Currency baseCurrency = Currency.getInstance(environment.getRequiredProperty("app.base-currency"));
+        return new CurrencyConversionNbpService(exchangeRatesNbpClient, baseCurrency);
     }
 
     @Bean

@@ -26,6 +26,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator:2.7.0'
     implementation "io.github.resilience4j:resilience4j-spring-boot2:1.5.0"
 
+    // https://mvnrepository.com/artifact/org.hibernate/hibernate-validator
+    implementation 'org.hibernate:hibernate-validator:6.2.3.Final'
+
+
     //documentation
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
 

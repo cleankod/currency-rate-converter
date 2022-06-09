@@ -10,8 +10,7 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 @Aspect
-public
-class ExchangeRatesNbpClientLoggingAspect {
+public class ExchangeRatesNbpClientLoggingAspect {
 
     private final Logger log = Logger.getLogger(ExchangeRatesNbpClient.class.getName());
 

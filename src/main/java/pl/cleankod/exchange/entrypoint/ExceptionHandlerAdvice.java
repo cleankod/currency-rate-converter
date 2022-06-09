@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.cleankod.exchange.core.usecase.CurrencyConversionException;
 import pl.cleankod.exchange.entrypoint.model.ApiError;
 
+import javax.validation.ConstraintViolationException;
+
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
 
@@ -26,13 +28,20 @@ public class ExceptionHandlerAdvice {
             return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
         }
 
-        return ResponseEntity.badRequest().body(new ApiError("Unknown error. Please try again later."));
+        return ResponseEntity.badRequest().body(new ApiError("Invalid input."));
     }
 
     @ExceptionHandler({
             FeignException.class
     })
-    protected ResponseEntity<ApiError> handleBadExternalServiceRequest(FeignException ex) {
+    protected ResponseEntity<ApiError> handleBadExternalServiceRequestException(FeignException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiError(ex.getMessage()));
+    }
+
+    @ExceptionHandler({
+            ConstraintViolationException.class
+    })
+    protected ResponseEntity<ApiError> handleBadConstraintViolationException(ConstraintViolationException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiError(ex.getMessage()));
     }
 }
