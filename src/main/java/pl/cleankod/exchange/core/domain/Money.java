@@ -4,9 +4,15 @@ import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.util.Preconditions;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Currency;
 
 public record Money(BigDecimal amount, Currency currency) {
+
+    public Money(BigDecimal amount, Currency currency) {
+        this.amount = amount.setScale(2, RoundingMode.HALF_UP);
+        this.currency = currency;
+    }
 
     public static Money of(BigDecimal amount, Currency currency) {
         Preconditions.requireNonNull(amount);
