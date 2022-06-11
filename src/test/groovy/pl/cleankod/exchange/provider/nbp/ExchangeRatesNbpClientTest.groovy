@@ -10,7 +10,7 @@ class ExchangeRatesNbpClientTest extends RealNbpSpecification {
 
     def "should return rate wrapper for currency"() {
         when:
-        def result = currencyConversionService.getMidRate(Currency.getInstance(targetCurrency), Currency.getInstance("PLN"))
+        def result = currencyConversionService.getMidRate(Currency.getInstance(targetCurrency))
 
         then:
         result.rate() == rate

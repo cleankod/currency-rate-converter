@@ -12,6 +12,8 @@ public class CurrencyConversionNbpService implements CurrencyConversionService {
     private final ExchangeRatesNbpClient exchangeRatesNbpClient;
     private final Currency baseCurrency;
     private final RateWrapper.MidRate baseCurrencyMidRate;
+    private final Currency PL_CURRENCY = Currency.getInstance("PLN");
+    private final String targetNbpTable = "A";
 
     public CurrencyConversionNbpService(ExchangeRatesNbpClient exchangeRatesNbpClient,
                                         Currency baseCurrency) {
@@ -22,21 +24,17 @@ public class CurrencyConversionNbpService implements CurrencyConversionService {
 
     @Override
     @CircuitBreaker(name = "NBP", fallbackMethod = "fallback")
-    public RateWrapper.MidRate getMidRate(
-            Currency targetCurrency,
-            //Im not sure if it is fine to have it here, since it's only used by circuit breaker
-            Currency sourceCurrency
-    ) {
+    public RateWrapper.MidRate getMidRate(Currency targetCurrency) {
         //this api is really weird, because we can not ask for a default currency (PLN). This is why I made this hacky if below
         if (baseCurrency == targetCurrency) {
             return baseCurrencyMidRate;
         }
 
-        RateWrapper rateWrapper = exchangeRatesNbpClient.fetch("A", targetCurrency.getCurrencyCode());
+        RateWrapper rateWrapper = exchangeRatesNbpClient.fetch(targetNbpTable, targetCurrency.getCurrencyCode());
         return rateWrapper.getMidRate();
     }
 
-    private RateWrapper.MidRate fallback(Currency targetCurrency, Currency sourceCurrency, Throwable e) {
-        return new RateWrapper.MidRate(BigDecimal.ONE, sourceCurrency);
+    private RateWrapper.MidRate fallback(Currency targetCurrency, Throwable e) {
+        return new RateWrapper.MidRate(BigDecimal.ONE, PL_CURRENCY);
     }
 }

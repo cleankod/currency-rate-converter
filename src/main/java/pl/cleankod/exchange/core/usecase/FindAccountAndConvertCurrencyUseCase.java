@@ -26,7 +26,7 @@ public class FindAccountAndConvertCurrencyUseCase {
         return accountRepository.find(id)
                 .map(account ->
                         {
-                            RateWrapper.MidRate midRate = findMidRateFor(targetCurrency, account);
+                            RateWrapper.MidRate midRate = findMidRateFor(targetCurrency);
                             return new Account(
                                     account.id(),
                                     account.number(),
@@ -39,7 +39,7 @@ public class FindAccountAndConvertCurrencyUseCase {
     public Optional<Account> execute(Account.Number number, Currency targetCurrency) {
         return accountRepository.find(number)
                 .map(account -> {
-                            RateWrapper.MidRate midRate = findMidRateFor(targetCurrency, account);
+                            RateWrapper.MidRate midRate = findMidRateFor(targetCurrency);
                             return new Account(
                                     account.id(),
                                     account.number(),
@@ -49,7 +49,7 @@ public class FindAccountAndConvertCurrencyUseCase {
                 );
     }
 
-    private RateWrapper.MidRate findMidRateFor(Currency targetCurrency, Account account) {
-        return currencyConversionService.getMidRate(targetCurrency, account.balance().currency());
+    private RateWrapper.MidRate findMidRateFor(Currency targetCurrency) {
+        return currencyConversionService.getMidRate(targetCurrency);
     }
 }
