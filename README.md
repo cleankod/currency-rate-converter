@@ -94,6 +94,8 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * I would add archunit library to make sure that syntax in CurrencyConversionNbpService.getMidRate and
   CurrencyConversionNbpService.fallback is the same
 * I would add at least one e2e test with happy path
+* I would suggest to add more implementation of CurrencyConversionService, because currently it's possible only to
+  convert currencies from PLN to others.
 
 #### Api documentation: [swagger] (http://localhost:8080/swagger-ui/index.html)
 
