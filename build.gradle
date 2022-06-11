@@ -3,6 +3,7 @@ plugins {
 
     // Apply the groovy plugin to also add support for Groovy (needed for Spock)
     id 'groovy'
+    id 'jacoco'
 }
 
 repositories {
@@ -15,22 +16,45 @@ java {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.3'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
-    implementation 'io.github.openfeign:feign-httpclient:11.8'
-    implementation 'io.github.openfeign:feign-jackson:11.8'
+    implementation "org.springframework.boot:spring-boot-starter-web:${springBoot}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonDatabind}"
+
+    implementation "io.github.openfeign:feign-httpclient:${feignHttpClient}"
+    implementation "io.github.openfeign:feign-jackson:${feignJackson}"
+
+    implementation "io.springfox:springfox-swagger2:${springfoxSwagger2}"
+    implementation "io.springfox:springfox-swagger-ui:${springfoxSwaggerUi}"
+
+    implementation "io.github.resilience4j:resilience4j-circuitbreaker:${resilience4jCircuitbreaker}"
 
     // Use the latest Groovy version for Spock testing
-    testImplementation 'org.codehaus.groovy:groovy:3.0.9'
+    testImplementation "org.codehaus.groovy:groovy:${groovy}"
 
     // Use the awesome Spock testing and specification framework even with Java
-    testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
+    testImplementation "org.spockframework:spock-core:${spockCore}"
 
-    testImplementation 'org.apache.httpcomponents:httpclient:4.5.13'
-    testImplementation 'com.github.tomakehurst:wiremock-jre8:2.27.2'
+    testImplementation "org.apache.httpcomponents:httpclient:${httpClient}"
+    testImplementation "com.github.tomakehurst:wiremock-jre8:${wiremockJre8}"
 }
 
+jacoco {
+    toolVersion = "0.8.7"
+    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
+}
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+test {
+    finalizedBy jacocoTestReport // report is always generated after tests run
+}
+
+jacocoTestReport {
+    dependsOn test // tests are required to run before generating the report
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
 }

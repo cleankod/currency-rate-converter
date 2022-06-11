@@ -1,13 +1,12 @@
-package pl.cleankod.exchange.provider;
+package pl.cleankod.exchange.core.repository;
 
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.domain.Money;
-import pl.cleankod.exchange.core.gateway.AccountRepository;
 
 import java.util.Optional;
 import java.util.Set;
 
-public class AccountInMemoryRepository implements AccountRepository {
+public class AccountInMemoryRepositoryImpl implements AccountRepository {
 
     private final Set<Account> accounts = Set.of(
             new Account(
@@ -23,14 +22,14 @@ public class AccountInMemoryRepository implements AccountRepository {
     );
 
     @Override
-    public Optional<Account> find(Account.Id id) {
+    public Optional<Account> find(final Account.Id id) {
         return accounts.stream()
                 .filter(account -> account.id().equals(id))
                 .findFirst();
     }
 
     @Override
-    public Optional<Account> find(Account.Number number) {
+    public Optional<Account> find(final Account.Number number) {
         return accounts.stream()
                 .filter(account -> account.number().equals(number))
                 .findFirst();

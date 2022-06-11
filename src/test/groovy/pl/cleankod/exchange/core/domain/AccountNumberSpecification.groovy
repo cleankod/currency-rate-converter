@@ -1,6 +1,6 @@
 package pl.cleankod.exchange.core.domain
 
-import pl.cleankod.exchange.core.domain.Account
+import pl.cleankod.exchange.exception.InvalidDataException
 import spock.lang.Specification
 
 class AccountNumberSpecification extends Specification {
@@ -33,8 +33,8 @@ class AccountNumberSpecification extends Specification {
         exception.message.startsWith(expectedExceptionMessage)
 
         where:
-        givenValue                           || expectedExceptionType    || expectedExceptionMessage
-        "PL65 1090 1665 0000 0001 0373 7343" || IllegalArgumentException || "The account number does not match the pattern"
-        null                                 || NullPointerException     || "Given value cannot be null"
+        givenValue                           || expectedExceptionType || expectedExceptionMessage
+        "PL65 1090 1665 0000 0001 0373 7343" || InvalidDataException  || "Account number 'PL65 1090 1665 0000 0001 0373 7343' is invalid"
+        null                                 || NullPointerException  || "Given value cannot be null"
     }
 }
