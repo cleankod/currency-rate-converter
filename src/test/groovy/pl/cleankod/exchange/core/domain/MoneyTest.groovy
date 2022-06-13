@@ -19,7 +19,7 @@ class MoneyTest extends Specification {
 
     }
 
-    def "will convert money"() {
+    def "will convert money - base and source currencies are the same"() {
         given:
         def currency = Currency.getInstance("PLN")
         def decimal = new BigDecimal(input).setScale(currency.defaultFractionDigits, RoundingMode.HALF_EVEN)
@@ -32,12 +32,31 @@ class MoneyTest extends Specification {
         convertedMoney.amount() == new BigDecimal(output).setScale(currency.defaultFractionDigits, RoundingMode.HALF_EVEN)
 
         where:
-        input   || rate || output
-        1.00    || 1.00 || 1.00
-        2.00    || 0.5  || 4.00
-        2.00    || 2.0  || 1.00
-        10.1111 || 0.5  || 20.22
+        input       || rate || output
+        1.00        || 1.00 || 1.00
+        2.00        || 0.5  || 4.00
+        2.00        || 2.0  || 1.00
+        10.11111111 || 0.5  || 20.22
     }
+
+
+    def "will convert money - target and source currencies are the same"() {
+        given:
+        def currency = Currency.getInstance("PLN")
+        def decimal = new BigDecimal(input).setScale(currency.defaultFractionDigits, RoundingMode.HALF_EVEN)
+        Money money = new Money(decimal, currency)
+
+        when:
+        Money convertedMoney = money.convert(Currency.getInstance("EUR"), currency, new BigDecimal(rate))
+
+        then:
+        convertedMoney.amount() == new BigDecimal(output).setScale(currency.defaultFractionDigits, RoundingMode.HALF_EVEN)
+
+        where:
+        input || rate || output
+        1.00  || 1.00 || 1.00
+    }
+
 
     def "will not convert money - base and target currency are the same"() {
         given:
@@ -50,7 +69,7 @@ class MoneyTest extends Specification {
         thrown(CurrencyConversionException)
     }
 
-    def "will return the same object"() {
+    def "will return the same object - base, target and source currencies are the same"() {
         given:
         Money money = new Money(new BigDecimal(1.0), Currency.getInstance("EUR"))
 
@@ -60,5 +79,17 @@ class MoneyTest extends Specification {
         then:
         convertedMoney.amount() == money.amount()
         convertedMoney == money
+    }
+
+    def "will return the same object - all currencies are different"() {
+        given:
+        Money money = new Money(new BigDecimal(1.0), Currency.getInstance("EUR"))
+
+        when:
+        Money convertedMoney = money.convert(Currency.getInstance("PLN"), Currency.getInstance("GBP"), new BigDecimal(1.0))
+
+        then:
+        convertedMoney.amount() == money.amount()
+        convertedMoney.currency() == Currency.getInstance("GBP")
     }
 }
