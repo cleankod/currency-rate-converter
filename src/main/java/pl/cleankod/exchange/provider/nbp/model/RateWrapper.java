@@ -27,7 +27,7 @@ public record RateWrapper(String table, String currency, String code, List<Rate>
         public MidRate {
             Preconditions.requireNonNull(rate);
             Preconditions.requireNonNull(currency);
-            if (rate.compareTo(BigDecimal.ZERO) < 0) {
+            if (rate.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new ExternalClientParameterException("Mid rate can not be less then 0!");
             }
         }

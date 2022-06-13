@@ -1,6 +1,7 @@
 package pl.cleankod.exchange.core.usecase;
 
 import pl.cleankod.exchange.core.domain.Account;
+import pl.cleankod.exchange.core.domain.rate.MidRate;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
@@ -26,11 +27,11 @@ public class FindAccountAndConvertCurrencyUseCase {
         return accountRepository.find(id)
                 .map(account ->
                         {
-                            RateWrapper.MidRate midRate = findMidRateFor(targetCurrency);
+                            MidRate midRate = findMidRateFor(targetCurrency);
                             return new Account(
                                     account.id(),
                                     account.number(),
-                                    account.balance().convert(baseCurrency, midRate)
+                                    account.balance().convert(baseCurrency, midRate.currency(), midRate.rate())
                             );
                         }
                 );
@@ -38,18 +39,20 @@ public class FindAccountAndConvertCurrencyUseCase {
 
     public Optional<Account> execute(Account.Number number, Currency targetCurrency) {
         return accountRepository.find(number)
-                .map(account -> {
-                            RateWrapper.MidRate midRate = findMidRateFor(targetCurrency);
+                .map(account ->
+                        {
+                            MidRate midRate = findMidRateFor(targetCurrency);
                             return new Account(
                                     account.id(),
                                     account.number(),
-                                    account.balance().convert(baseCurrency, midRate)
+                                    account.balance().convert(baseCurrency, midRate.currency(), midRate.rate())
                             );
                         }
                 );
     }
 
-    private RateWrapper.MidRate findMidRateFor(Currency targetCurrency) {
-        return currencyConversionService.getMidRate(targetCurrency);
+    private MidRate findMidRateFor(Currency targetCurrency) {
+        RateWrapper.MidRate midRate = currencyConversionService.getMidRate(targetCurrency);
+        return new MidRate(midRate.currency(), midRate.rate());
     }
 }

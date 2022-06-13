@@ -29,6 +29,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.hibernate/hibernate-validator
     implementation 'org.hibernate:hibernate-validator:6.2.3.Final'
 
+    // logging
+    implementation 'org.slf4j:slf4j-api:1.7.36'
 
     //documentation
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'

@@ -1,6 +1,7 @@
 package pl.cleankod;
 
 import feign.Feign;
+import feign.Logger;
 import feign.httpclient.ApacheHttpClient;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
@@ -11,17 +12,15 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.env.Environment;
+import org.springframework.web.filter.CommonsRequestLoggingFilter;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
-import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 import pl.cleankod.exchange.entrypoint.AccountController;
 import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
-import pl.cleankod.exchange.entrypoint.configuration.ControllersLoggingAspect;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
-import pl.cleankod.exchange.provider.configuration.ExchangeRatesNbpClientLoggingAspect;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 
 import java.util.Currency;
@@ -45,6 +44,8 @@ public class ApplicationInitializer {
         String nbpApiBaseUrl = environment.getRequiredProperty("provider.nbp-api.base-url");
         return Feign.builder()
                 .client(new ApacheHttpClient())
+                .logger(new Logger.JavaLogger(ExchangeRatesNbpClient.class.getName()))
+                .logLevel(Logger.Level.BASIC)
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
                 .target(ExchangeRatesNbpClient.class, nbpApiBaseUrl);
@@ -73,16 +74,9 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    FindAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase findAccountAndConvertCurrencyFooUseCase(
-            FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
-            FindAccountUseCase findAccountUseCase) {
-
-        return new FindAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
-    }
-
-    @Bean
-    AccountController accountController(FindAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase findAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase) {
-        return new AccountController(findAccountAndConvertCurrencyDependsOnNullabilityOfCurrencyUseCase);
+    AccountController accountController(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
+                                        FindAccountUseCase findAccountUseCase) {
+        return new AccountController(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
     }
 
     @Bean
@@ -91,12 +85,12 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    ExchangeRatesNbpClientLoggingAspect nbpClientLoggingAspect() {
-        return new ExchangeRatesNbpClientLoggingAspect();
-    }
-
-    @Bean
-    ControllersLoggingAspect controllersLoggingAspect() {
-        return new ControllersLoggingAspect();
+    public CommonsRequestLoggingFilter requestLoggingFilter() {
+        CommonsRequestLoggingFilter loggingFilter = new CommonsRequestLoggingFilter();
+        loggingFilter.setIncludeClientInfo(true);
+        loggingFilter.setIncludeQueryString(true);
+        loggingFilter.setIncludePayload(true);
+        loggingFilter.setMaxPayloadLength(64000);
+        return loggingFilter;
     }
 }

@@ -78,6 +78,23 @@ class AccountSpecification extends BaseApplicationSpecification {
         )
     }
 
+    def "should return an account by number and currency"() {
+        given:
+        def accountNumberValue = "65 1090 1665 0000 0001 0373 7343"
+        def currency = "EUR"
+        def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
+
+        when:
+        AccountDto response = get("/accounts/number=${accountNumberUrlEncoded}?currency=${currency}", AccountDto)
+
+        then:
+        response == new AccountDto(
+                UUID.fromString("fa07c538-8ce4-11ec-9ad5-4f5a625cd744"),
+                accountNumberValue,
+                new MoneyDto(27.16.toBigDecimal(), Currency.getInstance("EUR"))
+        )
+    }
+
     def "should return an account by number with different currency"() {
         given:
         def accountNumberValue = "75 1240 2034 1111 0000 0306 8582"
@@ -111,5 +128,29 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         then:
         response.getStatusLine().getStatusCode() == 404
+    }
+
+    def "should throw exception for invalid account number format"() {
+        given:
+        def accountNumberValue = "75 1240 2034 1111 0000 0306 AAAA"
+        def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
+
+        when:
+        def response = getResponse("/accounts/number=${accountNumberUrlEncoded}")
+
+        then:
+        response.getStatusLine().getStatusCode() == 400
+    }
+
+    def "should throw exception for invalid currency"() {
+        given:
+        def accountNumberValue = "75 1240 2034 1111 0000 0306 0306"
+        def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
+
+        when:
+        def response = getResponse("/accounts/number=${accountNumberUrlEncoded}?currency=InvalidCurrency")
+
+        then:
+        response.getStatusLine().getStatusCode() == 400
     }
 }

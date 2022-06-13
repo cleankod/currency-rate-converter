@@ -35,7 +35,7 @@ public class ExceptionHandlerAdvice {
             FeignException.class
     })
     protected ResponseEntity<ApiError> handleBadExternalServiceRequestException(FeignException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiError(ex.getMessage()));
+        return ResponseEntity.status(ex.status()).body(new ApiError(ex.getMessage()));
     }
 
     @ExceptionHandler({
