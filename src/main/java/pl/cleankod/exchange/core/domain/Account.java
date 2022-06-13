@@ -18,10 +18,6 @@ public record Account(Id id, Number number, Money balance) {
             Preconditions.requireNonNull(value);
         }
 
-        public Id(String id) {
-            this(UUID.fromString(id));
-        }
-
         public static Id of(UUID value) {
             return new Id(value);
         }

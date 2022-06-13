@@ -7,6 +7,10 @@ import java.util.Currency;
 
 public record MidRate(Currency currency, BigDecimal rate) {
 
+    public MidRate(String currency, BigDecimal rate) {
+        this(Currency.getInstance(currency), rate);
+    }
+
     public MidRate {
         Preconditions.requireNonNull(rate);
         Preconditions.requireNonNull(currency);
@@ -14,5 +18,4 @@ public record MidRate(Currency currency, BigDecimal rate) {
             throw new MidRateCanNotBeLowerThenZeroException("Mid rate can not be less then 0!");
         }
     }
-
 }

@@ -4,7 +4,6 @@ import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.domain.rate.MidRate;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
-import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
 
 import java.util.Currency;
 import java.util.Optional;
@@ -52,7 +51,6 @@ public class FindAccountAndConvertCurrencyUseCase {
     }
 
     private MidRate findMidRateFor(Currency targetCurrency) {
-        RateWrapper.MidRate midRate = currencyConversionService.getMidRate(targetCurrency);
-        return new MidRate(midRate.currency(), midRate.rate());
+        return currencyConversionService.getMidRate(targetCurrency);
     }
 }

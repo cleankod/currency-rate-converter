@@ -3,7 +3,7 @@ package pl.cleankod.exchange.provider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
+import pl.cleankod.exchange.core.domain.rate.MidRate;
 
 import java.math.BigDecimal;
 import java.util.Currency;
@@ -16,15 +16,15 @@ class CurrencyConversionNbpServiceCircuitBreakerTest {
     @Autowired
     private CurrencyConversionNbpService currencyConversionNbpService;
 
-    private final RateWrapper.MidRate CIRCUIT_BREAKER_MID_RATE = new RateWrapper.MidRate(
-            BigDecimal.ONE,
-            Currency.getInstance("PLN")
+    private final MidRate CIRCUIT_BREAKER_MID_RATE = new MidRate(
+            Currency.getInstance("PLN"),
+            BigDecimal.ONE
     );
 
     @Test
     void shouldReturnDefaultCurrency() {
         //when
-        RateWrapper.MidRate rate = currencyConversionNbpService.getMidRate(Currency.getInstance("USD"));
+        MidRate rate = currencyConversionNbpService.getMidRate(Currency.getInstance("USD"));
 
         //then
         assertEquals(CIRCUIT_BREAKER_MID_RATE, rate);
