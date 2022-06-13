@@ -1,6 +1,5 @@
 package pl.cleankod.exchange.entrypoint;
 
-import feign.FeignException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -29,13 +28,6 @@ public class ExceptionHandlerAdvice {
         }
 
         return ResponseEntity.badRequest().body(new ApiError("Invalid input."));
-    }
-
-    @ExceptionHandler({
-            FeignException.class
-    })
-    protected ResponseEntity<ApiError> handleBadExternalServiceRequestException(FeignException ex) {
-        return ResponseEntity.status(ex.status()).body(new ApiError(ex.getMessage()));
     }
 
     @ExceptionHandler({
