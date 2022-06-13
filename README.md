@@ -111,9 +111,6 @@ Also, value-objects are responsible for a little more than just plain data holdi
   convert currencies from PLN to others.
 * Maybe it's worth to add timeout when calling external services
 * And also rate-limiting on our side
-* I would also suggest creating dedicated data structures for controllers (at the moment entities and objects accepted
-  in controllers are the same (Account.Id and Account.Number))
-*
 
 #### Api documentation: [swagger] (http://localhost:8080/swagger-ui/index.html)
 

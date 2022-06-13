@@ -9,12 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
-import pl.cleankod.exchange.entrypoint.model.AccountDto;
-import pl.cleankod.exchange.entrypoint.model.AccountNumber;
-import pl.cleankod.exchange.entrypoint.model.MoneyDto;
+import pl.cleankod.exchange.entrypoint.model.*;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Currency;
 
 @RestController
@@ -32,24 +28,24 @@ public class AccountController {
     }
 
     @GetMapping(path = "/{id}", params = "currency")
-    ResponseEntity<AccountDto> findAccountById(@PathVariable Account.Id id, Currency currency) {
-        return findAccountAndConvertCurrencyUseCase.execute(id, currency)
+    ResponseEntity<AccountDto> findAccountById(@PathVariable AccountIdDto id, Currency currency) {
+        return findAccountAndConvertCurrencyUseCase.execute(Account.Id.of(id.id()), currency)
                 .map(this::toAccountDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping(path = "/{id}")
-    ResponseEntity<AccountDto> findAccountById(@PathVariable Account.Id id) {
-        return findAccountUseCase.execute(id)
+    ResponseEntity<AccountDto> findAccountById(@PathVariable AccountIdDto id) {
+        return findAccountUseCase.execute(Account.Id.of(id.id()))
                 .map(this::toAccountDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping(path = "/number={number}", params = "currency")
-    ResponseEntity<AccountDto> findAccountByNumber(@PathVariable @AccountNumber String number, Currency currency) {
-        Account.Number accountNumber = Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8));
+    ResponseEntity<AccountDto> findAccountByNumber(@PathVariable @AccountNumber AccountNumberDto number, Currency currency) {
+        Account.Number accountNumber = Account.Number.of(number.decode());
 
         return findAccountAndConvertCurrencyUseCase.execute(accountNumber, currency)
                 .map(this::toAccountDto)
@@ -58,8 +54,8 @@ public class AccountController {
     }
 
     @GetMapping(path = "/number={number}")
-    ResponseEntity<AccountDto> findAccountByNumber(@PathVariable @AccountNumber String number) {
-        Account.Number accountNumber = Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8));
+    ResponseEntity<AccountDto> findAccountByNumber(@PathVariable @AccountNumber AccountNumberDto number) {
+        Account.Number accountNumber = Account.Number.of(number.decode());
 
         return findAccountUseCase.execute(accountNumber)
                 .map(this::toAccountDto)

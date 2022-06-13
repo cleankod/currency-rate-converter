@@ -4,7 +4,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.regex.Pattern;
 
-public class AccountNumberValidator implements ConstraintValidator<AccountNumber, String> {
+public class AccountNumberValidator implements ConstraintValidator<AccountNumber, AccountNumberDto> {
 
     private static final Pattern PATTERN =
             Pattern.compile("\\d{2}[+]?\\d{4}[+]?\\d{4}[+]?\\d{4}[+]?\\d{4}[+]?\\d{4}[+]?\\d{4}");
@@ -15,7 +15,7 @@ public class AccountNumberValidator implements ConstraintValidator<AccountNumber
     }
 
     @Override
-    public boolean isValid(String value, ConstraintValidatorContext context) {
-        return PATTERN.matcher(value).matches();
+    public boolean isValid(AccountNumberDto value, ConstraintValidatorContext context) {
+        return PATTERN.matcher(value.number()).matches();
     }
 }
