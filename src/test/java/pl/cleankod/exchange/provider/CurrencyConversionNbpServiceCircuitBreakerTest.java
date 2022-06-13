@@ -13,12 +13,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CurrencyConversionNbpServiceCircuitBreakerTest {
 
+    @Autowired
+    private CurrencyConversionNbpService currencyConversionNbpService;
+
     private final RateWrapper.MidRate CIRCUIT_BREAKER_MID_RATE = new RateWrapper.MidRate(
             BigDecimal.ONE,
             Currency.getInstance("PLN")
     );
-    @Autowired
-    private CurrencyConversionNbpService currencyConversionNbpService;
 
     @Test
     void shouldReturnDefaultCurrency() {

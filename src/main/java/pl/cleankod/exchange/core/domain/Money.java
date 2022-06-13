@@ -12,9 +12,6 @@ public record Money(BigDecimal amount, Currency currency) {
     public Money {
         Preconditions.requireNonNull(amount);
         Preconditions.requireNonNull(currency);
-        if (amount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new MoneyCanNotBeLowerThenZeroException("Money can not be lower then zero!");
-        }
     }
 
     public static Money of(BigDecimal amount, Currency currency) {

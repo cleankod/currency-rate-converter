@@ -19,14 +19,6 @@ class MoneyTest extends Specification {
 
     }
 
-    def "will throw exception while creating money - amount is < 0"() {
-        when:
-        Money money = new Money(new BigDecimal(-100), Currency.getInstance("PLN"))
-
-        then:
-        def exception = thrown(MoneyCanNotBeLowerThenZeroException)
-    }
-
     def "will convert money"() {
         given:
         def currency = Currency.getInstance("PLN")
