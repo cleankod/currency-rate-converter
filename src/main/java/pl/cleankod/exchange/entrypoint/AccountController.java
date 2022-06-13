@@ -32,16 +32,16 @@ public class AccountController {
     }
 
     @GetMapping(path = "/{id}", params = "currency")
-    ResponseEntity<AccountDto> findAccountById(@PathVariable String id, Currency currency) {
-        return findAccountAndConvertCurrencyUseCase.execute(Account.Id.of(id), currency)
+    ResponseEntity<AccountDto> findAccountById(@PathVariable Account.Id id, Currency currency) {
+        return findAccountAndConvertCurrencyUseCase.execute(id, currency)
                 .map(this::toAccountDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping(path = "/{id}")
-    ResponseEntity<AccountDto> findAccountById(@PathVariable String id) {
-        return findAccountUseCase.execute(Account.Id.of(id))
+    ResponseEntity<AccountDto> findAccountById(@PathVariable Account.Id id) {
+        return findAccountUseCase.execute(id)
                 .map(this::toAccountDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
