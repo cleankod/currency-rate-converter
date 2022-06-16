@@ -1,3 +1,5 @@
+Test
+
 # About
 This is an example project that calculates the amount balance to a given currency.
 
