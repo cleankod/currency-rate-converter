@@ -20,6 +20,10 @@ dependencies {
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
 
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
+    implementation 'org.springframework.boot:spring-boot-starter-cache:2.5.2'
+
+
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy:3.0.9'
 

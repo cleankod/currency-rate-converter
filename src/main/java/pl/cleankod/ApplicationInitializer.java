@@ -7,8 +7,14 @@ import feign.jackson.JacksonEncoder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.format.FormatterRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import pl.cleankod.exchange.core.converter.StringToAccountNumberConverter;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
@@ -18,14 +24,25 @@ import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
+import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClientWrapper;
 
 import java.util.Currency;
 
 @SpringBootConfiguration
 @EnableAutoConfiguration
+@EnableCaching
 public class ApplicationInitializer {
     public static void main(String[] args) {
         SpringApplication.run(ApplicationInitializer.class, args);
+    }
+
+    @Configuration
+    static class MyConfig implements WebMvcConfigurer
+    {
+        @Override
+        public void addFormatters(FormatterRegistry registry) {
+            registry.addConverter(new StringToAccountNumberConverter());
+        }
     }
 
     @Bean
@@ -44,8 +61,13 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
-        return new CurrencyConversionNbpService(exchangeRatesNbpClient);
+    ExchangeRatesNbpClientWrapper exchangeRatesNbpClientWrapper(ExchangeRatesNbpClient exchangeRatesNbpClient) {
+        return new ExchangeRatesNbpClientWrapper(exchangeRatesNbpClient);
+    }
+
+    @Bean
+    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClientWrapper exchangeRatesNbpClientWrapper) {
+        return new CurrencyConversionNbpService(exchangeRatesNbpClientWrapper);
     }
 
     @Bean

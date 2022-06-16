@@ -39,9 +39,9 @@ public class AccountController {
                 );
     }
 
-    @GetMapping(path = "/number={number}")
-    public ResponseEntity<Account> findAccountByNumber(@PathVariable String number, @RequestParam(required = false) String currency) {
-        Account.Number accountNumber = Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8));
+    @GetMapping(path = "/number={accountNumber}")
+    public ResponseEntity<Account> findAccountByNumber(@PathVariable Account.Number accountNumber, @RequestParam(required = false) String currency) {
+
         return Optional.ofNullable(currency)
                 .map(s ->
                         findAccountAndConvertCurrencyUseCase.execute(accountNumber, Currency.getInstance(s))
