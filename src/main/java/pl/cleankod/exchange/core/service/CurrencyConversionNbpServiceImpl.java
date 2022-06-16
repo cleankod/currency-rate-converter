@@ -9,7 +9,6 @@ import org.springframework.util.CollectionUtils;
 import pl.cleankod.exchange.core.cache.CacheService;
 import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.exchange.exception.CurrencyConversionException;
-import pl.cleankod.exchange.exception.ResourceNotFoundException;
 import pl.cleankod.exchange.exception.error_type.CurrencyConversionErrorType;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 import pl.cleankod.exchange.provider.nbp.model.Rate;
@@ -57,7 +56,7 @@ public class CurrencyConversionNbpServiceImpl implements CurrencyConversionServi
                     TABLE_A, targetCurrency.getCurrencyCode(), getTodayDate());
             final RateWrapper rateWrapper = getRateWrapperAndAddToCache(targetCurrency);
             final List<Rate> rates = rateWrapper.rates();
-            checkIfRatesWereObtainedFromSupplier(rates);
+            checkIfRatesArePresent(CollectionUtils.isEmpty(rates));
             final BigDecimal midRate = rates.get(0).mid();
             final BigDecimal calculatedRate = money.amount()
                     .divide(midRate, RoundingMode.HALF_UP)
@@ -74,16 +73,11 @@ public class CurrencyConversionNbpServiceImpl implements CurrencyConversionServi
         return money;
     }
 
-    private void checkIfRatesWereObtainedFromSupplier(final List<Rate> rates) {
-        if (CollectionUtils.isEmpty(rates)) {
-            throw new ResourceNotFoundException(CurrencyConversionErrorType.NO_RATES_FOUND, "No rates were found");
-        }
-    }
-
     private RateWrapper getRateWrapperAndAddToCache(final Currency targetCurrency) {
 
         final Response response = getResponseFromSupplier(targetCurrency);
         final RateWrapper rateWrapper;
+        checkIfRatesArePresent(response.status() == 404);
         try {
             rateWrapper = objectMapper.readValue(response.body().asInputStream(), RateWrapper.class);
         } catch (final IOException ex) {
@@ -94,6 +88,13 @@ public class CurrencyConversionNbpServiceImpl implements CurrencyConversionServi
 
         addResponseToCache(response.request().url(), rateWrapper);
         return rateWrapper;
+    }
+
+    private void checkIfRatesArePresent(final boolean response) {
+        if (response) {
+            throw new CurrencyConversionException(CurrencyConversionErrorType.NO_RATES_FOUND,
+                    String.format("No rates were found for date: %s", getTodayDate()));
+        }
     }
 
     private Response getResponseFromSupplier(final Currency targetCurrency) {
