@@ -22,6 +22,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.4.6'
 
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy:3.0.9'

@@ -1,7 +1,8 @@
 package pl.cleankod.exchange.entrypoint;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
@@ -13,7 +14,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/accounts")
-public class AccountController {
+public class AccountController implements AccountApi {
 
     private final FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase;
     private final FindAccountUseCase findAccountUseCase;
@@ -24,8 +25,8 @@ public class AccountController {
         this.findAccountUseCase = findAccountUseCase;
     }
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<Account> findAccountById(@PathVariable String id, @RequestParam(required = false) String currency) {
+    @Override
+    public ResponseEntity<Account> findAccountById(String id, String currency) {
         return Optional.ofNullable(currency)
                 .map(s ->
                         findAccountAndConvertCurrencyUseCase.execute(Account.Id.of(id), Currency.getInstance(s))
@@ -39,8 +40,8 @@ public class AccountController {
                 );
     }
 
-    @GetMapping(path = "/number={number}")
-    public ResponseEntity<Account> findAccountByNumber(@PathVariable String number, @RequestParam(required = false) String currency) {
+    @Override
+    public ResponseEntity<Account> findAccountByNumber(String number, String currency) {
         Account.Number accountNumber = Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8));
         return Optional.ofNullable(currency)
                 .map(s ->
@@ -54,6 +55,4 @@ public class AccountController {
                                 .orElse(ResponseEntity.notFound().build())
                 );
     }
-
-
 }
