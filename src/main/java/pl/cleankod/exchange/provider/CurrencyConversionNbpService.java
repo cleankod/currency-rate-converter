@@ -10,7 +10,7 @@ import java.math.RoundingMode;
 import java.util.Currency;
 
 public class CurrencyConversionNbpService implements CurrencyConversionService {
-    public static final short SCALE = 3;
+    public static final short SCALE = 2;
     public static final String EXCHANGE_TABLE = "A";
 
     private final ExchangeRatesNbpClient exchangeRatesNbpClient;

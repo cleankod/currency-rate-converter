@@ -1,10 +1,11 @@
 package pl.cleankod.exchange.provider;
 
 import pl.cleankod.exchange.core.domain.Account;
+import pl.cleankod.exchange.core.domain.AccountOperationFailedReason;
 import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
+import pl.cleankod.util.domain.Result;
 
-import java.util.Optional;
 import java.util.Set;
 
 public class AccountInMemoryRepository implements AccountRepository {
@@ -23,16 +24,20 @@ public class AccountInMemoryRepository implements AccountRepository {
     );
 
     @Override
-    public Optional<Account> find(Account.Id id) {
+    public Result<Account, AccountOperationFailedReason> find(Account.Id id) {
         return accounts.stream()
                 .filter(account -> account.id().equals(id))
-                .findFirst();
+                .findFirst()
+                .map(Result::<Account, AccountOperationFailedReason>successful)
+                .orElseGet(() -> Result.fail(AccountOperationFailedReason.accountNotFound()));
     }
 
     @Override
-    public Optional<Account> find(Account.Number number) {
+    public Result<Account, AccountOperationFailedReason> find(Account.Number number) {
         return accounts.stream()
                 .filter(account -> account.number().equals(number))
-                .findFirst();
+                .findFirst()
+                .map(Result::<Account, AccountOperationFailedReason>successful)
+                .orElseGet(() -> Result.fail(AccountOperationFailedReason.accountNotFound()));
     }
 }

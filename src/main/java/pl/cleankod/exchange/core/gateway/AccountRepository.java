@@ -1,10 +1,10 @@
 package pl.cleankod.exchange.core.gateway;
 
 import pl.cleankod.exchange.core.domain.Account;
-
-import java.util.Optional;
+import pl.cleankod.exchange.core.domain.AccountOperationFailedReason;
+import pl.cleankod.util.domain.Result;
 
 public interface AccountRepository {
-    Optional<Account> find(Account.Id id);
-    Optional<Account> find(Account.Number number);
+    Result<Account, AccountOperationFailedReason> find(Account.Id id);
+    Result<Account, AccountOperationFailedReason> find(Account.Number number);
 }
