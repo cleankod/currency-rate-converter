@@ -112,4 +112,34 @@ class AccountSpecification extends BaseApplicationSpecification {
         then:
         response.getStatusLine().getStatusCode() == 404
     }
+
+    def "should open the circuit breaker when the failing failureRateThreshold reached"() {
+        given:
+        def happyFlowCurrency = "EUR"
+        def failingFlowCurrency = "USD"
+        def accountId = "fa07c538-8ce4-11ec-9ad5-4f5a625cd744"
+        wireMockServer.stubFor(
+                WireMock.get("/exchangerates/rates/A/USD/2022-02-08")
+                        .willReturn(WireMock.serverError())
+        )
+
+        when:
+        def happyCall1 = getResponse("/accounts/${accountId}?currency=${happyFlowCurrency}")
+        def happyCall2 = getResponse("/accounts/${accountId}?currency=${happyFlowCurrency}")
+        def happyCall3 = getResponse("/accounts/${accountId}?currency=${happyFlowCurrency}")
+        def internalServerErrorFlow = getResponse("/accounts/${accountId}?currency=${failingFlowCurrency}")
+        def happyCall4 = getResponse("/accounts/${accountId}?currency=${happyFlowCurrency}")
+        def openCircuitFlow = getResponse("/accounts/${accountId}?currency=${happyFlowCurrency}")
+        sleep(600)
+        def closedCircuitFlow = getResponse("/accounts/${accountId}?currency=${happyFlowCurrency}")
+
+        then:
+        happyCall1.getStatusLine().getStatusCode() == 200
+        happyCall2.getStatusLine().getStatusCode() == 200
+        happyCall3.getStatusLine().getStatusCode() == 200
+        happyCall4.getStatusLine().getStatusCode() == 200
+        internalServerErrorFlow.getStatusLine().getStatusCode() == 500
+        openCircuitFlow.getStatusLine().getStatusCode() == 503
+        closedCircuitFlow.getStatusLine().getStatusCode() == 200
+    }
 }
