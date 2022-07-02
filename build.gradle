@@ -30,6 +30,8 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
     implementation 'com.google.code.gson:gson:2.8.8'
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.0'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    implementation group: 'io.github.resilience4j', name: 'resilience4j-circuitbreaker', version: '1.6.1'
 
     // Test:
     // Use the latest Groovy version for Spock testing

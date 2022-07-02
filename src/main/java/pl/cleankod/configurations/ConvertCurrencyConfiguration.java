@@ -1,5 +1,6 @@
 package pl.cleankod.configurations;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,8 +20,9 @@ import java.util.Optional;
 public class ConvertCurrencyConfiguration {
     @Bean
     CurrencyConversionService currencyConversionNbpService(ExchangeRatesNbpClient exchangeRatesNbpClient,
-                                                           CacheService<String, Optional<RateWrapper>> cacheService) {
-        return new CurrencyConversionServiceImpl(exchangeRatesNbpClient, cacheService);
+                                                           CacheService<String, Optional<RateWrapper>> cacheService,
+                                                           CircuitBreaker circuitBreaker) {
+        return new CurrencyConversionServiceImpl(exchangeRatesNbpClient, cacheService, circuitBreaker);
     }
 
     @Bean
