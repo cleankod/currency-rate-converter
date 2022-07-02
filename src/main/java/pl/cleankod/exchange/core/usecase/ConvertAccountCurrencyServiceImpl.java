@@ -30,6 +30,9 @@ public class ConvertAccountCurrencyServiceImpl implements ConvertAccountCurrency
         if (!baseCurrency.equals(targetCurrency)) {
             return money.convert(currencyConversionService, targetCurrency);
         }
+        if (!money.currency().equals(targetCurrency)) {
+            return Result.fail(MoneyOperationFailedReason.conversionFailed(money.currency(), targetCurrency));
+        }
         LOGGER.info("Money are already in target currency of {}", targetCurrency.getCurrencyCode());
         return Result.successful(money);
     }
