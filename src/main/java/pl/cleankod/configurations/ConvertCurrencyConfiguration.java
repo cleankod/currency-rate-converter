@@ -14,13 +14,12 @@ import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
 
 import java.util.Currency;
-import java.util.Optional;
 
 @Configuration
 public class ConvertCurrencyConfiguration {
     @Bean
     CurrencyConversionService currencyConversionNbpService(ExchangeRatesNbpClient exchangeRatesNbpClient,
-                                                           CacheService<String, Optional<RateWrapper>> cacheService,
+                                                           CacheService<String, RateWrapper> cacheService,
                                                            CircuitBreaker circuitBreaker) {
         return new CurrencyConversionServiceImpl(exchangeRatesNbpClient, cacheService, circuitBreaker);
     }

@@ -1,7 +1,9 @@
 package pl.cleankod.exchange.provider.util;
 
 import pl.cleankod.exchange.core.domain.Money;
+import pl.cleankod.exchange.core.domain.MoneyOperationFailedReason;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
+import pl.cleankod.util.domain.Result;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -12,10 +14,10 @@ public class CurrencyConversionStubService implements CurrencyConversionService 
     private static final BigDecimal EUR_TO_PLN_RATE = BigDecimal.valueOf(4.58d);
 
     @Override
-    public Money convert(Money money, Currency targetCurrency) {
-        return money.currency().equals(targetCurrency)
+    public Result<Money, MoneyOperationFailedReason> convert(Money money, Currency targetCurrency) {
+        return Result.successful(money.currency().equals(targetCurrency)
                 ? money
-                : calculate(money, targetCurrency);
+                : calculate(money, targetCurrency));
     }
 
     private Money calculate(Money money, Currency targetCurrency) {

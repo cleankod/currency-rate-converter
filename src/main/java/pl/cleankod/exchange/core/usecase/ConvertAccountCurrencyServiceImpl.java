@@ -9,7 +9,6 @@ import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.util.domain.Result;
 
 import java.util.Currency;
-import java.util.Optional;
 
 public class ConvertAccountCurrencyServiceImpl implements ConvertAccountCurrencyService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConvertAccountCurrencyServiceImpl.class);
@@ -24,16 +23,14 @@ public class ConvertAccountCurrencyServiceImpl implements ConvertAccountCurrency
     @Override
     public Result<Account, MoneyOperationFailedReason> execute(Account account, Currency targetCurrency) {
         LOGGER.info("Starting to convert account with id {} to target currency of {}", account.id().value(), targetCurrency.getCurrencyCode());
-        return convert(account.balance(), targetCurrency)
-                .map(money -> Result.<Account, MoneyOperationFailedReason>successful(new Account(account.id(), account.number(), money)))
-                .orElseGet(() -> Result.fail(MoneyOperationFailedReason.conversionFailed(account.balance().currency(), targetCurrency)));
+        return convert(account.balance(), targetCurrency).successMap(money -> new Account(account.id(), account.number(), money));
     }
 
-    private Optional<Money> convert(Money money, Currency targetCurrency) {
+    private Result<Money, MoneyOperationFailedReason> convert(Money money, Currency targetCurrency) {
         if (!baseCurrency.equals(targetCurrency)) {
-            return Optional.ofNullable(money.convert(currencyConversionService, targetCurrency));
+            return money.convert(currencyConversionService, targetCurrency);
         }
         LOGGER.info("Money are already in target currency of {}", targetCurrency.getCurrencyCode());
-        return Optional.of(money);
+        return Result.successful(money);
     }
 }
