@@ -31,7 +31,7 @@ public class ConvertAccountCurrencyServiceImpl implements ConvertAccountCurrency
 
     private Optional<Money> convert(Money money, Currency targetCurrency) {
         if (!baseCurrency.equals(targetCurrency)) {
-            return Optional.of(money.convert(currencyConversionService, targetCurrency));
+            return Optional.ofNullable(money.convert(currencyConversionService, targetCurrency));
         }
 
         if (!money.currency().equals(targetCurrency)) {

@@ -29,6 +29,7 @@ dependencies {
     implementation 'io.github.openfeign:feign-jackson:11.8'
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
     implementation 'com.google.code.gson:gson:2.8.8'
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.0'
 
     // Test:
     // Use the latest Groovy version for Spock testing

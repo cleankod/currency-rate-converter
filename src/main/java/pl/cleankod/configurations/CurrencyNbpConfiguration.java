@@ -7,8 +7,6 @@ import feign.jackson.JacksonEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
-import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 
 @Configuration
@@ -21,10 +19,5 @@ public class CurrencyNbpConfiguration {
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
                 .target(ExchangeRatesNbpClient.class, nbpApiBaseUrl);
-    }
-
-    @Bean
-    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
-        return new CurrencyConversionNbpService(exchangeRatesNbpClient);
     }
 }
