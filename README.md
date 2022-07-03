@@ -64,10 +64,10 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * Rounding when calculating the amount is not done correctly for this type of operation.
 * <s>Investigate whether it is possible to implement the value-object serialization, to avoid `value` nested field in JSON. See [#10](https://github.com/cleankod/currency-rate-converter/pull/10) as a starting point. Or maybe there is a better solution to the problem at hand?</s>
 * Move parameter-specific logic outside the controller.
-* Better error handling, especially of potential errors from NBP API.
+* <s>Better error handling, especially of potential errors from NBP API.</s>
 * Caching the NBP API results.
 * <s>Circuit-breaker for the NBP API client.</s>
-* Better logging with traceability.
+* <s>Better logging with traceability.</s>
 * Replace exceptions with `Result` (`either`) which improves the overall methods API readability and forces error handling. Look into [cleankod/architecture-archetype](https://github.com/cleankod/architecture-archetype) as a starting point.
 * Test coverage report.
 * Auto generating REST API docs.

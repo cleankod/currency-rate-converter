@@ -10,6 +10,7 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.exchange.core.mapper.AccountMapper;
@@ -21,6 +22,8 @@ import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
+import pl.cleankod.trace.ContextInitializeInterceptor;
+import pl.cleankod.trace.WebMvcConfig;
 
 import java.util.Currency;
 
@@ -86,5 +89,15 @@ public class ApplicationInitializer {
     @Bean
     MoneyMapper moneyMapper() {
         return Mappers.getMapper( MoneyMapper.class);
+    }
+
+    @Bean
+    ContextInitializeInterceptor contextInitializeInterceptor() {
+        return new ContextInitializeInterceptor();
+    }
+
+    @Bean
+    WebMvcConfigurer webMvcConfig(ContextInitializeInterceptor contextInitializeInterceptor) {
+        return new WebMvcConfig(contextInitializeInterceptor);
     }
 }

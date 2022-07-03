@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import org.apache.http.HttpResponse
 import pl.cleankod.BaseApplicationSpecification
 import pl.cleankod.exchange.entrypoint.model.AccountDto
+import pl.cleankod.exchange.entrypoint.model.ApiError
 import pl.cleankod.exchange.entrypoint.model.MoneyDto
 
 import java.nio.charset.StandardCharsets
@@ -88,7 +89,9 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         then:
         response.getStatusLine().getStatusCode() == 400
-        transformError(response).message() == "Cannot convert currency from EUR to PLN."
+        ApiError apiError = transformError(response)
+        apiError.message() == "Cannot convert currency from EUR to PLN."
+        apiError.traceId() != null
     }
 
     def "should not find an account by ID"() {

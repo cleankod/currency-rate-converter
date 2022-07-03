@@ -2,6 +2,8 @@ package pl.cleankod.exchange.entrypoint;
 
 import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -12,10 +14,12 @@ import pl.cleankod.exchange.provider.nbp.FetchFallbackInvokedException;
 
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
+    private static final Logger LOGGER= LoggerFactory.getLogger(ExceptionHandlerAdvice.class);
 
     @ExceptionHandler({FetchFallbackInvokedException.class})
     protected ResponseEntity<ApiError> handleFetchFallbackInvokedException(FetchFallbackInvokedException ex) {
         if (ex.getCause() instanceof CallNotPermittedException) {
+            LOGGER.info("Nbp circuit breaker open:", ex);
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new ApiError("Nbp client unavailable"));
         } else if (ex.getCause() instanceof FeignException feignException) {
             return ResponseEntity.status(feignException.status()).body(new ApiError(HttpStatus.valueOf(feignException.status()).getReasonPhrase()));
@@ -28,7 +32,8 @@ public class ExceptionHandlerAdvice {
             CurrencyConversionException.class,
             IllegalArgumentException.class
     })
-    protected ResponseEntity<ApiError> handleBadRequest(CurrencyConversionException ex) {
+    protected ResponseEntity<ApiError> handleBadRequest(RuntimeException ex) {
+        LOGGER.info("Bad request:", ex);
         return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
     }
 }
