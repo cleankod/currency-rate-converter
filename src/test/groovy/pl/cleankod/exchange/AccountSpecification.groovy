@@ -127,21 +127,16 @@ class AccountSpecification extends BaseApplicationSpecification {
         )
 
         when:
-        def happyCall1 = getResponse("/accounts/${accountId}?currency=${happyFlowCurrency}")
-        def happyCall2 = getResponse("/accounts/${accountId}?currency=${happyFlowCurrency}")
-        def happyCall3 = getResponse("/accounts/${accountId}?currency=${happyFlowCurrency}")
-        def internalServerErrorFlow = getResponse("/accounts/${accountId}?currency=${failingFlowCurrency}")
-        def happyCall4 = getResponse("/accounts/${accountId}?currency=${happyFlowCurrency}")
+        getResponse("/accounts/${accountId}?currency=${happyFlowCurrency}")
+        getResponse("/accounts/${accountId}?currency=${happyFlowCurrency}")
+        getResponse("/accounts/${accountId}?currency=${happyFlowCurrency}")
+        getResponse("/accounts/${accountId}?currency=${failingFlowCurrency}")
+        getResponse("/accounts/${accountId}?currency=${failingFlowCurrency}")
         def openCircuitFlow = getResponse("/accounts/${accountId}?currency=${happyFlowCurrency}")
         sleep(600)
         def closedCircuitFlow = getResponse("/accounts/${accountId}?currency=${happyFlowCurrency}")
 
         then:
-        happyCall1.getStatusLine().getStatusCode() == 200
-        happyCall2.getStatusLine().getStatusCode() == 200
-        happyCall3.getStatusLine().getStatusCode() == 200
-        happyCall4.getStatusLine().getStatusCode() == 200
-        internalServerErrorFlow.getStatusLine().getStatusCode() == 500
         openCircuitFlow.getStatusLine().getStatusCode() == 503
         closedCircuitFlow.getStatusLine().getStatusCode() == 200
     }
