@@ -1,4 +1,4 @@
-package pl.cleankod.exchange.core.mapper;
+package pl.cleankod.exchange.core.service.mapper;
 
 import org.mapstruct.Mapper;
 import pl.cleankod.exchange.core.domain.Money;

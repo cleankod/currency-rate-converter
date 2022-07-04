@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.cleankod.exchange.core.service.AccountNotFoundException;
-import pl.cleankod.exchange.core.usecase.CurrencyConversionException;
+import pl.cleankod.exchange.core.service.CurrencyConversionException;
 import pl.cleankod.exchange.entrypoint.model.ApiError;
 import pl.cleankod.exchange.provider.nbp.FetchFallbackInvokedException;
 
