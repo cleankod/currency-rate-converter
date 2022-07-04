@@ -75,3 +75,4 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * Replace Spring Framework with a different one.
 * The proposed architecture is not perfect. Suggest improvements.
     * <s>Add service layer for the AccountController</s>
+    * <s>Move configuration to separate file</s>
