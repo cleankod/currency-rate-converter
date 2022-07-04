@@ -15,6 +15,8 @@ import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.exchange.core.mapper.AccountMapper;
 import pl.cleankod.exchange.core.mapper.MoneyMapper;
+import pl.cleankod.exchange.core.trace.ContextInitializeInterceptor;
+import pl.cleankod.exchange.core.trace.WebMvcConfig;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 import pl.cleankod.exchange.entrypoint.AccountController;
@@ -22,8 +24,6 @@ import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
-import pl.cleankod.trace.ContextInitializeInterceptor;
-import pl.cleankod.trace.WebMvcConfig;
 
 import java.util.Currency;
 

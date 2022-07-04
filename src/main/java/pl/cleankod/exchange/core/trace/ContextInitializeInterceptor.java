@@ -1,4 +1,4 @@
-package pl.cleankod.trace;
+package pl.cleankod.exchange.core.trace;
 
 import io.micrometer.core.lang.NonNull;
 import org.slf4j.MDC;
