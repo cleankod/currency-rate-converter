@@ -77,3 +77,4 @@ Also, value-objects are responsible for a little more than just plain data holdi
     * <s>Add service layer for the AccountController</s>
     * <s>Remove use case package and classes. Move logic to the service</s>
     * <s>Move configuration to separate file</s>
+    * Multi module project. Module structure: application, nbp-client, account-repository, shared-module
