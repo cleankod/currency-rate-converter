@@ -69,7 +69,7 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * <s>Circuit-breaker for the NBP API client.</s>
 * <s>Better logging with traceability.</s>
 * Replace exceptions with `Result` (`either`) which improves the overall methods API readability and forces error handling. Look into [cleankod/architecture-archetype](https://github.com/cleankod/architecture-archetype) as a starting point.
-* Test coverage report.
+* <s>Test coverage report.</s>
 * Auto generating REST API docs.
 * Integration tests with the real NBP API.
 * Replace Spring Framework with a different one.
