@@ -15,6 +15,8 @@ import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.exchange.core.mapper.AccountMapper;
 import pl.cleankod.exchange.core.mapper.MoneyMapper;
+import pl.cleankod.exchange.core.service.AccountService;
+import pl.cleankod.exchange.core.service.AccountServiceImpl;
 import pl.cleankod.exchange.core.trace.ContextInitializeInterceptor;
 import pl.cleankod.exchange.core.trace.WebMvcConfig;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
@@ -70,10 +72,8 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    AccountController accountController(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
-                                        FindAccountUseCase findAccountUseCase,
-                                        AccountMapper accountMapper) {
-        return new AccountController(findAccountAndConvertCurrencyUseCase, findAccountUseCase, accountMapper);
+    AccountController accountController(AccountService accountService) {
+        return new AccountController(accountService);
     }
 
     @Bean
@@ -99,5 +99,12 @@ public class ApplicationInitializer {
     @Bean
     WebMvcConfigurer webMvcConfig(ContextInitializeInterceptor contextInitializeInterceptor) {
         return new WebMvcConfig(contextInitializeInterceptor);
+    }
+
+    @Bean
+    AccountService accountService(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
+                                     FindAccountUseCase findAccountUseCase,
+                                     AccountMapper accountMapper) {
+        return new AccountServiceImpl(findAccountAndConvertCurrencyUseCase, findAccountUseCase, accountMapper);
     }
 }

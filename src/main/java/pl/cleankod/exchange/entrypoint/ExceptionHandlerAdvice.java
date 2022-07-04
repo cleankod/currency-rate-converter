@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import pl.cleankod.exchange.core.service.AccountNotFoundException;
 import pl.cleankod.exchange.core.usecase.CurrencyConversionException;
 import pl.cleankod.exchange.entrypoint.model.ApiError;
 import pl.cleankod.exchange.provider.nbp.FetchFallbackInvokedException;
@@ -15,6 +16,11 @@ import pl.cleankod.exchange.provider.nbp.FetchFallbackInvokedException;
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
     private static final Logger LOGGER= LoggerFactory.getLogger(ExceptionHandlerAdvice.class);
+
+    @ExceptionHandler({AccountNotFoundException.class})
+    protected ResponseEntity<ApiError> handleAccountNotFoundException(AccountNotFoundException ex) {
+        return ResponseEntity.notFound().build();
+    }
 
     @ExceptionHandler({FetchFallbackInvokedException.class})
     protected ResponseEntity<ApiError> handleFetchFallbackInvokedException(FetchFallbackInvokedException ex) {
