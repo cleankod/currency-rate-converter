@@ -15,8 +15,10 @@ import pl.cleankod.exchange.entrypoint.AccountController;
 import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
 import pl.cleankod.exchange.entrypoint.model.IncorrectFormatException;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
+import pl.cleankod.exchange.provider.Cache;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
+import pl.cleankod.exchange.provider.nbp.cache.NbpLFUCache;
 
 import java.util.Currency;
 
@@ -42,6 +44,11 @@ public class ExchangeConfig {
     }
 
     @Bean
+    Cache cache(Environment environment){
+        return new NbpLFUCache(environment.getRequiredProperty("cache.maxCacheSize", Integer.class));
+    }
+
+    @Bean
     ExchangeRatesNbpClient exchangeRatesNbpClient(Environment environment) {
         String nbpApiBaseUrl = environment.getRequiredProperty("provider.nbp-api.base-url");
         return Feign.builder()
@@ -52,13 +59,14 @@ public class ExchangeConfig {
     }
 
     @Bean
-    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
-        return new CurrencyConversionNbpService(exchangeRatesNbpClient);
+    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient, Cache cache) {
+        return new CurrencyConversionNbpService(exchangeRatesNbpClient, cache);
     }
 
     @Bean
     ExceptionHandlerAdvice exceptionHandlerAdvice() {
         return new ExceptionHandlerAdvice();
     }
+
 
 }
