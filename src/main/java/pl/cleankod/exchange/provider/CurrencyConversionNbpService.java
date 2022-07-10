@@ -20,7 +20,7 @@ public class CurrencyConversionNbpService implements CurrencyConversionService {
     public Money convert(Money money, Currency targetCurrency) {
         RateWrapper rateWrapper = exchangeRatesNbpClient.fetch("A", targetCurrency.getCurrencyCode());
         BigDecimal midRate = rateWrapper.rates().get(0).mid();
-        BigDecimal calculatedRate = money.amount().divide(midRate, RoundingMode.HALF_UP);
+        BigDecimal calculatedRate = money.amount().divide(midRate, RoundingMode.FLOOR);
         return new Money(calculatedRate, targetCurrency);
     }
 }

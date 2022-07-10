@@ -20,6 +20,6 @@ public class CurrencyConversionStubService implements CurrencyConversionService 
 
     private Money calculate(Money money, Currency targetCurrency) {
         BigDecimal rate = "PLN".equals(targetCurrency.getCurrencyCode()) ? EUR_TO_PLN_RATE : PLN_TO_EUR_RATE;
-        return Money.of(money.amount().multiply(rate).setScale(2, RoundingMode.HALF_UP), targetCurrency);
+        return Money.of(money.amount().divide(rate,RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP), targetCurrency);
     }
 }

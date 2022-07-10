@@ -3,7 +3,6 @@ package pl.cleankod.exchange.core.domain;
 import pl.cleankod.util.Preconditions;
 
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 public record Account(Id id, Number number, Money balance) {
 
@@ -22,15 +21,11 @@ public record Account(Id id, Number number, Money balance) {
         }
     }
 
-    public static record Number(String value) {
-        private static final Pattern PATTERN =
-                Pattern.compile("\\d{2}[ ]?\\d{4}[ ]?\\d{4}[ ]?\\d{4}[ ]?\\d{4}[ ]?\\d{4}[ ]?\\d{4}");
+    public record Number(String value) {
 
         public Number {
             Preconditions.requireNonNull(value);
-            if (!PATTERN.matcher(value).matches()) {
-                throw new IllegalArgumentException("The account number does not match the pattern: " + PATTERN);
-            }
+            Preconditions.validateAccountNumber(value);
         }
 
         public static Number of(String value) {

@@ -1,4 +1,4 @@
 package pl.cleankod.exchange.entrypoint.model;
 
-public record ApiError(String message) {
+public record ApiException(String message) {
 }
