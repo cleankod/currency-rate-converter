@@ -32,7 +32,7 @@ public class CorrelationIdInterceptor implements HandlerInterceptor {
             HttpServletResponse response,
             Object handler,
             ModelAndView modelAndView) {
-
+        //TODO does not work when using ResponseEntity. More to be implemented to be able to return response with cid in headers
         response.addHeader("CID", MDC.get("CID"));
         log.info("[postHandle][ correlationId: " + MDC.get("CID") + "]" + " response with status: " + response.getStatus());
     }

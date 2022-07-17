@@ -10,5 +10,4 @@ public interface Cache{
 
     void put(String currencyCode, String requestedDate, RateWrapper rate);
 
-    void clear(int maxCapacity);
 }

@@ -20,6 +20,8 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/accounts")
+//TODO introduce session for CID
+//TODO do we need to introduce support for Async req?
 public class AccountController {
     private static final Logger logger = LoggerFactory.getLogger(AccountController.class);
     private final AccountService accountService;

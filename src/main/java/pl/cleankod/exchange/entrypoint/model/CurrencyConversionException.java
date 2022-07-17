@@ -7,8 +7,4 @@ public class CurrencyConversionException extends IllegalStateException {
         super(String.format("Cannot convert currency from %s to %s.", sourceCurrency, targetCurrency));
     }
 
-    public CurrencyConversionException(String targetCurrency) {
-        super(String.format("The requested currency %s is unsupported.", targetCurrency));
-    }
-
 }
