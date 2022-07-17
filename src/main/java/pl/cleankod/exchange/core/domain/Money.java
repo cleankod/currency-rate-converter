@@ -20,7 +20,7 @@ public record Money(BigDecimal amount, Currency currency) {
         return new Money(new BigDecimal(amount), Currency.getInstance(currency));
     }
 
-    public Money convert(CurrencyConversionService currencyConverter, Currency targetCurrency) {
-        return currencyConverter.convert(this, targetCurrency);
+    public Money convert(CurrencyConversionService currencyConverter, Currency targetCurrency, String correlationId) {
+        return currencyConverter.convert(this, targetCurrency, correlationId);
     }
 }

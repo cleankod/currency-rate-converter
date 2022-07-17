@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public record Account(Id id, Number number, Money balance) {
 
-    public static record Id(UUID value) {
+    public record Id(UUID value) {
         public Id {
             Preconditions.requireNonNull(value);
         }

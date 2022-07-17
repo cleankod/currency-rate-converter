@@ -1,6 +1,7 @@
 package pl.cleankod.exchange.core.domain
 
 import pl.cleankod.exchange.core.domain.Account
+import pl.cleankod.exchange.entrypoint.model.ValidationException
 import spock.lang.Specification
 
 class AccountNumberSpecification extends Specification {
@@ -34,7 +35,7 @@ class AccountNumberSpecification extends Specification {
 
         where:
         givenValue                           || expectedExceptionType    || expectedExceptionMessage
-        "PL65 1090 1665 0000 0001 0373 7343" || IllegalArgumentException || "The account number does not match the pattern"
+        "PL65 1090 1665 0000 0001 0373 7343" || ValidationException || "The account number does not match the pattern"
         null                                 || NullPointerException     || "Given value cannot be null"
     }
 }

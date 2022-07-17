@@ -5,6 +5,6 @@ import java.util.Currency;
 
 
 public record AccountResponse(String id, String number, MoneyResponse balance) {
-    public record MoneyResponse(BigDecimal amount, Currency currency) {
+    public record MoneyResponse(BigDecimal amount, String currency) {
     }
 }

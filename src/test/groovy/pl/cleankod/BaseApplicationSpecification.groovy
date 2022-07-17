@@ -6,7 +6,7 @@ import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.util.EntityUtils
-import pl.cleankod.exchange.entrypoint.model.ApiException
+import pl.cleankod.exchange.entrypoint.model.ApiError
 import spock.lang.Specification
 
 abstract class BaseApplicationSpecification extends Specification {
@@ -37,8 +37,8 @@ abstract class BaseApplicationSpecification extends Specification {
     return objectMapper.readValue(response, classOfT)
   }
 
-  static ApiException transformError(HttpResponse httpResponse) {
-    return transform(httpResponse, ApiException)
+  static ApiError transformError(HttpResponse httpResponse) {
+    return transform(httpResponse, ApiError)
   }
 
   private static HttpResponse execute(HttpUriRequest request) {

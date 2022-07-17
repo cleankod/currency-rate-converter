@@ -1,8 +1,10 @@
 package pl.cleankod.util
 
+import pl.cleankod.exchange.entrypoint.model.ValidationException
 import spock.lang.Specification
 
-class PreconditionsRequireNonNullSpecification extends Specification {
+class PreconditionsSpecification extends Specification {
+
     def "should return object since it's not null"() {
         when:
         //noinspection GroovyAssignabilityCheck
@@ -27,4 +29,23 @@ class PreconditionsRequireNonNullSpecification extends Specification {
         where:
         givenValue << [null as String, null as Long]
     }
+
+    def "should not validate account number because of wrong format"() {
+        when:
+        Preconditions.validateAccountNumber("x")
+
+        then:
+        def exception = thrown(ValidationException)
+        exception.message.startsWith("The account number does not match the pattern")
+    }
+
+    def "should not validate id of an account because of wrong format"() {
+        when:
+        Preconditions.validateUUIDFormat("x")
+
+        then:
+        def exception = thrown(ValidationException)
+        exception.message.startsWith("Format validation failed for id x")
+    }
+
 }

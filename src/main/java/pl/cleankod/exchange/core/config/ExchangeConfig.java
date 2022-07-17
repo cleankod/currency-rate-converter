@@ -1,9 +1,5 @@
 package pl.cleankod.exchange.core.config;
 
-import feign.Feign;
-import feign.httpclient.ApacheHttpClient;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
@@ -13,12 +9,8 @@ import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.exchange.core.usecase.AccountServiceImpl;
 import pl.cleankod.exchange.entrypoint.AccountController;
 import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
-import pl.cleankod.exchange.entrypoint.model.IncorrectFormatException;
+import pl.cleankod.exchange.entrypoint.model.ValidationException;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
-import pl.cleankod.exchange.provider.Cache;
-import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
-import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
-import pl.cleankod.exchange.provider.nbp.cache.NbpLFUCache;
 
 import java.util.Currency;
 
@@ -39,34 +31,13 @@ public class ExchangeConfig {
     }
 
     @Bean
-    AccountRepository accountRepository() throws IncorrectFormatException {
+    AccountRepository accountRepository() throws ValidationException {
         return new AccountInMemoryRepository();
-    }
-
-    @Bean
-    Cache cache(Environment environment){
-        return new NbpLFUCache(environment.getRequiredProperty("cache.maxCacheSize", Integer.class));
-    }
-
-    @Bean
-    ExchangeRatesNbpClient exchangeRatesNbpClient(Environment environment) {
-        String nbpApiBaseUrl = environment.getRequiredProperty("provider.nbp-api.base-url");
-        return Feign.builder()
-                .client(new ApacheHttpClient())
-                .encoder(new JacksonEncoder())
-                .decoder(new JacksonDecoder())
-                .target(ExchangeRatesNbpClient.class, nbpApiBaseUrl);
-    }
-
-    @Bean
-    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient, Cache cache) {
-        return new CurrencyConversionNbpService(exchangeRatesNbpClient, cache);
     }
 
     @Bean
     ExceptionHandlerAdvice exceptionHandlerAdvice() {
         return new ExceptionHandlerAdvice();
     }
-
 
 }

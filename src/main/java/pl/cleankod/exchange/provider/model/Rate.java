@@ -1,4 +1,4 @@
-package pl.cleankod.exchange.provider.nbp.model;
+package pl.cleankod.exchange.provider.model;
 
 import java.math.BigDecimal;
 

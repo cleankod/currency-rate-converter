@@ -1,10 +1,14 @@
 package pl.cleankod.exchange.entrypoint.model;
 
-public class AccountNotFoundException extends Exception{
+public final class AccountNotFoundException extends RuntimeException {
 
-    public static final String ACCOUNT_NOT_FOUND = "Requested account does not exist.";
+    private final String cid;
+    public AccountNotFoundException(String cid){
+        super("The requested account was not found. ");
+        this.cid = cid;
+    }
 
-    public AccountNotFoundException(String message) {
-        super(message);
+    public String getCid() {
+        return cid;
     }
 }
