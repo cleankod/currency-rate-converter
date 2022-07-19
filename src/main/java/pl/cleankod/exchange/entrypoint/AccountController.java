@@ -26,34 +26,24 @@ public class AccountController {
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<Account> findAccountById(@PathVariable String id, @RequestParam(required = false) String currency) {
+        Account.Id accountId = Account.Id.of(id);
         return Optional.ofNullable(currency)
-                .map(s ->
-                        findAccountAndConvertCurrencyUseCase.execute(Account.Id.of(id), Currency.getInstance(s))
-                                .map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build())
-                )
-                .orElseGet(() ->
-                        findAccountUseCase.execute(Account.Id.of(id))
-                                .map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build())
-                );
+                .map(s -> findAccountAndConvertCurrencyUseCase.execute(accountId, Currency.getInstance(s)))
+                .orElseGet(() -> findAccountUseCase.execute(accountId))
+                .map(ResponseEntity::ok)
+                .orElseGet(ResponseEntity.notFound()::build);
     }
 
     @GetMapping(path = "/number={number}")
-    public ResponseEntity<Account> findAccountByNumber(@PathVariable String number, @RequestParam(required = false) String currency) {
+    public ResponseEntity<Account> findAccountByNumber(
+            @PathVariable String number,
+            @RequestParam(required = false) String currency
+    ) {
         Account.Number accountNumber = Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8));
         return Optional.ofNullable(currency)
-                .map(s ->
-                        findAccountAndConvertCurrencyUseCase.execute(accountNumber, Currency.getInstance(s))
-                                .map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build())
-                )
-                .orElseGet(() ->
-                        findAccountUseCase.execute(accountNumber)
-                                .map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build())
-                );
+                .map(s -> findAccountAndConvertCurrencyUseCase.execute(accountNumber, Currency.getInstance(s)))
+                .orElseGet(() -> findAccountUseCase.execute(accountNumber))
+                .map(ResponseEntity::ok)
+                .orElseGet(ResponseEntity.notFound()::build);
     }
-
-
 }

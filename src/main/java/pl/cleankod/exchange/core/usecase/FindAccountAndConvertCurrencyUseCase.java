@@ -10,25 +10,25 @@ import java.util.Optional;
 
 public class FindAccountAndConvertCurrencyUseCase {
 
-    private final AccountRepository accountRepository;
+    private final FindAccountUseCase findAccountUseCase;
     private final CurrencyConversionService currencyConversionService;
     private final Currency baseCurrency;
 
-    public FindAccountAndConvertCurrencyUseCase(AccountRepository accountRepository,
+    public FindAccountAndConvertCurrencyUseCase(FindAccountUseCase findAccountUseCase,
                                                 CurrencyConversionService currencyConversionService,
                                                 Currency baseCurrency) {
-        this.accountRepository = accountRepository;
+        this.findAccountUseCase = findAccountUseCase;
         this.currencyConversionService = currencyConversionService;
         this.baseCurrency = baseCurrency;
     }
 
     public Optional<Account> execute(Account.Id id, Currency targetCurrency) {
-        return accountRepository.find(id)
+        return findAccountUseCase.execute(id)
                 .map(account -> new Account(account.id(), account.number(), convert(account.balance(), targetCurrency)));
     }
 
     public Optional<Account> execute(Account.Number number, Currency targetCurrency) {
-        return accountRepository.find(number)
+        return findAccountUseCase.execute(number)
                 .map(account -> new Account(account.id(), account.number(), convert(account.balance(), targetCurrency)));
     }
 

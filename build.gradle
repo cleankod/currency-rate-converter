@@ -15,10 +15,13 @@ java {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.3'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
-    implementation 'io.github.openfeign:feign-httpclient:11.8'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.7.1'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator:2.7.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
+
+    implementation 'io.github.openfeign:feign-hc5:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.1'
 
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy:3.0.9'
@@ -27,7 +30,7 @@ dependencies {
     testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
 
     testImplementation 'org.apache.httpcomponents:httpclient:4.5.13'
-    testImplementation 'com.github.tomakehurst:wiremock-jre8:2.27.2'
+    testImplementation 'com.github.tomakehurst:wiremock-jre8:2.33.2'
 }
 
 

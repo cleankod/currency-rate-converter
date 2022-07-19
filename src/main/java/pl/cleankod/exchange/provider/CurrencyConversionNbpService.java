@@ -18,9 +18,13 @@ public class CurrencyConversionNbpService implements CurrencyConversionService {
 
     @Override
     public Money convert(Money money, Currency targetCurrency) {
-        RateWrapper rateWrapper = exchangeRatesNbpClient.fetch("A", targetCurrency.getCurrencyCode());
+        RateWrapper rateWrapper = fetchRate(targetCurrency.getCurrencyCode());
         BigDecimal midRate = rateWrapper.rates().get(0).mid();
         BigDecimal calculatedRate = money.amount().divide(midRate, RoundingMode.HALF_UP);
         return new Money(calculatedRate, targetCurrency);
+    }
+
+    RateWrapper fetchRate(String currencyCode) {
+        return exchangeRatesNbpClient.fetch("A", currencyCode);
     }
 }

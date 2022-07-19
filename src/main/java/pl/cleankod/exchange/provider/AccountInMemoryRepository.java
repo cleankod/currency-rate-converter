@@ -4,8 +4,11 @@ import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class AccountInMemoryRepository implements AccountRepository {
 
@@ -22,17 +25,19 @@ public class AccountInMemoryRepository implements AccountRepository {
             )
     );
 
+    private final Map<Account.Number, Account> accountsByAccountNumber = accounts.stream()
+            .collect(Collectors.toMap(Account::number, Function.identity()));
+
+    private final Map<Account.Id, Account> accountsById = accounts.stream()
+            .collect(Collectors.toMap(Account::id, Function.identity()));
+
     @Override
     public Optional<Account> find(Account.Id id) {
-        return accounts.stream()
-                .filter(account -> account.id().equals(id))
-                .findFirst();
+        return Optional.ofNullable(accountsById.get(id));
     }
 
     @Override
     public Optional<Account> find(Account.Number number) {
-        return accounts.stream()
-                .filter(account -> account.number().equals(number))
-                .findFirst();
+        return Optional.ofNullable(accountsByAccountNumber.get(number));
     }
 }
