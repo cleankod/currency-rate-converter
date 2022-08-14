@@ -24,12 +24,16 @@ public class FindAccountAndConvertCurrencyUseCase {
 
     public Optional<Account> execute(Account.Id id, Currency targetCurrency) {
         return accountRepository.find(id)
-                .map(account -> new Account(account.id(), account.number(), convert(account.balance(), targetCurrency)));
+                .map(account -> getConvertedAccount(account, targetCurrency));
     }
 
     public Optional<Account> execute(Account.Number number, Currency targetCurrency) {
         return accountRepository.find(number)
-                .map(account -> new Account(account.id(), account.number(), convert(account.balance(), targetCurrency)));
+                .map(account -> getConvertedAccount(account, targetCurrency));
+    }
+
+    private Account getConvertedAccount(Account account, Currency targetCurrency) {
+        return new Account(account.id(), account.number(), convert(account.balance(), targetCurrency));
     }
 
     private Money convert(Money money, Currency targetCurrency) {
