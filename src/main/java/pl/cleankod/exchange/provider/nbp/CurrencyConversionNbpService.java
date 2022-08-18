@@ -1,26 +1,27 @@
-package pl.cleankod.exchange.provider;
+package pl.cleankod.exchange.provider.nbp;
 
 import pl.cleankod.exchange.core.domain.Money;
-import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
-import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
+import pl.cleankod.exchange.provider.FixedCurrencyConversionService;
+import pl.cleankod.exchange.provider.nbp.client.ExchangeRatesNbpClient;
 import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Currency;
 
-public class CurrencyConversionNbpService implements CurrencyConversionService {
+public class CurrencyConversionNbpService extends FixedCurrencyConversionService {
     private final ExchangeRatesNbpClient exchangeRatesNbpClient;
 
-    public CurrencyConversionNbpService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
+    public CurrencyConversionNbpService(ExchangeRatesNbpClient exchangeRatesNbpClient, Currency baseCurrency) {
+        super(baseCurrency);
         this.exchangeRatesNbpClient = exchangeRatesNbpClient;
     }
 
     @Override
-    public Money convert(Money money, Currency targetCurrency) {
+    public Money doConvert(BigDecimal amount, Currency targetCurrency) {
         RateWrapper rateWrapper = exchangeRatesNbpClient.fetch("A", targetCurrency.getCurrencyCode());
         BigDecimal midRate = rateWrapper.rates().get(0).mid();
-        BigDecimal calculatedRate = money.amount().divide(midRate, RoundingMode.HALF_UP);
+        BigDecimal calculatedRate = amount.divide(midRate, RoundingMode.HALF_UP);
         return new Money(calculatedRate, targetCurrency);
     }
 }

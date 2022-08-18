@@ -91,7 +91,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         transformError(response).message() == "Cannot convert currency from EUR to PLN."
     }
 
-    def "should not find an account by ID"() {
+    def "should not find an account by inexistent ID"() {
         given:
         def accountId = "ac270f3a-8d08-11ec-8b91-9bcdf6e2522a"
 
@@ -102,7 +102,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         response.getStatusLine().getStatusCode() == 404
     }
 
-    def "should not find an account by number"() {
+    def "should not find an account by inexistent number"() {
         given:
         def accountNumber = URLEncoder.encode("11 1750 0009 0000 0000 2156 6004", StandardCharsets.UTF_8)
 

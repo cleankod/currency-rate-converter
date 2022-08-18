@@ -1,4 +1,4 @@
-package pl.cleankod.exchange.provider.nbp;
+package pl.cleankod.exchange.provider.nbp.client;
 
 import feign.Param;
 import feign.RequestLine;

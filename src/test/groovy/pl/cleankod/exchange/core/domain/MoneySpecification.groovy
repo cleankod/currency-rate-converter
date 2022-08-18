@@ -1,7 +1,6 @@
 package pl.cleankod.exchange.core.domain
 
 
-import pl.cleankod.exchange.core.domain.Money
 import spock.lang.Specification
 
 class MoneySpecification extends Specification {
@@ -56,5 +55,16 @@ class MoneySpecification extends Specification {
 
         where:
         givenAmount << ["EUR", "\0", "123,45"]
+    }
+
+    def "should not create object with negative amount"() {
+        when:
+        Money.of(givenAmount, "PLN")
+
+        then:
+        thrown(IllegalArgumentException)
+
+        where:
+        givenAmount = "-1"
     }
 }
