@@ -78,6 +78,9 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * Better logging with traceability.
 * Replace exceptions with `Result` (`either`) which improves the overall methods API readability and forces error handling. Look into [cleankod/architecture-archetype](https://github.com/cleankod/architecture-archetype) as a starting point.
 * Test coverage report.
+  * Ok, this one was easy altough first I wanted to skip it - just added the sample gradle config from here https://docs.gradle.org/current/userguide/jacoco_plugin.html
+  * Not too bad coverage, there is one extra class not covered (the stub) which I wanted to exclude
+  * The first two exclusions trials were not succesful (one advice was for an older version of gradle and the second way did not worked). Normally I keep on trying but I do not think it matters that much at this stage of the process
 * Auto generating REST API docs.
 * Integration tests with the real NBP API.
 * Replace Spring Framework with a different one.
