@@ -90,11 +90,15 @@ See [#10](https://github.com/cleankod/currency-rate-converter/pull/10) as a star
 * Better error handling, especially of potential errors from NBP API.
 * 
 * Caching the NBP API results.
-* 
+  * Cached using the simplest local caching and explained how it can be properly done
 * Circuit-breaker for the NBP API client.
-* 
+  * Not implemented but commented out the code where it would be implemented with resilience4j
+  * 
 * Better logging with traceability.
-* 
+  * I added some logs mostly to test the caching. However, to achieve traceability we would need to be able to correlate the logs,
+  * associate all the logs belonging to a request. And a way to achieve this would be with a correlation id - unique per request.
+  * It would work very well with the account id or the account number if it is not a sensitive data and is safe to print it in the logs.
+  * The chosen unique identifier can pe pushed in the NDC context and the logger can be configured to include that parameter in the log pattern.
 * Replace exceptions with `Result` (`either`) which improves the overall methods API readability and forces error handling. Look into [cleankod/architecture-archetype](https://github.com/cleankod/architecture-archetype) as a starting point.
 * 
 * `Test coverage report.`

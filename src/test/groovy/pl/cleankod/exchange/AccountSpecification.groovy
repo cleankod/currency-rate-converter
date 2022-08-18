@@ -14,7 +14,7 @@ class AccountSpecification extends BaseApplicationSpecification {
 
     private static WireMockServer wireMockServer = new WireMockServer(
             WireMockConfiguration.options()
-                    .port(8081)
+                    .port(8089)
     )
 
     def setupSpec() {

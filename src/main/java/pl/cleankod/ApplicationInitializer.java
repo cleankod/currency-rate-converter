@@ -24,6 +24,8 @@ import pl.cleankod.exchange.provider.account.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.conversion.CurrencyConversionServiceProvider;
 import pl.cleankod.exchange.provider.conversion.nbp.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.conversion.nbp.client.ExchangeRatesNbpClient;
+import pl.cleankod.exchange.provider.conversion.nbp.client.ExchangeRatesNbpClientCachingWrapper;
+import pl.cleankod.exchange.provider.conversion.nbp.client.ExchangeRatesNbpClientCircuitBreakerWrapper;
 
 import java.io.IOException;
 import java.util.Currency;
@@ -53,7 +55,13 @@ public class ApplicationInitializer {
     @Bean
     CurrencyConversionNbpService nbpConversionService(ExchangeRatesNbpClient client, Environment environment) {
         Currency baseCurrency = Currency.getInstance(environment.getRequiredProperty("app.base-currency"));
-        return new CurrencyConversionNbpService(client, baseCurrency);
+
+        // here we wire up the wrapper in the order we wish, but the best usage is achieved by having the caching wrapper
+        // as the outmost layer in the chain
+        var circuitBreakerWrapper = new ExchangeRatesNbpClientCircuitBreakerWrapper(client);
+        var cachingWrapper = new ExchangeRatesNbpClientCachingWrapper(circuitBreakerWrapper);
+
+        return new CurrencyConversionNbpService(cachingWrapper, baseCurrency);
     }
 
     @Bean
