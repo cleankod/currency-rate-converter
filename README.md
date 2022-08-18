@@ -66,15 +66,26 @@ Also, value-objects are responsible for a little more than just plain data holdi
 
 # To do
 * Rounding when calculating the amount is not done correctly for this type of operation.
+  * This one was very interesting. First it showed me that the numeric operations must be taken out of the conversion 
+  service, so they will be unit tested easily regardless of the currencies.
+  * Second - I probably would have gone with the Money API which was added in Javax a while ago to not care about the 
+  money conversion code. I am not completely sure that this solution is 100% correct. It looks like it as far as I can 
+  see and from the tests done. The obvious thing which made the rounding errors appear in the first place was that the 
+  given amount did not have a scale set. But my solution will work perfect only for the money which have the subunit with 
+  2 decimals (cent / eurocent / ban / etc). I think that for the other types of currencies the scale must match the number
+  of subdivisions, case in which the rounding errors might return.
+  * For the purpose of this process I would say is a good enough solution, I will not change now the Money with the javax Money but in a real project I think that would be the best option 
 * 
 * `Value-object serialization`
-* Investigate whether it is possible to implement the value-object serialization, to avoid `value` nested field in JSON. See [#10](https://github.com/cleankod/currency-rate-converter/pull/10) as a starting point. Or maybe there is a better solution to the problem at hand?
+* Investigate whether it is possible to implement the value-object serialization, to avoid `value` nested field in JSON. 
+See [#10](https://github.com/cleankod/currency-rate-converter/pull/10) as a starting point. Or maybe there is a better solution to the problem at hand?
   * Commit 2
   * Yes, it is possible but I prefer a different approach in which the domain object are not tainted by serialization code
   * That is why I fixed it with a simple serializer for each type with a value and it works like a charm (and the only change needed is in the app initializer)
   * Did not like the changes needed to make the tests pass, it was a little tedious, however it works even though might be a cleaner way
 * 
 * Move parameter-specific logic outside the controller.
+* 
 * 
 * Better error handling, especially of potential errors from NBP API.
 * 
@@ -90,7 +101,8 @@ Also, value-objects are responsible for a little more than just plain data holdi
   * Commit 3 
   * Ok, this one was easy altough first I wanted to skip it - just added the sample gradle config from here https://docs.gradle.org/current/userguide/jacoco_plugin.html
   * Not too bad coverage, there is one extra class not covered (the stub) which I wanted to exclude
-  * The first two exclusions trials were not succesful (one advice was for an older version of gradle and the second way did not worked). Normally I keep on trying but I do not think it matters that much at this stage of the process
+  * The first two exclusions trials were not succesful (one advice was for an older version of gradle and the second way 
+  did not worked). Normally I keep on trying but I do not think it matters that much at this stage of the process
 * 
 * `Auto generating REST API docs.`
   * Commit 5 (just test - no implementation at this moment) 
@@ -102,10 +114,14 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * 
 * `Replace Spring Framework with a different one.`
   * Commit 4 (just text - no implementation at this moment)
-  * I honestly to not plan to do this - is not very difficult from this point as besides the initializer where everything is wired there is no explicit dependency on the framework itself and will try to keep it in this way. 
-  * I know other todos which I might do soon can be solved by throwing an annotation like @Cacheable but will try to keep the current state of affairs in order to keep an eventual migration easy
-  * If I would actually do it I would replace Spring with Quarkus because that is a framework which I really wanted to try for a while now because it seems it has a few nice advantages over Spring. 
-  * Also from what I read might be very easy to replace as they build it with this Spring compatibility in mind. I will see how busy will be in the next days maybe I will take a chance at this later.
+  * I honestly to not plan to do this - is not very difficult from this point as besides the initializer where 
+  everything is wired there is no explicit dependency on the framework itself and will try to keep it in this way. 
+  * I know other todos which I might do soon can be solved by throwing an annotation like @Cacheable but will try to 
+  keep the current state of affairs in order to keep an eventual migration easy
+  * If I would actually do it I would replace Spring with Quarkus because that is a framework which I really wanted 
+  to try for a while now because it seems it has a few nice advantages over Spring. 
+  * Also from what I read might be very easy to replace as they build it with this Spring compatibility in mind. 
+  I will see how busy will be in the next days maybe I will take a chance at this later.
 * 
 * `The proposed architecture is not perfect. Suggest improvements.`
   * Commit 1.

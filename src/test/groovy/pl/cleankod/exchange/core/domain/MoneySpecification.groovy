@@ -67,4 +67,35 @@ class MoneySpecification extends Specification {
         where:
         givenAmount = "-1"
     }
+
+    def "should create object with amount correctly rounded when division applied"() {
+        when:
+        Money money = Money.of(startingAmount, divideRate, Currency.getInstance("RON"))
+
+        then:
+        money != null
+        money.amount() == expectedAmount
+
+        where:
+        startingAmount             | divideRate || expectedAmount
+        BigDecimal.valueOf(0.01)   | 0.9152     || BigDecimal.valueOf(0.01)
+        BigDecimal.valueOf(0.3)    | 0.9152     || BigDecimal.valueOf(0.33)
+        BigDecimal.valueOf(0.5)    | 0.9152     || BigDecimal.valueOf(0.55)
+        BigDecimal.valueOf(0.99)   | 0.9152     || BigDecimal.valueOf(1.08)
+        BigDecimal.valueOf(1.0)    | 0.9152     || BigDecimal.valueOf(1.09)
+        BigDecimal.valueOf(1.1)    | 0.9152     || BigDecimal.valueOf(1.20)
+        BigDecimal.valueOf(1.11)   | 0.9152     || BigDecimal.valueOf(1.21)
+        BigDecimal.valueOf(123.45) | 0.9152     || BigDecimal.valueOf(134.89)
+        BigDecimal.valueOf(999.99) | 0.9152     || BigDecimal.valueOf(1092.65)
+
+        BigDecimal.valueOf(0.01)   | 4.5274     || BigDecimal.valueOf(0.00)
+        BigDecimal.valueOf(0.3)    | 4.5274     || BigDecimal.valueOf(0.07)
+        BigDecimal.valueOf(0.5)    | 4.5274     || BigDecimal.valueOf(0.11)
+        BigDecimal.valueOf(0.99)   | 4.5274     || BigDecimal.valueOf(0.22)
+        BigDecimal.valueOf(1.0)    | 4.5274     || BigDecimal.valueOf(0.22)
+        BigDecimal.valueOf(1.1)    | 4.5274     || BigDecimal.valueOf(0.24)
+        BigDecimal.valueOf(1.11)   | 4.5274     || BigDecimal.valueOf(0.25)
+        BigDecimal.valueOf(123.45) | 4.5274     || BigDecimal.valueOf(27.27)
+        BigDecimal.valueOf(999.99) | 4.5274     || BigDecimal.valueOf(220.88)
+    }
 }

@@ -31,7 +31,8 @@ public record Money(BigDecimal amount, Currency currency) {
     }
 
     private static BigDecimal computeAmount(BigDecimal amount, BigDecimal rate) {
-        return amount.divide(rate, RoundingMode.HALF_UP);
+        amount = amount.setScale(2, RoundingMode.HALF_EVEN);
+        return amount.divide(rate, RoundingMode.HALF_EVEN);
     }
 
     public Optional<Money> convert(CurrencyConversionService currencyConverter, Currency targetCurrency) {
