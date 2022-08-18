@@ -67,6 +67,10 @@ Also, value-objects are responsible for a little more than just plain data holdi
 # To do
 * Rounding when calculating the amount is not done correctly for this type of operation.
 * Investigate whether it is possible to implement the value-object serialization, to avoid `value` nested field in JSON. See [#10](https://github.com/cleankod/currency-rate-converter/pull/10) as a starting point. Or maybe there is a better solution to the problem at hand?
+  * Commit 2
+  * Yes, it is possible but I prefer a different approach in which the domain object are not tainted by serialization code
+  * That is why I fixed it with a simple serializer for each type with a value and it works like a charm (and the only change needed is in the app initializer)
+  * Did not like the changes needed to make the tests pass, it was a little tedious, however it works even though might be a cleaner way
 * Move parameter-specific logic outside the controller.
 * Better error handling, especially of potential errors from NBP API.
 * Caching the NBP API results.
