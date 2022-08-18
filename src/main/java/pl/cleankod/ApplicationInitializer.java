@@ -15,15 +15,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
-import pl.cleankod.exchange.provider.FixedCurrencyConversionService;
+import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 import pl.cleankod.exchange.entrypoint.AccountController;
 import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
-import pl.cleankod.exchange.provider.AccountInMemoryRepository;
-import pl.cleankod.exchange.provider.CurrencyConversionServiceProvider;
-import pl.cleankod.exchange.provider.nbp.CurrencyConversionNbpService;
-import pl.cleankod.exchange.provider.nbp.client.ExchangeRatesNbpClient;
+import pl.cleankod.exchange.provider.account.AccountInMemoryRepository;
+import pl.cleankod.exchange.provider.conversion.CurrencyConversionServiceProvider;
+import pl.cleankod.exchange.provider.conversion.nbp.CurrencyConversionNbpService;
+import pl.cleankod.exchange.provider.conversion.nbp.client.ExchangeRatesNbpClient;
 
 import java.io.IOException;
 import java.util.Currency;
@@ -71,7 +71,7 @@ public class ApplicationInitializer {
     @Bean
     FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase(
             AccountRepository accountRepository,
-            FixedCurrencyConversionService currencyConversionService
+            CurrencyConversionService currencyConversionService
     ) {
         return new FindAccountAndConvertCurrencyUseCase(accountRepository, currencyConversionService);
     }

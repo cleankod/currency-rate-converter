@@ -1,4 +1,4 @@
-package pl.cleankod.exchange.provider.stub;
+package pl.cleankod.exchange.provider.conversion.stub;
 
 import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;

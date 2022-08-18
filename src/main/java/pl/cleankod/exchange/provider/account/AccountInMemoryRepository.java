@@ -1,4 +1,4 @@
-package pl.cleankod.exchange.provider;
+package pl.cleankod.exchange.provider.account;
 
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.domain.Money;

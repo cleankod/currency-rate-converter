@@ -1,4 +1,4 @@
-package pl.cleankod.exchange.provider.nbp.model;
+package pl.cleankod.exchange.provider.conversion.nbp.model;
 
 import java.util.List;
 
