@@ -78,12 +78,18 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * Better logging with traceability.
 * Replace exceptions with `Result` (`either`) which improves the overall methods API readability and forces error handling. Look into [cleankod/architecture-archetype](https://github.com/cleankod/architecture-archetype) as a starting point.
 * Test coverage report.
+  * Commit 3 
   * Ok, this one was easy altough first I wanted to skip it - just added the sample gradle config from here https://docs.gradle.org/current/userguide/jacoco_plugin.html
   * Not too bad coverage, there is one extra class not covered (the stub) which I wanted to exclude
   * The first two exclusions trials were not succesful (one advice was for an older version of gradle and the second way did not worked). Normally I keep on trying but I do not think it matters that much at this stage of the process
 * Auto generating REST API docs.
 * Integration tests with the real NBP API.
 * Replace Spring Framework with a different one.
+  * Commit 4 (just text - no implementation so far)
+  * I honestly to not plan to do this - is not very difficult from this point as besides the initializer where everything is wired there is no explicit dependency on the framework itself and will try to keep it in this way. 
+  * I know other todos which I might do soon can be solved by throwing an annotation like @Cacheable but will try to keep the current state of affairs in order to keep an eventual migration easy
+  * If I would actually do it I would replace Spring with Quarkus because that is a framework which I really wanted to try for a while now because it seems it has a few nice advantages over Spring. 
+  * Also from what I read might be very easy to replace as they build it with this Spring compatibility in mind. I will see how busy will be in the next days maybe I will take a chance at this later.
 * The proposed architecture is not perfect. Suggest improvements.
   * Commit 1.
   * My first step was to understand what is this application doing. After running the tests and the application and applying some
