@@ -85,7 +85,7 @@ See [#10](https://github.com/cleankod/currency-rate-converter/pull/10) as a star
   * Did not like the changes needed to make the tests pass, it was a little tedious, however it works even though might be a cleaner way
 * 
 * Move parameter-specific logic outside the controller.
-* 
+  * DONE
 * 
 * Better error handling, especially of potential errors from NBP API.
 * 
