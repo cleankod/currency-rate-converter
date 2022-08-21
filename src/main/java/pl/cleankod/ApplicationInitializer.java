@@ -22,6 +22,7 @@ import pl.cleankod.exchange.entrypoint.AccountController;
 import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
+import pl.cleankod.exchange.provider.FindAccountService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 
 import java.io.IOException;
@@ -70,11 +71,8 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    AccountController accountController(
-            FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
-            FindAccountUseCase findAccountUseCase
-    ) {
-        return new AccountController(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
+    AccountController accountController(FindAccountService findAccountService) {
+        return new AccountController(findAccountService);
     }
 
     @Bean
@@ -96,5 +94,13 @@ public class ApplicationInitializer {
             }
         });
         return module;
+    }
+
+    @Bean
+    public FindAccountService findAccountService(
+            FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
+            FindAccountUseCase findAccountUseCase
+    ) {
+        return new FindAccountService(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
     }
 }
