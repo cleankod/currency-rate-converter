@@ -11,6 +11,10 @@ import feign.jackson.JacksonEncoder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.cache.Cache;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean;
+import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import pl.cleankod.exchange.core.domain.SingleValueObject;
@@ -27,10 +31,13 @@ import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 import pl.cleankod.exchange.provider.nbp.errors.NbpErrorDecoder;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Currency;
+import java.util.List;
 
 @SpringBootConfiguration
 @EnableAutoConfiguration
+@EnableCaching
 public class ApplicationInitializer {
     public static void main(String[] args) {
         SpringApplication.run(ApplicationInitializer.class, args);
@@ -104,5 +111,21 @@ public class ApplicationInitializer {
             FindAccountUseCase findAccountUseCase
     ) {
         return new FindAccountService(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
+    }
+
+    @Bean
+    public SimpleCacheManager cacheManager() {
+        SimpleCacheManager cacheManager = new SimpleCacheManager();
+        List<Cache> caches = new ArrayList<>();
+        caches.add(cacheBean().getObject());
+        cacheManager.setCaches(caches);
+        return cacheManager;
+    }
+
+    @Bean
+    public ConcurrentMapCacheFactoryBean cacheBean() {
+        ConcurrentMapCacheFactoryBean cacheFactoryBean = new ConcurrentMapCacheFactoryBean();
+        cacheFactoryBean.setName("currency-cache");
+        return cacheFactoryBean;
     }
 }
