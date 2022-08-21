@@ -3,7 +3,9 @@ package pl.cleankod.exchange.provider;
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
+import pl.cleankod.util.AccountFailedReason;
 import pl.cleankod.util.Preconditions;
+import pl.cleankod.util.Result;
 
 import java.util.Currency;
 import java.util.Optional;
@@ -20,17 +22,21 @@ public class FindAccountService {
         this.findAccountUseCase = findAccountUseCase;
     }
 
-    public Optional<Account> findAccountById(Account.Id accountId, String currency) {
+    public Result<Account, AccountFailedReason> findAccountById(Account.Id accountId, String currency) {
         Preconditions.requireNonNull(accountId);
         return Optional.ofNullable(currency)
                 .map(s -> findAccountAndConvertCurrencyUseCase.execute(accountId, Currency.getInstance(s)))
-                .orElseGet(() -> findAccountUseCase.execute(accountId));
+                .orElseGet(() -> findAccountUseCase.execute(accountId))
+                .map(Result::<Account, AccountFailedReason>successful)
+                .orElseGet(() -> Result.fail(AccountFailedReason.NOT_FOUND));
     }
 
-    public Optional<Account> findAccountByNumber(Account.Number accountNumber, String currency) {
+    public Result<Account, AccountFailedReason> findAccountByNumber(Account.Number accountNumber, String currency) {
         Preconditions.requireNonNull(accountNumber);
         return Optional.ofNullable(currency)
                 .map(s -> findAccountAndConvertCurrencyUseCase.execute(accountNumber, Currency.getInstance(s)))
-                .orElseGet(() -> findAccountUseCase.execute(accountNumber));
+                .orElseGet(() -> findAccountUseCase.execute(accountNumber))
+                .map(Result::<Account, AccountFailedReason>successful)
+                .orElseGet(() -> Result.fail(AccountFailedReason.NOT_FOUND));
     }
 }

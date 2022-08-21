@@ -21,15 +21,19 @@ public class AccountController {
     @GetMapping(path = "/{id}")
     public ResponseEntity<Account> findAccountById(@PathVariable String id, @RequestParam(required = false) String currency) {
         return findAccountService.findAccountById(Account.Id.of(URLDecoder.decode(id, StandardCharsets.UTF_8)), currency)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .fold(
+                        ResponseEntity::ok,
+                        authenticationFailedReason -> ResponseEntity.notFound().build()
+                );
     }
 
     @GetMapping(path = "/number={number}")
     public ResponseEntity<Account> findAccountByNumber(@PathVariable String number, @RequestParam(required = false) String currency) {
         return findAccountService.findAccountByNumber(Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8)), currency)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .fold(
+                        ResponseEntity::ok,
+                        authenticationFailedReason -> ResponseEntity.notFound().build()
+                );
     }
 
 
