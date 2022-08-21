@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import org.apache.http.HttpResponse
+import org.apache.http.util.EntityUtils
 import pl.cleankod.BaseApplicationSpecification
 import pl.cleankod.exchange.core.domain.Account
 import pl.cleankod.exchange.core.domain.Money
@@ -111,5 +112,17 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         then:
         response.getStatusLine().getStatusCode() == 404
+    }
+
+    def "should return an account without value"() {
+        given:
+        def accountNumberValue = "75 1240 2034 1111 0000 0306 8582"
+        def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
+
+        when:
+        def response = getResponse("/accounts/number=${accountNumberUrlEncoded}")
+
+        then:
+        EntityUtils.toString(response.getEntity(), "UTF-8") == "{\"id\":\"78743420-8ce9-11ec-b0d0-57b77255c208\",\"number\":\"75 1240 2034 1111 0000 0306 8582\",\"balance\":{\"amount\":456.78,\"currency\":\"EUR\"}}"
     }
 }
