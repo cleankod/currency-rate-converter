@@ -5,6 +5,9 @@ This is an example project that calculates the amount balance to a given currenc
 * JDK 17
 * Gradle 7.4 (you can use the gradle wrapper instead)
 
+# REST API Documentation
+The REST API documentation is accessible after running the application on the `/swagger-ui/index.html` address
+
 # REST API
 ## Get account
 Endpoints:
@@ -78,4 +81,5 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * Integration tests with the real NBP API.
 * Replace Spring Framework with a different one.
 * The proposed architecture is not perfect. Suggest improvements.
+
 * Change SimpleCacheManager to different one
