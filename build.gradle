@@ -1,6 +1,8 @@
 plugins {
     id 'java'
 
+    id 'jacoco'
+
     // Apply the groovy plugin to also add support for Groovy (needed for Spock)
     id 'groovy'
 }
@@ -14,11 +16,58 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+test {
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+}
+
+jacoco {
+    toolVersion = "0.8.8"
+    reportsDirectory = file("$buildDir/jacoco")
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+         rule {
+            element = 'CLASS'
+
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                maximum = 0.8
+            }
+        }
+    }
+}
+
+jacocoTestReport {
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: 'pl/cleankod/ApplicationInitializer.class')
+        }))
+    }
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web:2.6.3'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
+
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.11'
+
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-dependencies', version: '2021.0.3', ext: 'pom'
+    implementation group: 'io.github.resilience4j', name: 'resilience4j-spring-boot2', version: '1.7.1'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '2.7.3'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: '2.7.3'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: '2.7.0'
+    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.1.1'
+    testImplementation group: 'org.springframework', name: 'spring-test', version: '5.3.22'
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.3'
+
 
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy:3.0.9'

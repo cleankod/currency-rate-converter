@@ -1,5 +1,6 @@
 package pl.cleankod;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Feign;
 import feign.httpclient.ApacheHttpClient;
 import feign.jackson.JacksonDecoder;
@@ -7,10 +8,13 @@ import feign.jackson.JacksonEncoder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
+import pl.cleankod.aspect.ControllerAspect;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
+import pl.cleankod.exchange.core.service.AccountService;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 import pl.cleankod.exchange.entrypoint.AccountController;
@@ -18,11 +22,14 @@ import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
+import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpService;
+import pl.cleankod.exchange.provider.nbp.NbpResponseDecoder;
 
 import java.util.Currency;
 
 @SpringBootConfiguration
 @EnableAutoConfiguration
+@EnableCaching
 public class ApplicationInitializer {
     public static void main(String[] args) {
         SpringApplication.run(ApplicationInitializer.class, args);
@@ -40,12 +47,13 @@ public class ApplicationInitializer {
                 .client(new ApacheHttpClient())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
+                .errorDecoder(new NbpResponseDecoder())
                 .target(ExchangeRatesNbpClient.class, nbpApiBaseUrl);
     }
 
     @Bean
-    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
-        return new CurrencyConversionNbpService(exchangeRatesNbpClient);
+    CurrencyConversionService currencyConversionService(ExchangeRatesNbpService exchangeRatesNbpService) {
+        return new CurrencyConversionNbpService(exchangeRatesNbpService);
     }
 
     @Bean
@@ -64,13 +72,29 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    AccountController accountController(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
-                                        FindAccountUseCase findAccountUseCase) {
-        return new AccountController(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
+    AccountController accountController(AccountService accountService) {
+        return new AccountController(accountService);
     }
 
     @Bean
     ExceptionHandlerAdvice exceptionHandlerAdvice() {
         return new ExceptionHandlerAdvice();
+    }
+
+
+    @Bean
+    AccountService accountService(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
+                                  FindAccountUseCase findAccountUseCase) {
+        return new AccountService(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
+    }
+
+    @Bean
+    ExchangeRatesNbpService exchangeRatesNbpService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
+        return new ExchangeRatesNbpService(exchangeRatesNbpClient);
+    }
+
+    @Bean
+    ControllerAspect controllerAspect() {
+        return new ControllerAspect(new ObjectMapper());
     }
 }
