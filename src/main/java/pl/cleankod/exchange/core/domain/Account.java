@@ -1,13 +1,10 @@
 package pl.cleankod.exchange.core.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import pl.cleankod.exchange.provider.AccountDeserializeService;
 import pl.cleankod.util.Preconditions;
 
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-@JsonDeserialize(using = AccountDeserializeService.class)
 public record Account(Id id, Number number, Money balance) {
 
     public static record Id(UUID value) implements SingleValueObject<UUID> {
