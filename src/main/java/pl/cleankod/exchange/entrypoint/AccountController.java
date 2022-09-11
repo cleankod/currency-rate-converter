@@ -13,9 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.provider.FindAccountService;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
 @RestController
 @RequestMapping("/accounts")
 @OpenAPIDefinition(info = @Info(title = "Accounts API", version = "1.0", description = "API for accessing to the customer account"))
@@ -46,7 +43,7 @@ public class AccountController {
             @Parameter(name = "currency", description = "Account currency")
     })
     public ResponseEntity<Account> findAccountById(@PathVariable String id, @RequestParam(required = false) String currency) {
-        return findAccountService.findAccountById(Account.Id.of(URLDecoder.decode(id, StandardCharsets.UTF_8)), currency)
+        return findAccountService.findAccountById(id, currency)
                 .fold(
                         ResponseEntity::ok,
                         authenticationFailedReason -> ResponseEntity.notFound().build()
@@ -59,7 +56,7 @@ public class AccountController {
             @Parameter(name = "currency", description = "Account currency")
     })
     public ResponseEntity<Account> findAccountByNumber(@PathVariable String number, @RequestParam(required = false) String currency) {
-        return findAccountService.findAccountByNumber(Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8)), currency)
+        return findAccountService.findAccountByNumber(number, currency)
                 .fold(
                         ResponseEntity::ok,
                         authenticationFailedReason -> ResponseEntity.notFound().build()

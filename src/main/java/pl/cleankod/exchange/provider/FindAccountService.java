@@ -7,6 +7,8 @@ import pl.cleankod.util.AccountFailedReason;
 import pl.cleankod.util.Preconditions;
 import pl.cleankod.util.Result;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Currency;
 import java.util.Optional;
 
@@ -22,8 +24,10 @@ public class FindAccountService {
         this.findAccountUseCase = findAccountUseCase;
     }
 
-    public Result<Account, AccountFailedReason> findAccountById(Account.Id accountId, String currency) {
-        Preconditions.requireNonNull(accountId);
+    public Result<Account, AccountFailedReason> findAccountById(String id, String currency) {
+        Preconditions.requireNonNull(id);
+
+        Account.Id accountId = Account.Id.of(URLDecoder.decode(id, StandardCharsets.UTF_8));
         return Optional.ofNullable(currency)
                 .map(s -> findAccountAndConvertCurrencyUseCase.execute(accountId, Currency.getInstance(s)))
                 .orElseGet(() -> findAccountUseCase.execute(accountId))
@@ -31,8 +35,10 @@ public class FindAccountService {
                 .orElseGet(() -> Result.fail(AccountFailedReason.NOT_FOUND));
     }
 
-    public Result<Account, AccountFailedReason> findAccountByNumber(Account.Number accountNumber, String currency) {
-        Preconditions.requireNonNull(accountNumber);
+    public Result<Account, AccountFailedReason> findAccountByNumber(String number, String currency) {
+        Preconditions.requireNonNull(number);
+
+        Account.Number accountNumber = Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8));
         return Optional.ofNullable(currency)
                 .map(s -> findAccountAndConvertCurrencyUseCase.execute(accountNumber, Currency.getInstance(s)))
                 .orElseGet(() -> findAccountUseCase.execute(accountNumber))
