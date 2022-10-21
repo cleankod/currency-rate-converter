@@ -1,5 +1,6 @@
 package pl.cleankod.exchange.provider;
 
+import org.springframework.stereotype.Repository;
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
@@ -7,6 +8,7 @@ import pl.cleankod.exchange.core.gateway.AccountRepository;
 import java.util.Optional;
 import java.util.Set;
 
+@Repository
 public class AccountInMemoryRepository implements AccountRepository {
 
     private final Set<Account> accounts = Set.of(

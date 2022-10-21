@@ -1,46 +1,36 @@
 package pl.cleankod.exchange.core.usecase;
 
+import org.springframework.stereotype.Service;
 import pl.cleankod.exchange.core.domain.Account;
-import pl.cleankod.exchange.core.domain.Money;
+import pl.cleankod.exchange.core.dto.AccountDTO;
+import pl.cleankod.exchange.core.gateway.AccountMapper;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
-import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 
 import java.util.Currency;
 import java.util.Optional;
 
+@Service
 public class FindAccountAndConvertCurrencyUseCase {
 
     private final AccountRepository accountRepository;
-    private final CurrencyConversionService currencyConversionService;
-    private final Currency baseCurrency;
+    private final AccountMapper accountMapper;
 
     public FindAccountAndConvertCurrencyUseCase(AccountRepository accountRepository,
-                                                CurrencyConversionService currencyConversionService,
-                                                Currency baseCurrency) {
+                                                AccountMapper accountMapper) {
         this.accountRepository = accountRepository;
-        this.currencyConversionService = currencyConversionService;
-        this.baseCurrency = baseCurrency;
+        this.accountMapper = accountMapper;
     }
 
-    public Optional<Account> execute(Account.Id id, Currency targetCurrency) {
-        return accountRepository.find(id)
-                .map(account -> new Account(account.id(), account.number(), convert(account.balance(), targetCurrency)));
+    public Optional<AccountDTO> execute(Account.Id id, Currency targetCurrency) {
+        return Optional.ofNullable(accountRepository.find(id)
+                .map(account -> accountMapper.mapAccountToDTO(account, targetCurrency))
+                .orElseThrow(() -> new UserNotFoundException(id.value())));
     }
 
-    public Optional<Account> execute(Account.Number number, Currency targetCurrency) {
-        return accountRepository.find(number)
-                .map(account -> new Account(account.id(), account.number(), convert(account.balance(), targetCurrency)));
+    public Optional<AccountDTO> execute(Account.Number number, Currency targetCurrency) {
+        return Optional.ofNullable(accountRepository.find(number)
+                .map(account -> accountMapper.mapAccountToDTO(account, targetCurrency))
+                .orElseThrow(() -> new UserNotFoundException(number.value())));
     }
 
-    private Money convert(Money money, Currency targetCurrency) {
-        if (!baseCurrency.equals(targetCurrency)) {
-            return money.convert(currencyConversionService, targetCurrency);
-        }
-
-        if (!money.currency().equals(targetCurrency)) {
-            throw new CurrencyConversionException(money.currency(), targetCurrency);
-        }
-
-        return money;
-    }
 }

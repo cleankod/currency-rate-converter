@@ -1,5 +1,6 @@
 package pl.cleankod.exchange.core.domain;
 
+import pl.cleankod.exchange.core.usecase.NumberPatternException;
 import pl.cleankod.util.Preconditions;
 
 import java.util.UUID;
@@ -29,7 +30,7 @@ public record Account(Id id, Number number, Money balance) {
         public Number {
             Preconditions.requireNonNull(value);
             if (!PATTERN.matcher(value).matches()) {
-                throw new IllegalArgumentException("The account number does not match the pattern: " + PATTERN);
+                throw new NumberPatternException(value, PATTERN.pattern());
             }
         }
 
