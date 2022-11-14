@@ -1,5 +1,5 @@
 # About
-This is an example project that calculates the amount balance to a given currency.
+This is an example project that calculates the amount balance to a given currency. It is based on the [cleankod/architecture-archetype](https://github.com/cleankod/architecture-archetype) concept.
 
 # Requirements
 * JDK 17
