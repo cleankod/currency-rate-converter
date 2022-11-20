@@ -73,9 +73,14 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    AccountController accountController(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
-                                        FindAccountUseCase findAccountUseCase) {
-        return new AccountController(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
+    AccountController accountController(AccountService findAccountService) {
+        return new AccountController(findAccountService);
+    }
+
+    @Bean
+    public AccountService findAccountService(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
+                                             FindAccountUseCase findAccountUseCase) {
+        return new AccountService(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
     }
 
     @Bean
