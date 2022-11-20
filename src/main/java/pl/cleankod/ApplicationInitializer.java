@@ -12,6 +12,7 @@ import feign.jackson.JacksonEncoder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import pl.cleankod.exchange.core.domain.SingleValueObject;
@@ -32,6 +33,7 @@ import java.util.Currency;
 
 @SpringBootConfiguration
 @EnableAutoConfiguration
+@EnableCaching
 public class ApplicationInitializer {
     public static void main(String[] args) {
         SpringApplication.run(ApplicationInitializer.class, args);
