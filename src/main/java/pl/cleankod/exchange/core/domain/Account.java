@@ -1,13 +1,19 @@
 package pl.cleankod.exchange.core.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import pl.cleankod.exchange.provider.AccountDeserializer;
+import pl.cleankod.exchange.provider.AccountSerializer;
 import pl.cleankod.util.Preconditions;
 
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+//@JsonSerialize(using = AccountSerializer.class)
+@JsonDeserialize(using = AccountDeserializer.class)
 public record Account(Id id, Number number, Money balance) {
 
-    public static record Id(UUID value) {
+    public static record Id(UUID value) implements SingleValueObject<UUID> {
         public Id {
             Preconditions.requireNonNull(value);
         }
@@ -22,7 +28,7 @@ public record Account(Id id, Number number, Money balance) {
         }
     }
 
-    public static record Number(String value) {
+    public static record Number(String value) implements SingleValueObject<String> {
         private static final Pattern PATTERN =
                 Pattern.compile("\\d{2}[ ]?\\d{4}[ ]?\\d{4}[ ]?\\d{4}[ ]?\\d{4}[ ]?\\d{4}[ ]?\\d{4}");
 
