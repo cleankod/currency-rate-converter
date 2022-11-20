@@ -49,6 +49,7 @@ public class ApplicationInitializer {
                 .client(new ApacheHttpClient())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
+                .errorDecoder(new NbpApiErrorDecoder())
                 .target(ExchangeRatesNbpClient.class, nbpApiBaseUrl);
     }
 
