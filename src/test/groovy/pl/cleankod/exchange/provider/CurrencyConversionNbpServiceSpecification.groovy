@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import org.apache.http.util.EntityUtils
 import pl.cleankod.BaseApplicationSpecification
 import pl.cleankod.exchange.core.domain.Money
+import pl.cleankod.exchange.provider.nbp.CircuitBreakerService
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient
 import pl.cleankod.exchange.provider.nbp.model.Rate
 import pl.cleankod.exchange.provider.nbp.model.RateWrapper
@@ -72,7 +73,9 @@ class CurrencyConversionNbpServiceSpecification extends BaseApplicationSpecifica
             return new RateWrapper("rate", "EUR", "EUR", [new Rate(_ as String, _ as String, BigDecimal.valueOf(4.5274))])
         }
 
-        CurrencyConversionNbpService currencyConversionNbpService = new CurrencyConversionNbpService(exchangeRatesNbpClient)
+        CircuitBreakerService circuitBreakerService = Mock(CircuitBreakerService.class);
+
+        CurrencyConversionNbpService currencyConversionNbpService = new CurrencyConversionNbpService(exchangeRatesNbpClient, circuitBreakerService)
 
         when:
         Money money = currencyConversionNbpService.convert(Money.of(givenAmount, givenCurrency), Currency.getInstance("EUR"))
