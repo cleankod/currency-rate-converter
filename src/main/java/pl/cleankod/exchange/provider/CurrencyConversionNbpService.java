@@ -11,16 +11,40 @@ import java.util.Currency;
 
 public class CurrencyConversionNbpService implements CurrencyConversionService {
     private final ExchangeRatesNbpClient exchangeRatesNbpClient;
+    private final Currency baseCurrency;
 
-    public CurrencyConversionNbpService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
+    public CurrencyConversionNbpService(ExchangeRatesNbpClient exchangeRatesNbpClient, Currency baseCurrency) {
         this.exchangeRatesNbpClient = exchangeRatesNbpClient;
+        this.baseCurrency = baseCurrency;
     }
 
     @Override
     public Money convert(Money money, Currency targetCurrency) {
-        RateWrapper rateWrapper = exchangeRatesNbpClient.fetch("A", targetCurrency.getCurrencyCode());
-        BigDecimal midRate = rateWrapper.rates().get(0).mid();
-        BigDecimal calculatedRate = money.amount().divide(midRate, RoundingMode.HALF_UP);
-        return new Money(calculatedRate, targetCurrency);
+        if (targetCurrency.equals(money.currency())) {
+            return money;
+        }
+
+        BigDecimal targetMidRate = baseCurrency.equals(targetCurrency) ? BigDecimal.valueOf(1L) : getExchangeRate(targetCurrency);
+
+        BigDecimal convertedAmount;
+        if (baseCurrency.equals(money.currency())) {
+            convertedAmount = money.amount().divide(targetMidRate, 2, RoundingMode.HALF_EVEN);
+            return new Money(convertedAmount, targetCurrency);
+        }
+
+        BigDecimal sourceMidRate = getExchangeRate(money.currency());
+        BigDecimal calculatedMidRate = sourceMidRate.divide(targetMidRate, RoundingMode.HALF_EVEN);
+        convertedAmount = money.amount().multiply(calculatedMidRate).setScale(2, RoundingMode.HALF_EVEN);
+
+        return new Money(convertedAmount, targetCurrency);
+    }
+
+    private BigDecimal getExchangeRate(Currency currency) {
+        RateWrapper targetRateWrapper = exchangeRatesNbpClient.fetch("A", currency.getCurrencyCode());
+        return targetRateWrapper.rates().get(0).mid();
+    }
+
+    public Currency getBaseCurrency() {
+        return this.baseCurrency;
     }
 }
