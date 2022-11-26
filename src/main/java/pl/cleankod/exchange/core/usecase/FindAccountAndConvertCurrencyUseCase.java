@@ -5,6 +5,7 @@ import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 
+import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Optional;
 
@@ -33,6 +34,12 @@ public class FindAccountAndConvertCurrencyUseCase {
     }
 
     private Money convert(Money money, Currency targetCurrency) {
+
+        if (money.amount().compareTo(BigDecimal.ZERO) <= 0) {
+            // todo: change
+            throw new CurrencyConversionException(money.currency(), targetCurrency);
+        }
+
         if (money.currency().equals(targetCurrency)) {
             return money;
         }
