@@ -1,8 +1,9 @@
 plugins {
-    id 'java'
-
+    id "java"
+    id "org.springframework.boot" version "2.7.6"
     // Apply the groovy plugin to also add support for Groovy (needed for Spock)
-    id 'groovy'
+    id "groovy"
+    id "jacoco"
 }
 
 repositories {
@@ -14,23 +15,38 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.3'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
-    implementation 'io.github.openfeign:feign-httpclient:11.8'
-    implementation 'io.github.openfeign:feign-jackson:11.8'
-
-    // Use the latest Groovy version for Spock testing
-    testImplementation 'org.codehaus.groovy:groovy:3.0.9'
-
-    // Use the awesome Spock testing and specification framework even with Java
-    testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
-
-    testImplementation 'org.apache.httpcomponents:httpclient:4.5.13'
-    testImplementation 'com.github.tomakehurst:wiremock-jre8:2.27.2'
+jacoco {
+    toolVersion = "0.8.8"
+    reportsDirectory = layout.buildDirectory.dir("jacoco")
 }
 
+dependencies {
+    // https://devhub.checkmarx.com/cve-details/CVE-2022-41854/
+    implementation "org.springframework.boot:spring-boot-starter-web:2.7.6"
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.14.1"
+    // https://devhub.checkmarx.com/cve-details/Cxeb68d52e-5509/
+    implementation "io.github.openfeign:feign-httpclient:12.1"
+    implementation "io.github.openfeign:feign-jackson:12.1"
+    implementation "org.springdoc:springdoc-openapi-ui:1.6.13"
 
-tasks.named('test') {
+    // Use the latest Groovy version for Spock testing
+    testImplementation "org.codehaus.groovy:groovy:3.0.9"
+    // Use the awesome Spock testing and specification framework even with Java
+    testImplementation "org.spockframework:spock-core:2.0-groovy-3.0"
+    testImplementation "org.apache.httpcomponents:httpclient:4.5.13"
+    testImplementation "com.github.tomakehurst:wiremock-jre8:2.35.0"
+}
+
+test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir("jacoco")
+    }
 }
