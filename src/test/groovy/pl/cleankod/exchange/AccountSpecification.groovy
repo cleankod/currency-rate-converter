@@ -91,6 +91,22 @@ class AccountSpecification extends BaseApplicationSpecification {
         transformError(response).message() == "Cannot convert currency from EUR to PLN."
     }
 
+    def "should return an account by number with same money amount if target currency is the same"() {
+        given:
+        def accountNumberValue = "75 1240 2034 1111 0000 0306 8582"
+        def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
+
+        when:
+        Account response = get("/accounts/number=${accountNumberUrlEncoded}?currency=EUR", Account)
+
+        then:
+        response == new Account(
+                Account.Id.of("78743420-8ce9-11ec-b0d0-57b77255c208"),
+                Account.Number.of(accountNumberValue),
+                Money.of("456.78", "EUR")
+        )
+    }
+
     def "should not find an account by ID"() {
         given:
         def accountId = "ac270f3a-8d08-11ec-8b91-9bcdf6e2522a"

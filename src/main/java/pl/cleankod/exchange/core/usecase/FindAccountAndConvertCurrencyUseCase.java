@@ -33,14 +33,14 @@ public class FindAccountAndConvertCurrencyUseCase {
     }
 
     private Money convert(Money money, Currency targetCurrency) {
+        if (money.currency().equals(targetCurrency)) {
+            return money;
+        }
+
         if (!baseCurrency.equals(targetCurrency)) {
             return money.convert(currencyConversionService, targetCurrency);
         }
 
-        if (!money.currency().equals(targetCurrency)) {
-            throw new CurrencyConversionException(money.currency(), targetCurrency);
-        }
-
-        return money;
+        throw new CurrencyConversionException(money.currency(), targetCurrency);
     }
 }
