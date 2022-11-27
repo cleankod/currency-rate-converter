@@ -20,12 +20,12 @@ public class ExceptionHandlerAdvice {
     }
 
     @ExceptionHandler(NbpClientErrorException.class)
-    protected ResponseEntity<ApiError> handleNbpExceptions(NbpClientErrorException ex) {
+    protected ResponseEntity<ApiError> handleNbpException(NbpClientErrorException ex) {
         return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
     }
 
     @ExceptionHandler(CallNotPermittedException.class)
-    protected ResponseEntity<ApiError> handleNbpExceptions(CallNotPermittedException ex) {
+    protected ResponseEntity<ApiError> handleCallNotPermittedException(CallNotPermittedException ex) {
         return ResponseEntity.badRequest().body(new ApiError("External calls failure rate too high."));
     }
 
