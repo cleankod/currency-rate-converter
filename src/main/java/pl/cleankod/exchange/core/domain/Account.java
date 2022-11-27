@@ -1,13 +1,13 @@
 package pl.cleankod.exchange.core.domain;
 
-import pl.cleankod.util.Preconditions;
-
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import pl.cleankod.util.Preconditions;
+
 public record Account(Id id, Number number, Money balance) {
 
-    public static record Id(UUID value) {
+    public record Id(UUID value) {
         public Id {
             Preconditions.requireNonNull(value);
         }
@@ -22,7 +22,7 @@ public record Account(Id id, Number number, Money balance) {
         }
     }
 
-    public static record Number(String value) {
+    public record Number(String value) {
         private static final Pattern PATTERN =
                 Pattern.compile("\\d{2}[ ]?\\d{4}[ ]?\\d{4}[ ]?\\d{4}[ ]?\\d{4}[ ]?\\d{4}[ ]?\\d{4}");
 
@@ -36,5 +36,9 @@ public record Account(Id id, Number number, Money balance) {
         public static Number of(String value) {
             return new Number(value);
         }
+    }
+
+    public AccountDto toDto() {
+        return new AccountDto(this.id.value, this.number.value, this.balance);
     }
 }

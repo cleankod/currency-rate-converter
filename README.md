@@ -27,18 +27,17 @@ http://localhost:8080/accounts/number=65+1090+1665+0000+0001+0373+7343?currency=
 Will produce:
 ```json
 {
-    "balance": {
-        "amount": 27.27,
-        "currency": "EUR"
-    },
-    "id": {
-        "value": "fa07c538-8ce4-11ec-9ad5-4f5a625cd744"
-    },
-    "number": {
-        "value": "65 1090 1665 0000 0001 0373 7343"
-    }
+  "id": "fa07c538-8ce4-11ec-9ad5-4f5a625cd744",
+  "number": "65 1090 1665 0000 0001 0373 7343",
+  "balance": {
+    "amount": 26.33,
+    "currency": "EUR"
+  }
 }
 ```
+
+## Auto generated Swagger API
+`http://localhost:8080/swagger-ui/`
 
 # Assumptions and design decisions
 ## Black-box testing

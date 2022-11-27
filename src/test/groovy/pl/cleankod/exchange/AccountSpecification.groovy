@@ -5,7 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import org.apache.http.HttpResponse
 import pl.cleankod.BaseApplicationSpecification
-import pl.cleankod.exchange.core.domain.Account
+import pl.cleankod.exchange.core.domain.AccountDto
 import pl.cleankod.exchange.core.domain.Money
 
 import java.nio.charset.StandardCharsets
@@ -22,7 +22,7 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         def body = "{\"table\":\"A\",\"currency\":\"euro\",\"code\":\"EUR\",\"rates\":[{\"no\":\"026/A/NBP/2022\",\"effectiveDate\":\"2022-02-08\",\"mid\":4.5452}]}"
         wireMockServer.stubFor(
-                WireMock.get("/exchangerates/rates/A/EUR/2022-02-08")
+                WireMock.get("/exchangerates/rates/A/EUR/" + startDate + "/" + endDate)
                         .willReturn(WireMock.ok(body))
         )
     }
@@ -36,12 +36,12 @@ class AccountSpecification extends BaseApplicationSpecification {
         def accountId = "fa07c538-8ce4-11ec-9ad5-4f5a625cd744"
 
         when:
-        Account response = get("/accounts/${accountId}", Account)
+        AccountDto response = get("/accounts/${accountId}", AccountDto)
 
         then:
-        response == new Account(
-                Account.Id.of(accountId),
-                Account.Number.of("65 1090 1665 0000 0001 0373 7343"),
+        response == new AccountDto(
+                UUID.fromString(accountId),
+                "65 1090 1665 0000 0001 0373 7343",
                 Money.of("123.45", "PLN")
         )
     }
@@ -52,12 +52,12 @@ class AccountSpecification extends BaseApplicationSpecification {
         def currency = "EUR"
 
         when:
-        Account response = get("/accounts/${accountId}?currency=${currency}", Account)
+        AccountDto response = get("/accounts/${accountId}?currency=${currency}", AccountDto)
 
         then:
-        response == new Account(
-                Account.Id.of(accountId),
-                Account.Number.of("65 1090 1665 0000 0001 0373 7343"),
+        response == new AccountDto(
+                UUID.fromString(accountId),
+                "65 1090 1665 0000 0001 0373 7343",
                 Money.of("27.16", currency)
         )
     }
@@ -68,12 +68,12 @@ class AccountSpecification extends BaseApplicationSpecification {
         def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
 
         when:
-        Account response = get("/accounts/number=${accountNumberUrlEncoded}", Account)
+        AccountDto response = get("/accounts/number=${accountNumberUrlEncoded}", AccountDto)
 
         then:
-        response == new Account(
-                Account.Id.of("78743420-8ce9-11ec-b0d0-57b77255c208"),
-                Account.Number.of(accountNumberValue),
+        response == new AccountDto(
+                UUID.fromString("78743420-8ce9-11ec-b0d0-57b77255c208"),
+                accountNumberValue,
                 Money.of("456.78", "EUR")
         )
     }
@@ -88,7 +88,7 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         then:
         response.getStatusLine().getStatusCode() == 400
-        transformError(response).message() == "Cannot convert currency from EUR to PLN."
+        transformError(response).errorMessage() == "Cannot convert currency from EUR to PLN."
     }
 
     def "should not find an account by ID"() {
@@ -111,5 +111,45 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         then:
         response.getStatusLine().getStatusCode() == 404
+    }
+
+    def "should not convert currency when nbp service is not available"() {
+        given:
+        def accountNumber = URLEncoder.encode("65 1090 1665 0000 0001 0373 7343", StandardCharsets.UTF_8)
+        wireMockServer.stubFor(
+                WireMock.get("/exchangerates/rates/A/USD/" + startDate + "/" + endDate)
+                        .willReturn(WireMock.badRequestEntity().withStatus(400)))
+
+        when:
+        HttpResponse response = getResponse("/accounts/number=${accountNumber}?currency=USD")
+
+        then:
+        response.getStatusLine().getStatusCode() == 503
+        transformError(response).errorMessage() == "External service is currently unavailable"
+    }
+
+    def "should cache response from nbp api"() {
+        given:
+        def accountId = "fa07c538-8ce4-11ec-9ad5-4f5a625cd744"
+        def currency = "EUR"
+        def firstExchangeRate = "9.99"
+        def secondExchangeRate = "123.45"
+
+        def firstNbpResponse = getNbpResponseWithRate(firstExchangeRate)
+        def secondNbpResponse = getNbpResponseWithRate(secondExchangeRate);
+
+        when:
+        wireMockServer.stubFor(WireMock.get("/exchangerates/rates/A/" + currency + "/" + startDate + "/" + endDate)
+                .willReturn(WireMock.ok(firstNbpResponse)))
+
+        AccountDto firstResponse = get("/accounts/${accountId}?currency=${currency}", AccountDto)
+
+        wireMockServer.stubFor(WireMock.get("/exchangerates/rates/A/" + currency + "/" + startDate + "/" + endDate)
+                .willReturn(WireMock.ok(secondNbpResponse)))
+
+        AccountDto secondResponse = get("/accounts/${accountId}?currency=${currency}", AccountDto)
+
+        then:
+        firstResponse == secondResponse
     }
 }
