@@ -69,11 +69,14 @@ public class ExchangeDomainConfig {
     }
 
     @Bean
-    CircuitBreakerRegistry circuitBreakerRegistry() {
+    CircuitBreakerRegistry circuitBreakerRegistry(Environment environment) {
+        final int slidingWindowSize = Integer.parseInt(environment.getRequiredProperty("circuitBreaker.slidingWindowSize"));
+        final float failureRateThreshold = Float.parseFloat(environment.getRequiredProperty("circuitBreaker.failureRateThreshold"));
+
         final var config = CircuitBreakerConfig.custom()
             .slidingWindowType(COUNT_BASED)
-            .slidingWindowSize(10)
-            .failureRateThreshold(70.0f)
+            .slidingWindowSize(slidingWindowSize)
+            .failureRateThreshold(failureRateThreshold)
             .build();
 
         return CircuitBreakerRegistry.of(config);
