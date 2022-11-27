@@ -89,7 +89,7 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         then:
         response.getStatusLine().getStatusCode() == 400
-        transformError(response).message() == "Cannot convert currency from EUR to PLN."
+        transformError(response).message() == "Cannot convert currency from [EUR] to [PLN]."
     }
 
     def "should return an account by number with same money amount if target currency is the same"() {

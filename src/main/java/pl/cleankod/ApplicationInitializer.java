@@ -1,5 +1,6 @@
 package pl.cleankod;
 
+import feign.codec.ErrorDecoder;
 import feign.httpclient.ApacheHttpClient;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
@@ -24,6 +25,7 @@ import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
+import pl.cleankod.exchange.provider.nbp.exception.NbpClientErrorException;
 import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
 
 import javax.cache.Caching;
@@ -45,7 +47,7 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    ExchangeRatesNbpClient exchangeRatesNbpClient(Environment environment, CircuitBreakerRegistry circuitBreakerRegistry) {
+    ExchangeRatesNbpClient exchangeRatesNbpClient(Environment environment, CircuitBreakerRegistry circuitBreakerRegistry, ErrorDecoder errorDecoder) {
         var nbpApiBaseUrl = environment.getRequiredProperty("provider.nbp-api.base-url");
         var decorators = FeignDecorators.builder()
                 .withCircuitBreaker(circuitBreakerRegistry.circuitBreaker("exchangeRatesNbpCB"))
@@ -55,7 +57,15 @@ public class ApplicationInitializer {
                 .client(new ApacheHttpClient())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
+                .errorDecoder(errorDecoder)
                 .target(ExchangeRatesNbpClient.class, nbpApiBaseUrl);
+    }
+
+    @Bean
+    ErrorDecoder errorDecoder(){
+        return (methodKey, response) -> new NbpClientErrorException(
+                String.valueOf(response.status()), response.reason()
+        );
     }
 
     @Bean
@@ -102,7 +112,6 @@ public class ApplicationInitializer {
 
     @Bean
     CircuitBreakerConfig circuitBreakerConfig() {
-        // open if 30% of the last 10 calls failed and 30% of calls took more than 1 second
         return CircuitBreakerConfig.custom()
                 .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
                 .slidingWindowSize(10)
