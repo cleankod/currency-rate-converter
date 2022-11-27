@@ -44,6 +44,10 @@ public class FindAccountAndConvertCurrencyUseCase {
             return money;
         }
 
+        if(!money.currency().equals(baseCurrency) && !targetCurrency.equals(baseCurrency)){
+            throw new CurrencyConversionException(money.currency(), targetCurrency);
+        }
+
         if (!baseCurrency.equals(targetCurrency)) {
             return money.convert(currencyConversionService, targetCurrency);
         }
