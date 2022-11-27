@@ -30,6 +30,8 @@ dependencies {
     implementation "org.springdoc:springdoc-openapi-ui:1.6.13"
     implementation "io.github.resilience4j:resilience4j-circuitbreaker:2.0.0"
     implementation 'io.github.resilience4j:resilience4j-feign:2.0.0'
+    implementation 'io.github.resilience4j:resilience4j-cache:2.0.0'
+    implementation 'org.ehcache:ehcache:3.10.8'
 
     // Use the latest Groovy version for Spock testing
     testImplementation "org.codehaus.groovy:groovy:3.0.9"

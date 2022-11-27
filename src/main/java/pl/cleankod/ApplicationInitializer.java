@@ -3,6 +3,7 @@ package pl.cleankod;
 import feign.httpclient.ApacheHttpClient;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import io.github.resilience4j.cache.Cache;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.feign.FeignDecorators;
@@ -21,7 +22,11 @@ import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
+import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
 
+import javax.cache.Caching;
+import javax.cache.configuration.MutableConfiguration;
+import javax.cache.expiry.CreatedExpiryPolicy;
 import java.time.Duration;
 import java.util.Currency;
 
@@ -44,7 +49,7 @@ public class ApplicationInitializer {
                 .withCircuitBreaker(circuitBreakerRegistry.circuitBreaker("exchangeRatesNbpCB"))
                 .build();
 
-        return  Resilience4jFeign.builder(decorators)
+        return Resilience4jFeign.builder(decorators)
                 .client(new ApacheHttpClient())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
@@ -53,7 +58,14 @@ public class ApplicationInitializer {
 
     @Bean
     CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
-        return new CurrencyConversionNbpService(exchangeRatesNbpClient);
+        var cacheManager = Caching.getCachingProvider().getCacheManager();
+        var cache = Cache.of(
+                cacheManager.createCache("exchangeRatesCache", new MutableConfiguration<String, RateWrapper>()
+                        .setExpiryPolicyFactory(CreatedExpiryPolicy.factoryOf(javax.cache.expiry.Duration.ONE_MINUTE))
+                )
+        );
+
+        return new CurrencyConversionNbpService(exchangeRatesNbpClient, cache);
     }
 
     @Bean
