@@ -1,9 +1,12 @@
 package pl.cleankod;
 
-import feign.Feign;
 import feign.httpclient.ApacheHttpClient;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.feign.FeignDecorators;
+import io.github.resilience4j.feign.Resilience4jFeign;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -19,6 +22,7 @@ import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 
+import java.time.Duration;
 import java.util.Currency;
 
 @SpringBootConfiguration
@@ -34,9 +38,13 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    ExchangeRatesNbpClient exchangeRatesNbpClient(Environment environment) {
-        String nbpApiBaseUrl = environment.getRequiredProperty("provider.nbp-api.base-url");
-        return Feign.builder()
+    ExchangeRatesNbpClient exchangeRatesNbpClient(Environment environment, CircuitBreakerRegistry circuitBreakerRegistry) {
+        var nbpApiBaseUrl = environment.getRequiredProperty("provider.nbp-api.base-url");
+        var decorators = FeignDecorators.builder()
+                .withCircuitBreaker(circuitBreakerRegistry.circuitBreaker("exchangeRatesNbpCB"))
+                .build();
+
+        return  Resilience4jFeign.builder(decorators)
                 .client(new ApacheHttpClient())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
@@ -73,4 +81,22 @@ public class ApplicationInitializer {
     ExceptionHandlerAdvice exceptionHandlerAdvice() {
         return new ExceptionHandlerAdvice();
     }
+
+    @Bean
+    CircuitBreakerConfig circuitBreakerConfig() {
+        // open if 30% of the last 10 calls failed and 30% of calls took more than 1 second
+        return CircuitBreakerConfig.custom()
+                .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
+                .slidingWindowSize(10)
+                .failureRateThreshold(30.0f)
+                .slowCallRateThreshold(30.0f)
+                .slowCallDurationThreshold(Duration.ofSeconds(1))
+                .build();
+    }
+
+    @Bean
+    CircuitBreakerRegistry circuitBreakerRegistry(CircuitBreakerConfig circuitBreakerConfig) {
+        return CircuitBreakerRegistry.of(circuitBreakerConfig);
+    }
+
 }
