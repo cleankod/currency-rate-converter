@@ -8,7 +8,7 @@ public class CurrencyConversionException extends IllegalStateException {
     }
 
     public CurrencyConversionException(Currency baseCurrency) {
-        super(String.format("Base currency set to [%s] exchange operation forbidden.", baseCurrency));
+        super(String.format("Base currency of application set to [%s] exchange operation forbidden.", baseCurrency));
     }
 
 }

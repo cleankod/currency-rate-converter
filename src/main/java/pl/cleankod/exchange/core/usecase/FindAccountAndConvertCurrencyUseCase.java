@@ -34,19 +34,20 @@ public class FindAccountAndConvertCurrencyUseCase {
     }
 
     private Money convert(Money money, Currency targetCurrency) {
+        var accountCurrency = money.currency();
 
-        if (money.currency().equals(targetCurrency)) {
+        if (accountCurrency.equals(targetCurrency)) {
             return money;
         }
 
         if (!baseCurrency.equals(targetCurrency)) {
-            if (!money.currency().equals(baseCurrency)) {
+            if (!accountCurrency.equals(baseCurrency)) {
                 throw new CurrencyConversionException(baseCurrency);
             } else {
                 return money.convert(currencyConversionService, targetCurrency);
             }
         }
 
-        throw new CurrencyConversionException(money.currency(), targetCurrency);
+        throw new CurrencyConversionException(accountCurrency, targetCurrency);
     }
 }
