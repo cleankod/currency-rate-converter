@@ -7,6 +7,10 @@ import feign.jackson.JacksonEncoder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCache;
+import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
@@ -21,10 +25,12 @@ import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 
 import java.util.Currency;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @SpringBootConfiguration
 @EnableAutoConfiguration
+@EnableCaching
 public class ApplicationInitializer {
     public static void main(String[] args) {
         SpringApplication.run(ApplicationInitializer.class, args);
@@ -33,6 +39,13 @@ public class ApplicationInitializer {
     @Bean
     AccountRepository accountRepository() {
         return new AccountInMemoryRepository();
+    }
+
+    @Bean
+    public CacheManager cacheManager() {
+        SimpleCacheManager cacheManager = new SimpleCacheManager();
+        cacheManager.setCaches(List.of(new ConcurrentMapCache("NbpRates")));
+        return cacheManager;
     }
 
     @Bean
@@ -55,7 +68,7 @@ public class ApplicationInitializer {
     CurrencyConversionServiceSelector currencyConversionServiceSelector(CurrencyConversionNbpService currencyConversionNbpService) {
         Map<Currency, CurrencyConversionService> currencyConversionServices = new HashMap<>();
         currencyConversionServices.put(currencyConversionNbpService.getBaseCurrency(), currencyConversionNbpService);
-        return new CurrencyConversionServiceSelector(currencyConversionServices, currencyConversionNbpService);
+        return new CurrencyConversionServiceSelector(currencyConversionServices);
     }
 
     @Bean
