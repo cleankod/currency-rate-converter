@@ -21,8 +21,8 @@ public class CurrencyConversionServiceSelector {
             return conversionServices.get(currency);
         }
 
-        LOG.warn("No compatible Conversion Service available for currency={}", currency.getCurrencyCode());
-        throw new ConversionServiceNotFoundException("Unable to convert from currency=" + currency.getCurrencyCode());
+        LOG.warn("No compatible Conversion Service available for currency={}.", currency.getCurrencyCode());
+        throw new ConversionServiceNotFoundException("Unable to convert account to specified currency.");
     }
 
 }
