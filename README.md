@@ -66,15 +66,22 @@ Also, value-objects are responsible for a little more than just plain data holdi
 
 # To do
 * Rounding when calculating the amount is not done correctly for this type of operation.
+  * Updated the rounding to use so-called banker's rounding. 
 * Investigate whether it is possible to implement the value-object serialization, to avoid `value` nested field in JSON. See [#10](https://github.com/cleankod/currency-rate-converter/pull/10) as a starting point. Or maybe there is a better solution to the problem at hand?
 * Move parameter-specific logic outside the controller.
+  * Completed + few refactorings.
 * Better error handling, especially of potential errors from NBP API.
+  * Completed using the classic way.
 * Caching the NBP API results.
+  * Completed using @Cacheable [needs additional configuration].
 * Circuit-breaker for the NBP API client.
 * Better logging with traceability.
+  * We could use here Spring Cloud Sleuth to add spanIds and traceIds across the apps - the downside is that it adds one more Spring dependency.
 * Replace exceptions with `Result` (`either`) which improves the overall methods API readability and forces error handling. Look into [cleankod/architecture-archetype](https://github.com/cleankod/architecture-archetype) as a starting point.
 * Test coverage report.
+  * Completed using Jacoco.
 * Auto generating REST API docs.
+  * Completed using Swagger.
 * Integration tests with the real NBP API.
 * Replace Spring Framework with a different one.
 * The proposed architecture is not perfect. Suggest improvements.
