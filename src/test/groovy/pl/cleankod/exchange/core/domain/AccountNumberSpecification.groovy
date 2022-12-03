@@ -35,6 +35,15 @@ class AccountNumberSpecification extends Specification {
         where:
         givenValue                           || expectedExceptionType    || expectedExceptionMessage
         "PL65 1090 1665 0000 0001 0373 7343" || IllegalArgumentException || "The account number does not match the pattern"
-        null                                 || NullPointerException     || "Given value cannot be null"
+        " "                                  || IllegalArgumentException || "The account number does not match the pattern"
+    }
+
+    def "should not create object due to null value"() {
+        when:
+        Account.Number.of(null as String);
+
+        then:
+        def exception = thrown(IllegalArgumentException)
+        exception.message.startsWith("Given value cannot be null")
     }
 }

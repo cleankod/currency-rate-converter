@@ -1,6 +1,5 @@
 package pl.cleankod.exchange.core.domain
 
-
 import pl.cleankod.exchange.core.domain.Account
 import spock.lang.Specification
 
@@ -35,7 +34,8 @@ class AccountIdSpecification extends Specification {
                 "4e34421e8cd9-11ec-a657-5fa089961eab",
                 "4e34421e-8cd911ec-a657-5fa089961eab",
                 "4e34421e-8cd9-11eca657-5fa089961eab",
-                "4e34421e-8cd9-11ec-a6575fa089961eab"
+                "4e34421e-8cd9-11ec-a6575fa089961eab",
+                " "
         ]
     }
 
@@ -44,7 +44,7 @@ class AccountIdSpecification extends Specification {
         Account.Id.of(null as String)
 
         then:
-        def exception = thrown(NullPointerException)
+        def exception = thrown(IllegalArgumentException)
         exception.message.startsWith("Given value cannot be null")
     }
 
@@ -53,7 +53,7 @@ class AccountIdSpecification extends Specification {
         Account.Id.of(null as UUID)
 
         then:
-        def exception = thrown(NullPointerException)
+        def exception = thrown(IllegalArgumentException)
         exception.message.startsWith("Given value cannot be null")
     }
 }

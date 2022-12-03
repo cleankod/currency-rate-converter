@@ -1,6 +1,5 @@
 package pl.cleankod.exchange.core.domain
 
-
 import pl.cleankod.exchange.core.domain.Money
 import spock.lang.Specification
 
@@ -18,7 +17,11 @@ class MoneySpecification extends Specification {
         givenAmount                    | givenCurrency               || expectedAmount                 || expectedCurrency
         "123.45"                       | "PLN"                       || BigDecimal.valueOf(123.45)     || Currency.getInstance("PLN")
         "12345678.9"                   | "EUR"                       || BigDecimal.valueOf(12345678.9) || Currency.getInstance("EUR")
+        "0"                            | "EUR"                       || BigDecimal.valueOf(0)          || Currency.getInstance("EUR")
+        "-123.4"                       | "EUR"                       || BigDecimal.valueOf(-123.4)     || Currency.getInstance("EUR")
         BigDecimal.valueOf(12345678.9) | Currency.getInstance("EUR") || BigDecimal.valueOf(12345678.9) || Currency.getInstance("EUR")
+        BigDecimal.valueOf(0)          | Currency.getInstance("EUR") || BigDecimal.valueOf(0)          || Currency.getInstance("EUR")
+        BigDecimal.valueOf(-123.4)     | Currency.getInstance("EUR") || BigDecimal.valueOf(-123.4)     || Currency.getInstance("EUR")
     }
 
     def "should not create object due to null value"() {
@@ -26,7 +29,7 @@ class MoneySpecification extends Specification {
         Money.of(givenAmount, givenCurrency)
 
         then:
-        def exception = thrown(NullPointerException)
+        def exception = thrown(IllegalArgumentException)
         exception.message.startsWith("Given value cannot be null")
 
         where:

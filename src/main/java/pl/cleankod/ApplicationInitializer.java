@@ -4,6 +4,7 @@ import feign.Feign;
 import feign.httpclient.ApacheHttpClient;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -28,13 +29,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@EnableCaching
 @SpringBootConfiguration
 @EnableAutoConfiguration
-@EnableCaching
 public class ApplicationInitializer {
     public static void main(String[] args) {
         SpringApplication.run(ApplicationInitializer.class, args);
     }
+
+    @Value("${app.base-currency}")
+    private String nbpApiBaseCurrency;
+
+    @Value("${provider.nbp-api.base-url}")
+    private String nbpApiBaseUrl;
 
     @Bean
     AccountRepository accountRepository() {
@@ -50,7 +57,6 @@ public class ApplicationInitializer {
 
     @Bean
     ExchangeRatesNbpClient exchangeRatesNbpClient(Environment environment) {
-        String nbpApiBaseUrl = environment.getRequiredProperty("provider.nbp-api.base-url");
         return Feign.builder()
                 .client(new ApacheHttpClient())
                 .encoder(new JacksonEncoder())
@@ -59,8 +65,8 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    CurrencyConversionNbpService currencyConversionNbpService(ExchangeRatesNbpClient exchangeRatesNbpClient, Environment environment) {
-        Currency baseCurrency = Currency.getInstance(environment.getRequiredProperty("provider.nbp-api.base-currency"));
+    CurrencyConversionNbpService currencyConversionNbpService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
+        Currency baseCurrency = Currency.getInstance(nbpApiBaseCurrency);
         return new CurrencyConversionNbpService(exchangeRatesNbpClient, baseCurrency);
     }
 

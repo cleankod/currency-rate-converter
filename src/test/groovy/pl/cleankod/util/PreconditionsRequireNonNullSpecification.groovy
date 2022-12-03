@@ -21,7 +21,7 @@ class PreconditionsRequireNonNullSpecification extends Specification {
         Preconditions.requireNonNull(givenValue)
 
         then:
-        def exception = thrown(NullPointerException)
+        def exception = thrown(IllegalArgumentException)
         exception.message.startsWith("Given value cannot be null")
 
         where:

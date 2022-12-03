@@ -20,6 +20,11 @@ public class ExceptionHandlerAdvice {
         return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
     }
 
+    @ExceptionHandler({ IllegalArgumentException.class })
+    protected ResponseEntity<ApiError> handleBadRequest(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
+    }
+
     @ExceptionHandler({ SystemException.class })
     protected ResponseEntity<ApiError> handleBadRequest(SystemException ex) {
         return ResponseEntity.internalServerError().body(new ApiError(ex.getMessage()));

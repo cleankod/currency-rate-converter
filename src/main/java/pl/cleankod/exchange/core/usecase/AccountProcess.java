@@ -1,5 +1,6 @@
 package pl.cleankod.exchange.core.usecase;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.cleankod.exchange.core.domain.Account;
@@ -34,13 +35,11 @@ public class AccountProcess {
     }
 
     private Account convertAccount(Account account, String currency) {
-        Currency targetCurrency;
-        try {
-            targetCurrency = Currency.getInstance(currency);
-        } catch (Exception e) {
-            LOG.warn("Unable to convert account. Unknown currency={}", currency);
-            throw new UnknownCurrencyException("Unknown currency=" + currency);
+        if (StringUtils.isBlank(currency)) {
+            return account;
         }
+
+        Currency targetCurrency = getMappedCurrency(currency);
         if (targetCurrency.equals(account.balance().currency())) {
             return account;
         }
@@ -51,6 +50,15 @@ public class AccountProcess {
     private Money convertToCurrency(Money money, Currency targetCurrency) {
         CurrencyConversionService currencyConversionService = currencyConversionServiceSelector.selectService(money.currency());
         return currencyConversionService.convert(money, targetCurrency);
+    }
+
+    private Currency getMappedCurrency(String currency) {
+        try {
+            return Currency.getInstance(currency);
+        } catch (Exception e) {
+            LOG.warn("Unable to convert account. Unknown currency={}", currency);
+            throw new UnknownCurrencyException("Unknown currency=" + currency);
+        }
     }
 
 }
