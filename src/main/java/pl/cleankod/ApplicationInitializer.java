@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
+import pl.cleankod.exchange.core.usecase.AccountUseCase;
+import pl.cleankod.exchange.core.usecase.ConvertMoneyByCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 import pl.cleankod.exchange.entrypoint.AccountController;
@@ -54,19 +56,32 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase(
-            AccountRepository accountRepository,
+    ConvertMoneyByCurrencyUseCase convertMoneyByCurrencyUseCase(
             CurrencyConversionService currencyConversionService,
             Environment environment
     ) {
         Currency baseCurrency = Currency.getInstance(environment.getRequiredProperty("app.base-currency"));
-        return new FindAccountAndConvertCurrencyUseCase(accountRepository, currencyConversionService, baseCurrency);
+        return new ConvertMoneyByCurrencyUseCase(currencyConversionService, baseCurrency);
     }
 
     @Bean
-    AccountController accountController(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
-                                        FindAccountUseCase findAccountUseCase) {
-        return new AccountController(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
+    FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase(
+            AccountRepository accountRepository,
+            ConvertMoneyByCurrencyUseCase convertMoneyByCurrencyUseCase
+    ) {
+        return new FindAccountAndConvertCurrencyUseCase(accountRepository, convertMoneyByCurrencyUseCase);
+    }
+
+    @Bean
+    AccountUseCase accountUseCase(
+            FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
+            FindAccountUseCase findAccountUseCase) {
+        return new AccountUseCase(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
+    }
+
+    @Bean
+    AccountController accountController(AccountUseCase accountUseCase) {
+        return new AccountController(accountUseCase);
     }
 
     @Bean
