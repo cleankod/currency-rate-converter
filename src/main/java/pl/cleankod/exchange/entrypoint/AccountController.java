@@ -1,58 +1,46 @@
 package pl.cleankod.exchange.entrypoint;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import pl.cleankod.exchange.core.domain.Account;
-import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
-import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Currency;
-import java.util.Optional;
+import pl.cleankod.exchange.core.AccountService;
+import pl.cleankod.exchange.core.domain.AccountRetrievalFailedReason;
 
-@RestController
-@RequestMapping("/accounts")
+import java.util.UUID;
+
+@Path("/accounts")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class AccountController {
 
-    private final FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase;
-    private final FindAccountUseCase findAccountUseCase;
+    private final AccountService accountService;
 
-    public AccountController(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
-                             FindAccountUseCase findAccountUseCase) {
-        this.findAccountAndConvertCurrencyUseCase = findAccountAndConvertCurrencyUseCase;
-        this.findAccountUseCase = findAccountUseCase;
+    public AccountController(AccountService accountService) {
+        this.accountService = accountService;
     }
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<Account> findAccountById(@PathVariable String id, @RequestParam(required = false) String currency) {
-        return Optional.ofNullable(currency)
-                .map(s ->
-                        findAccountAndConvertCurrencyUseCase.execute(Account.Id.of(id), Currency.getInstance(s))
-                                .map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build())
-                )
-                .orElseGet(() ->
-                        findAccountUseCase.execute(Account.Id.of(id))
-                                .map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build())
-                );
+    @Path("/{id}")
+    @GET
+    public Response findAccountById(@PathParam("id") UUID id, @QueryParam("currency") String currency) {
+        return accountService.findAccountById(id, currency).fold(
+                account -> Response.ok(account).build(),
+                this::handleFailed);
     }
 
-    @GetMapping(path = "/number={number}")
-    public ResponseEntity<Account> findAccountByNumber(@PathVariable String number, @RequestParam(required = false) String currency) {
-        Account.Number accountNumber = Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8));
-        return Optional.ofNullable(currency)
-                .map(s ->
-                        findAccountAndConvertCurrencyUseCase.execute(accountNumber, Currency.getInstance(s))
-                                .map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build())
-                )
-                .orElseGet(() ->
-                        findAccountUseCase.execute(accountNumber)
-                                .map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build())
-                );
+    @Path("/number={number}")
+    @GET
+    public Response findAccountByNumber(@PathParam("number") String number, @QueryParam("currency") String currency) {
+        return accountService.findAccountByNumber(number, currency).fold(
+                account -> Response.ok(account).build(),
+                this::handleFailed);
+    }
+
+    private Response handleFailed(AccountRetrievalFailedReason failedReason) {
+        if (AccountRetrievalFailedReason.ACCOUNT_NOT_FOUND.equals(failedReason)) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.serverError().build();
     }
 
 

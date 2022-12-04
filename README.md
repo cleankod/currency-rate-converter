@@ -66,15 +66,33 @@ Also, value-objects are responsible for a little more than just plain data holdi
 
 # To do
 * Rounding when calculating the amount is not done correctly for this type of operation (we're loosing money!) and it is done in the wrong place.
+  * Done.
 * Investigate whether it is possible to implement the value-object serialization, to avoid `value` nested field in JSON. See [#10](https://github.com/cleankod/currency-rate-converter/pull/10) as a starting point. Or maybe there is a better solution to the problem at hand?
+  * It is possible, done. 
 * Move parameter-specific logic outside the controller.
+  * Done.
 * Better error handling, especially of potential errors from NBP API.
+  * Done with pl.cleankod.ExceptionHandlerAdvice. It's usage vanished with `Result` (`either`) and Framework replacement though.
 * Caching the NBP API results.
+  * Done. Just local caching with TODOs in code.
 * Circuit-breaker for the NBP API client.
+  * Done.
 * Better logging with traceability.
+  * Added some logging - should add more (logger.trace(...)) etc to be production ready.
 * Replace exceptions with `Result` (`either`) which improves the overall methods API readability and forces error handling. Look into [cleankod/architecture-archetype](https://github.com/cleankod/architecture-archetype) as a starting point.
+  * I met this approach first time in my life actually... I did apply it for one scenario. I'm not convinced of its benefits though.
 * Test coverage report.
+  * Skipped. Would integrate some SonarQube plugin for that as I did many times before in real projects.
 * Auto generating REST API docs.
+  * Skipped. Would use swagger or spring restdocs as I did many times before in real projects.
 * Integration tests with the real NBP API.
+  * Done.
 * Replace Spring Framework with a different one.
+  * Done, Quarkus.
 * The proposed architecture is not perfect. Suggest improvements.
+  * I moved many files, added inheritance or composition in some placed.
+
+General notes:
+* Task itself was very interesting, and I'm glad I found some time for this.
+* I left some todos in code which requires qualification or extra work but are not crucial for evaluation task.
+* Integration tests can be enhanced. For sure some corner cases are missing + testing other currencies. 

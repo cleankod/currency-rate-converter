@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'io.quarkus'
 
     // Apply the groovy plugin to also add support for Groovy (needed for Spock)
     id 'groovy'
@@ -15,10 +16,18 @@ java {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.3'
+    implementation enforcedPlatform("io.quarkus:quarkus-universe-bom:2.14.2.Final")
+    implementation 'javax.ws.rs:javax.ws.rs-api:2.0'
+    implementation 'io.quarkus:quarkus-arc'
+    implementation 'io.quarkus:quarkus-resteasy-reactive'
+    implementation 'io.quarkus:quarkus-resteasy-reactive-jackson'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
+    implementation "io.github.resilience4j:resilience4j-circuitbreaker:0.12.1"
+    implementation "com.hazelcast:hazelcast:5.2.0"
+    implementation "org.apache.logging.log4j:log4j-api:2.6.1"
+    implementation "org.apache.logging.log4j:log4j-core:2.6.1"
 
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy:3.0.9'
@@ -29,7 +38,6 @@ dependencies {
     testImplementation 'org.apache.httpcomponents:httpclient:4.5.13'
     testImplementation 'com.github.tomakehurst:wiremock-jre8:2.27.2'
 }
-
 
 tasks.named('test') {
     useJUnitPlatform()
