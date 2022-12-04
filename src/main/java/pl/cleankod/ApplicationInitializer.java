@@ -19,12 +19,10 @@ import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.nbp.service.CurrencyConversionNbpServiceImpl;
 import pl.cleankod.exchange.provider.nbp.client.ExchangeRatesNbpClient;
 
-import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 import java.util.Currency;
 
 @QuarkusMain
-@Dependent
 public class ApplicationInitializer {
 
     public static void main(String ... args) {

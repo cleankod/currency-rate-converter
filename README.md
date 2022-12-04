@@ -72,7 +72,7 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * Move parameter-specific logic outside the controller.
   * Done.
 * Better error handling, especially of potential errors from NBP API.
-  * Done with pl.cleankod.ExceptionHandlerAdvice. It's usage vanished with `Result` (`either`) and Framework replacement though.
+  * Done with pl.cleankod.ExceptionHandlerAdvice. It's usage vanished with `Result` (`either`) and Framework replacement though. I left commented ExceptionHandlerAdvice and Exceptions throws in the flow for reference.
 * Caching the NBP API results.
   * Done. Just local caching with TODOs in code.
 * Circuit-breaker for the NBP API client.
