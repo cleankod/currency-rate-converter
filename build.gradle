@@ -20,6 +20,11 @@ dependencies {
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
 
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+
+
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy:3.0.9'
 
@@ -28,6 +33,8 @@ dependencies {
 
     testImplementation 'org.apache.httpcomponents:httpclient:4.5.13'
     testImplementation 'com.github.tomakehurst:wiremock-jre8:2.27.2'
+    testCompileOnly 'org.projectlombok:lombok:1.18.24'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
 }
 
 

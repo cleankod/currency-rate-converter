@@ -1,6 +1,7 @@
 package pl.cleankod;
 
 import feign.Feign;
+import feign.codec.ErrorDecoder;
 import feign.httpclient.ApacheHttpClient;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
@@ -16,10 +17,11 @@ import pl.cleankod.exchange.core.usecase.ConvertMoneyByCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 import pl.cleankod.exchange.entrypoint.AccountController;
-import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
+import pl.cleankod.exchange.entrypoint.ApiExceptionHandler;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
+import pl.cleankod.exchange.provider.nbp.RetreiveMessageErrorDecoder;
 
 import java.util.Currency;
 
@@ -42,12 +44,15 @@ public class ApplicationInitializer {
                 .client(new ApacheHttpClient())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
+                .errorDecoder(new RetreiveMessageErrorDecoder())
                 .target(ExchangeRatesNbpClient.class, nbpApiBaseUrl);
     }
 
     @Bean
-    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
-        return new CurrencyConversionNbpService(exchangeRatesNbpClient);
+    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient,
+                                                        Environment environment) {
+        long cacheTimeToLiveInSecods =Long.parseLong(environment.getRequiredProperty("cache-manager.time-to-live-in-seconds"));
+        return new CurrencyConversionNbpService(exchangeRatesNbpClient,cacheTimeToLiveInSecods);
     }
 
     @Bean
@@ -85,7 +90,12 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    ExceptionHandlerAdvice exceptionHandlerAdvice() {
-        return new ExceptionHandlerAdvice();
+    ApiExceptionHandler restExceptionHandlerAdvice() {
+        return new ApiExceptionHandler();
+    }
+
+    @Bean
+    public ErrorDecoder errorDecoder() {
+        return new RetreiveMessageErrorDecoder();
     }
 }

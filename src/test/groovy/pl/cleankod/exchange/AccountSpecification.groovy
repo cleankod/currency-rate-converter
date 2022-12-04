@@ -88,7 +88,7 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         then:
         response.getStatusLine().getStatusCode() == 400
-        transformError(response).message() == "Cannot convert currency from EUR to PLN."
+        transformError(response).getMessage() == "Cannot convert currency from EUR to PLN."
     }
 
     def "should not find an account by ID"() {
