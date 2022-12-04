@@ -5,9 +5,9 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import org.apache.http.HttpResponse
 import pl.cleankod.BaseApplicationSpecification
-import pl.cleankod.exchange.core.domain.Account
 import pl.cleankod.exchange.core.domain.Money
 import pl.cleankod.exchange.core.usecase.dto.AccountDto
+import pl.cleankod.exchange.core.usecase.dto.MoneyDto
 
 import java.nio.charset.StandardCharsets
 
@@ -41,9 +41,9 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         then:
         response == new AccountDto(
-                Account.Id.of(accountId),
-                Account.Number.of("65 1090 1665 0000 0001 0373 7343"),
-                Money.of("123.45", "PLN")
+                accountId,
+                "65 1090 1665 0000 0001 0373 7343",
+                MoneyDto.from(Money.of("123.45", "PLN"))
         )
     }
 
@@ -57,9 +57,9 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         then:
         response == new AccountDto(
-                Account.Id.of(accountId),
-                Account.Number.of("65 1090 1665 0000 0001 0373 7343"),
-                Money.of("27.16", currency)
+                accountId,
+                "65 1090 1665 0000 0001 0373 7343",
+                MoneyDto.from(Money.of("27.16", currency))
         )
     }
 
@@ -73,9 +73,9 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         then:
         response == new AccountDto(
-                Account.Id.of("78743420-8ce9-11ec-b0d0-57b77255c208"),
-                Account.Number.of(accountNumberValue),
-                Money.of("456.78", "EUR")
+                "78743420-8ce9-11ec-b0d0-57b77255c208",
+                accountNumberValue,
+                MoneyDto.from(Money.of("456.78", "EUR"))
         )
     }
 
@@ -102,9 +102,9 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         then:
         response == new AccountDto(
-                Account.Id.of("78743420-8ce9-11ec-b0d0-57b77255c208"),
-                Account.Number.of(accountNumberValue),
-                Money.of("456.78", "EUR")
+                "78743420-8ce9-11ec-b0d0-57b77255c208",
+                accountNumberValue,
+                MoneyDto.from(Money.of("456.78", "EUR"))
         )
     }
 

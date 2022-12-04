@@ -6,7 +6,6 @@ import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
 
-import java.math.RoundingMode;
 import java.util.Currency;
 
 public class CurrencyConversionNbpService implements CurrencyConversionService {
@@ -25,9 +24,7 @@ public class CurrencyConversionNbpService implements CurrencyConversionService {
                 )
                 .apply(targetCurrency.getCurrencyCode());
         var midRate = rateWrapper.rates().get(0).mid();
-        var calculatedRate = money.amount()
-                .divide(midRate, RoundingMode.HALF_EVEN);
 
-        return new Money(calculatedRate, targetCurrency);
+        return money.exchangeTo(midRate, targetCurrency);
     }
 }

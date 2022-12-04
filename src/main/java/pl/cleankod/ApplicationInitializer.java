@@ -46,7 +46,8 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    ExchangeRatesNbpClient exchangeRatesNbpClient(Environment environment, CircuitBreakerRegistry circuitBreakerRegistry, ErrorDecoder errorDecoder) {
+    ExchangeRatesNbpClient exchangeRatesNbpClient(Environment environment) {
+        var circuitBreakerRegistry = getConfiguredCircuitBreakerRegistry();
         var nbpApiBaseUrl = environment.getRequiredProperty("provider.nbp-api.base-url");
         var decorators = FeignDecorators.builder()
                 .withCircuitBreaker(circuitBreakerRegistry.circuitBreaker("exchangeRatesNbpCB"))
@@ -56,12 +57,23 @@ public class ApplicationInitializer {
                 .client(new ApacheHttpClient())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
-                .errorDecoder(errorDecoder)
+                .errorDecoder(errorDecoder())
                 .target(ExchangeRatesNbpClient.class, nbpApiBaseUrl);
     }
 
-    @Bean
-    ErrorDecoder errorDecoder(){
+    private CircuitBreakerRegistry getConfiguredCircuitBreakerRegistry() {
+        return CircuitBreakerRegistry.of(
+                CircuitBreakerConfig.custom()
+                        .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
+                        .slidingWindowSize(10)
+                        .failureRateThreshold(30.0f)
+                        .slowCallRateThreshold(30.0f)
+                        .slowCallDurationThreshold(Duration.ofSeconds(1))
+                        .build()
+        );
+    }
+
+    private ErrorDecoder errorDecoder() {
         return (methodKey, response) -> new NbpClientErrorException(
                 String.valueOf(response.status()), response.reason()
         );
@@ -80,7 +92,7 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    AccountService accountService(FindAccountUseCase findAccountUseCase, FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase){
+    AccountService accountService(FindAccountUseCase findAccountUseCase, FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase) {
         return new AccountService(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
     }
 
@@ -107,22 +119,6 @@ public class ApplicationInitializer {
     @Bean
     ExceptionHandlerAdvice exceptionHandlerAdvice() {
         return new ExceptionHandlerAdvice();
-    }
-
-    @Bean
-    CircuitBreakerConfig circuitBreakerConfig() {
-        return CircuitBreakerConfig.custom()
-                .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
-                .slidingWindowSize(10)
-                .failureRateThreshold(30.0f)
-                .slowCallRateThreshold(30.0f)
-                .slowCallDurationThreshold(Duration.ofSeconds(1))
-                .build();
-    }
-
-    @Bean
-    CircuitBreakerRegistry circuitBreakerRegistry(CircuitBreakerConfig circuitBreakerConfig) {
-        return CircuitBreakerRegistry.of(circuitBreakerConfig);
     }
 
 }

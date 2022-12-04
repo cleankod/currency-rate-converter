@@ -11,16 +11,17 @@ import pl.cleankod.exchange.provider.nbp.exception.NbpClientErrorException;
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
 
-    @ExceptionHandler({
-            CurrencyConversionException.class,
-            IllegalArgumentException.class
-    })
-    protected ResponseEntity<ApiError> handleBadRequest(CurrencyConversionException ex) {
+    @ExceptionHandler(IllegalArgumentException.class)
+    protected ResponseEntity<ApiError> handleIllegalArgumentException(IllegalArgumentException ex) {
         return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
     }
 
-    @ExceptionHandler(NbpClientErrorException.class)
-    protected ResponseEntity<ApiError> handleNbpException(NbpClientErrorException ex) {
+    @ExceptionHandler({
+            CurrencyConversionException.class,
+            NbpClientErrorException.class,
+            IllegalStateException.class
+    })
+    protected ResponseEntity<ApiError> handleIllegalStateException(IllegalStateException ex) {
         return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
     }
 
