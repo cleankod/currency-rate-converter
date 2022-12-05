@@ -25,6 +25,12 @@ class AccountSpecification extends BaseApplicationSpecification {
                 WireMock.get("/exchangerates/rates/A/EUR/2022-02-08")
                         .willReturn(WireMock.ok(body))
         )
+
+        body = "{\"table\":\"A\",\"currency\":\"dolar australijski\",\"code\":\"AUD\",\"rates\":[{\"no\":\"026/A/NBP/2022\",\"effectiveDate\":\"2022-02-08\",\"mid\":2.0000}]}"
+        wireMockServer.stubFor(
+                WireMock.get("/exchangerates/rates/A/AUD/2022-02-08")
+                        .willReturn(WireMock.ok(body))
+        )
     }
 
     def cleanupSpec() {
@@ -59,6 +65,38 @@ class AccountSpecification extends BaseApplicationSpecification {
                 Account.Id.of(accountId),
                 Account.Number.of("65 1090 1665 0000 0001 0373 7343"),
                 Money.of("27.16", currency)
+        )
+    }
+
+    def "should return an account by ID with different currency rounded down using 'half even' strategy"() {
+        given:
+        def accountId = "0bb1378a-8d43-4071-b44c-67a0f356d9bb"
+        def currency = "AUD"
+
+        when:
+        Account response = get("/accounts/${accountId}?currency=${currency}", Account)
+
+        then:
+        response == new Account(
+                Account.Id.of(accountId),
+                Account.Number.of("11 1111 1111 1111 1111 1111 1111"),
+                Money.of("1.00", currency)
+        )
+    }
+
+    def "should return an account by ID with different currency rounded up using 'half even' strategy"() {
+        given:
+        def accountId = "bce2bb32-4582-4734-9273-613804acf36d"
+        def currency = "AUD"
+
+        when:
+        Account response = get("/accounts/${accountId}?currency=${currency}", Account)
+
+        then:
+        response == new Account(
+                Account.Id.of(accountId),
+                Account.Number.of("21 1111 1111 1111 1111 1111 1111"),
+                Money.of("1.02", currency)
         )
     }
 
