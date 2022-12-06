@@ -2,9 +2,8 @@ package pl.cleankod.exchange.entrypoint;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.cleankod.exchange.core.domain.Account;
-import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.exchange.core.usecase.FindAccountDelegator;
+import pl.cleankod.exchange.entrypoint.model.AccountDTO;
 
 import java.util.Optional;
 
@@ -18,18 +17,18 @@ public class AccountController {
     }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<Account> findAccountById(@PathVariable String id, @RequestParam Optional<String> currency) {
+    public ResponseEntity<AccountDTO> findAccountById(@PathVariable String id, @RequestParam Optional<String> currency) {
         return findAccountDelegator.findById(id, currency)
+                .map(AccountDTO::from)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping(path = "/number={number}")
-    public ResponseEntity<Account> findAccountByNumber(@PathVariable String number, @RequestParam Optional<String> currency) {
+    public ResponseEntity<AccountDTO> findAccountByNumber(@PathVariable String number, @RequestParam Optional<String> currency) {
         return findAccountDelegator.findByNumber(number, currency)
+                .map(AccountDTO::from)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
-
 }
