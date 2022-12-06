@@ -10,13 +10,14 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
-import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
+import pl.cleankod.exchange.core.gateway.RateFetchingService;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 import pl.cleankod.exchange.entrypoint.AccountController;
 import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
+import pl.cleankod.exchange.core.usecase.FindAccountDelegator;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
-import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
+import pl.cleankod.exchange.provider.RateFetchingNbpService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 
 import java.util.Currency;
@@ -44,8 +45,8 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
-        return new CurrencyConversionNbpService(exchangeRatesNbpClient);
+    RateFetchingService rateFetchingService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
+        return new RateFetchingNbpService(exchangeRatesNbpClient);
     }
 
     @Bean
@@ -56,17 +57,21 @@ public class ApplicationInitializer {
     @Bean
     FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase(
             AccountRepository accountRepository,
-            CurrencyConversionService currencyConversionService,
+            RateFetchingService rateFetchingService,
             Environment environment
     ) {
         Currency baseCurrency = Currency.getInstance(environment.getRequiredProperty("app.base-currency"));
-        return new FindAccountAndConvertCurrencyUseCase(accountRepository, currencyConversionService, baseCurrency);
+        return new FindAccountAndConvertCurrencyUseCase(accountRepository, rateFetchingService, baseCurrency);
     }
 
     @Bean
-    AccountController accountController(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
-                                        FindAccountUseCase findAccountUseCase) {
-        return new AccountController(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
+    FindAccountDelegator findAccountDelegator(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase, FindAccountUseCase findAccountUseCase) {
+        return new FindAccountDelegator(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
+    }
+
+    @Bean
+    AccountController accountController(FindAccountDelegator findAccountDelegator) {
+        return new AccountController(findAccountDelegator);
     }
 
     @Bean

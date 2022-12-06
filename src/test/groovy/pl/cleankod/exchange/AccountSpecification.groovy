@@ -5,8 +5,8 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import org.apache.http.HttpResponse
 import pl.cleankod.BaseApplicationSpecification
-import pl.cleankod.exchange.core.domain.Account
 import pl.cleankod.exchange.core.domain.Money
+import pl.cleankod.exchange.entrypoint.model.AccountDTO
 
 import java.nio.charset.StandardCharsets
 
@@ -25,6 +25,12 @@ class AccountSpecification extends BaseApplicationSpecification {
                 WireMock.get("/exchangerates/rates/A/EUR/2022-02-08")
                         .willReturn(WireMock.ok(body))
         )
+
+        body = "{\"table\":\"A\",\"currency\":\"dolar australijski\",\"code\":\"AUD\",\"rates\":[{\"no\":\"026/A/NBP/2022\",\"effectiveDate\":\"2022-02-08\",\"mid\":2.0000}]}"
+        wireMockServer.stubFor(
+                WireMock.get("/exchangerates/rates/A/AUD/2022-02-08")
+                        .willReturn(WireMock.ok(body))
+        )
     }
 
     def cleanupSpec() {
@@ -36,12 +42,12 @@ class AccountSpecification extends BaseApplicationSpecification {
         def accountId = "fa07c538-8ce4-11ec-9ad5-4f5a625cd744"
 
         when:
-        Account response = get("/accounts/${accountId}", Account)
+        AccountDTO response = get("/accounts/${accountId}", AccountDTO)
 
         then:
-        response == new Account(
-                Account.Id.of(accountId),
-                Account.Number.of("65 1090 1665 0000 0001 0373 7343"),
+        response == new AccountDTO(
+                accountId,
+                "65 1090 1665 0000 0001 0373 7343",
                 Money.of("123.45", "PLN")
         )
     }
@@ -52,13 +58,45 @@ class AccountSpecification extends BaseApplicationSpecification {
         def currency = "EUR"
 
         when:
-        Account response = get("/accounts/${accountId}?currency=${currency}", Account)
+        AccountDTO response = get("/accounts/${accountId}?currency=${currency}", AccountDTO)
 
         then:
-        response == new Account(
-                Account.Id.of(accountId),
-                Account.Number.of("65 1090 1665 0000 0001 0373 7343"),
+        response == new AccountDTO(
+                accountId,
+                "65 1090 1665 0000 0001 0373 7343",
                 Money.of("27.16", currency)
+        )
+    }
+
+    def "should return an account by ID with different currency rounded down using 'half even' strategy"() {
+        given:
+        def accountId = "0bb1378a-8d43-4071-b44c-67a0f356d9bb"
+        def currency = "AUD"
+
+        when:
+        AccountDTO response = get("/accounts/${accountId}?currency=${currency}", AccountDTO)
+
+        then:
+        response == new AccountDTO(
+                accountId,
+                "11 1111 1111 1111 1111 1111 1111",
+                Money.of("1.00", currency)
+        )
+    }
+
+    def "should return an account by ID with different currency rounded up using 'half even' strategy"() {
+        given:
+        def accountId = "bce2bb32-4582-4734-9273-613804acf36d"
+        def currency = "AUD"
+
+        when:
+        AccountDTO response = get("/accounts/${accountId}?currency=${currency}", AccountDTO)
+
+        then:
+        response == new AccountDTO(
+                accountId,
+                "21 1111 1111 1111 1111 1111 1111",
+                Money.of("1.02", currency)
         )
     }
 
@@ -68,12 +106,12 @@ class AccountSpecification extends BaseApplicationSpecification {
         def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
 
         when:
-        Account response = get("/accounts/number=${accountNumberUrlEncoded}", Account)
+        AccountDTO response = get("/accounts/number=${accountNumberUrlEncoded}", AccountDTO)
 
         then:
-        response == new Account(
-                Account.Id.of("78743420-8ce9-11ec-b0d0-57b77255c208"),
-                Account.Number.of(accountNumberValue),
+        response == new AccountDTO(
+                "78743420-8ce9-11ec-b0d0-57b77255c208",
+                accountNumberValue,
                 Money.of("456.78", "EUR")
         )
     }

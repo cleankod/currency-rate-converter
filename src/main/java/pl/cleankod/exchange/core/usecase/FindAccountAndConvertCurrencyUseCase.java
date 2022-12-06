@@ -3,7 +3,7 @@ package pl.cleankod.exchange.core.usecase;
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
-import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
+import pl.cleankod.exchange.core.gateway.RateFetchingService;
 
 import java.util.Currency;
 import java.util.Optional;
@@ -11,14 +11,14 @@ import java.util.Optional;
 public class FindAccountAndConvertCurrencyUseCase {
 
     private final AccountRepository accountRepository;
-    private final CurrencyConversionService currencyConversionService;
+    private final RateFetchingService rateFetchingService;
     private final Currency baseCurrency;
 
     public FindAccountAndConvertCurrencyUseCase(AccountRepository accountRepository,
-                                                CurrencyConversionService currencyConversionService,
+                                                RateFetchingService rateFetchingService,
                                                 Currency baseCurrency) {
         this.accountRepository = accountRepository;
-        this.currencyConversionService = currencyConversionService;
+        this.rateFetchingService = rateFetchingService;
         this.baseCurrency = baseCurrency;
     }
 
@@ -34,7 +34,7 @@ public class FindAccountAndConvertCurrencyUseCase {
 
     private Money convert(Money money, Currency targetCurrency) {
         if (!baseCurrency.equals(targetCurrency)) {
-            return money.convert(currencyConversionService, targetCurrency);
+            return money.convert(rateFetchingService, targetCurrency);
         }
 
         if (!money.currency().equals(targetCurrency)) {
