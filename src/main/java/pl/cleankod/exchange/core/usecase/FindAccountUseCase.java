@@ -8,7 +8,7 @@ import pl.cleankod.util.Result;
 import java.util.UUID;
 
 public class FindAccountUseCase {
-    protected final AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
 
     public FindAccountUseCase(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;

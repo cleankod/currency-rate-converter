@@ -11,7 +11,8 @@ import java.util.UUID;
 public class AccountInMemoryRepository implements AccountRepository {
 
     private final Set<Account> accounts = Set.of(
-            new Account(UUID.fromString("fa07c538-8ce4-11ec-9ad5-4f5a625cd744"),
+            new Account(
+                    UUID.fromString("fa07c538-8ce4-11ec-9ad5-4f5a625cd744"),
                     "65 1090 1665 0000 0001 0373 7343",
                     Money.of("123.45", "PLN")
             ),
