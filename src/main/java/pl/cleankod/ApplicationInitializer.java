@@ -1,5 +1,9 @@
 package pl.cleankod;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import feign.Feign;
 import feign.httpclient.ApacheHttpClient;
 import feign.jackson.JacksonDecoder;
@@ -9,6 +13,7 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
+import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
@@ -19,6 +24,7 @@ import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 
+import java.io.IOException;
 import java.util.Currency;
 
 @SpringBootConfiguration
@@ -67,6 +73,29 @@ public class ApplicationInitializer {
     AccountController accountController(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
                                         FindAccountUseCase findAccountUseCase) {
         return new AccountController(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
+    }
+
+    @Bean
+    SimpleModule singleValueObjectModule() {
+        SimpleModule module = new SimpleModule();
+
+        module.addSerializer(Account.Number.class, new JsonSerializer<>() {
+            @Override
+            public void serialize(Account.Number accountNumber, JsonGenerator jsonGenerator,
+                                  SerializerProvider serializerProvider) throws IOException {
+                jsonGenerator.writeObject(accountNumber.value());
+            }
+        });
+
+        module.addSerializer(Account.Id.class, new JsonSerializer<>() {
+            @Override
+            public void serialize(Account.Id accountId, JsonGenerator jsonGenerator,
+                                  SerializerProvider serializerProvider) throws IOException {
+                jsonGenerator.writeObject(accountId.value());
+            }
+        });
+
+        return module;
     }
 
     @Bean
