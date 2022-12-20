@@ -1,7 +1,7 @@
 package pl.cleankod.exchange.adapter.provider.nbp;
 
+import pl.cleankod.exchange.adapter.provider.nbp.client.ExchangeRatesNbpClient;
 import pl.cleankod.exchange.core.port.ExchangeRatesProviderPort;
-import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 
 import java.math.BigDecimal;
 import java.util.Currency;

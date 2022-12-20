@@ -2,10 +2,10 @@ package pl.cleankod.exchange.adapter.provider.nbp.client;
 
 import feign.Param;
 import feign.RequestLine;
-import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
+import pl.cleankod.exchange.adapter.provider.nbp.dto.RateWrapperDto;
 
 public interface ExchangeRatesNbpClient {
     @RequestLine("GET /exchangerates/rates/{table}/{currency}/2022-02-08")
-    RateWrapper fetch(@Param("table") String table, @Param("currency") String currency);
+    RateWrapperDto fetch(@Param("table") String table, @Param("currency") String currency);
 }
 
