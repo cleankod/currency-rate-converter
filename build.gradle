@@ -19,6 +19,9 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
+    // https://mvnrepository.com/artifact/io.github.openfeign/feign-hystrix
+    implementation  'io.github.openfeign:feign-hystrix:11.9.1'
+
 
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy:3.0.9'

@@ -1,7 +1,7 @@
 package pl.cleankod;
 
-import feign.Feign;
 import feign.httpclient.ApacheHttpClient;
+import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import org.springframework.boot.SpringApplication;
@@ -14,6 +14,7 @@ import pl.cleankod.exchange.adapter.persistence.repository.AccountRepository;
 
 import pl.cleankod.exchange.adapter.provider.nbp.ExchangeRatesProvider;
 import pl.cleankod.exchange.adapter.provider.nbp.client.ExchangeRatesNbpClient;
+import pl.cleankod.exchange.adapter.provider.nbp.client.ExchangeRatesNbpClientFallbackFactory;
 import pl.cleankod.exchange.core.port.ExchangeRatesProviderPort;
 import pl.cleankod.exchange.core.service.AccountService;
 import pl.cleankod.exchange.core.service.CurrencyConversionService;
@@ -44,11 +45,12 @@ public class ApplicationInitializer {
     @Bean
     ExchangeRatesNbpClient exchangeRatesNbpClient(Environment environment) {
         String nbpApiBaseUrl = environment.getRequiredProperty("provider.nbp-api.base-url");
-        return Feign.builder()
+        return HystrixFeign.builder()
                 .client(new ApacheHttpClient())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
-                .target(ExchangeRatesNbpClient.class, nbpApiBaseUrl);
+                .target(ExchangeRatesNbpClient.class,
+                        nbpApiBaseUrl, ExchangeRatesNbpClientFallbackFactory.fallbackFactory);
     }
 
     @Bean
