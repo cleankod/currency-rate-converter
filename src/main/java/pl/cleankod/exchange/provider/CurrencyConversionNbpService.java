@@ -16,6 +16,7 @@ public class CurrencyConversionNbpService implements CurrencyConversionService {
         this.exchangeRatesNbpClient = exchangeRatesNbpClient;
     }
 
+    // TODO: remove and refactor business logic out of here to a dedicated service (core) and provider
     @Override
     public Money convert(Money money, Currency targetCurrency) {
         RateWrapper rateWrapper = exchangeRatesNbpClient.fetch("A", targetCurrency.getCurrencyCode());

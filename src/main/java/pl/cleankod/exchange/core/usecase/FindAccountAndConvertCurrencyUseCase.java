@@ -37,6 +37,7 @@ public class FindAccountAndConvertCurrencyUseCase {
             return money.convert(currencyConversionService, targetCurrency);
         }
 
+        // TODO: (maybe) refactor since if baseCurrency = "PLN", targetCurrency = "PLN" and if money.currency() = "EUR", an Exception is thrown
         if (!money.currency().equals(targetCurrency)) {
             throw new CurrencyConversionException(money.currency(), targetCurrency);
         }
