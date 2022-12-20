@@ -18,7 +18,7 @@ import pl.cleankod.exchange.core.port.ExchangeRatesProviderPort;
 import pl.cleankod.exchange.core.service.AccountService;
 import pl.cleankod.exchange.core.service.CurrencyConversionService;
 import pl.cleankod.exchange.adapter.entrypoint.AccountController;
-import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
+import pl.cleankod.exchange.adapter.entrypoint.ExceptionHandlerAdvice;
 import pl.cleankod.exchange.adapter.persistence.repository.AccountInMemoryRepository;
 
 

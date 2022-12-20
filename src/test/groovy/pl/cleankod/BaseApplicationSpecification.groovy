@@ -6,7 +6,7 @@ import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.util.EntityUtils
-import pl.cleankod.exchange.entrypoint.model.ApiError
+import pl.cleankod.exchange.adapter.entrypoint.model.ApiError
 import spock.lang.Specification
 
 abstract class BaseApplicationSpecification extends Specification {
