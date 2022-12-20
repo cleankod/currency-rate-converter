@@ -1,4 +1,4 @@
-package pl.cleankod.util;
+package pl.cleankod.exchange.core.util;
 
 public interface Preconditions {
     static <T> T requireNonNull(T obj) {

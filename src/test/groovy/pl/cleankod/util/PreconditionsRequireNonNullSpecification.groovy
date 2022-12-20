@@ -1,5 +1,6 @@
 package pl.cleankod.util
 
+import pl.cleankod.exchange.core.util.Preconditions
 import spock.lang.Specification
 
 class PreconditionsRequireNonNullSpecification extends Specification {

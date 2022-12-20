@@ -1,6 +1,6 @@
 package pl.cleankod.exchange.core.domain;
 
-import pl.cleankod.util.Preconditions;
+import pl.cleankod.exchange.core.util.Preconditions;
 
 import java.util.UUID;
 import java.util.regex.Pattern;

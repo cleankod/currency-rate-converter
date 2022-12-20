@@ -1,7 +1,7 @@
 package pl.cleankod.exchange.core.domain;
 
 import pl.cleankod.exchange.core.service.CurrencyConversionService;
-import pl.cleankod.util.Preconditions;
+import pl.cleankod.exchange.core.util.Preconditions;
 
 import java.math.BigDecimal;
 import java.util.Currency;

@@ -3,7 +3,7 @@ package pl.cleankod.exchange.core.service;
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.exchange.core.port.AccountRepositoryPort;
-import pl.cleankod.exchange.core.usecase.CurrencyConversionException;
+import pl.cleankod.exchange.core.exception.CurrencyConversionException;
 
 import java.util.Currency;
 import java.util.Optional;
