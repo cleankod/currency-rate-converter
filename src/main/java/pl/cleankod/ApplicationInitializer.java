@@ -17,6 +17,7 @@ import pl.cleankod.exchange.adapter.persistence.repository.AccountRepository;
 
 import pl.cleankod.exchange.adapter.provider.nbp.ExchangeRatesProvider;
 import pl.cleankod.exchange.adapter.provider.nbp.client.ExchangeRatesNbpClient;
+import pl.cleankod.exchange.adapter.provider.nbp.client.ExchangeRatesNbpClientFallbackFactory;
 import pl.cleankod.exchange.core.port.ExchangeRatesProviderPort;
 import pl.cleankod.exchange.core.service.AccountService;
 import pl.cleankod.exchange.core.service.CurrencyConversionService;
@@ -57,7 +58,7 @@ public class ApplicationInitializer {
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
                 .target(ExchangeRatesNbpClient.class,
-                        nbpApiBaseUrl); //, ExchangeRatesNbpClientFallbackFactory.fallbackFactory);
+                        nbpApiBaseUrl, ExchangeRatesNbpClientFallbackFactory.fallbackFactory);
     }
 
     @Bean
