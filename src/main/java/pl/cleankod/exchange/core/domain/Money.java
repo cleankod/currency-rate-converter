@@ -1,6 +1,5 @@
 package pl.cleankod.exchange.core.domain;
 
-import pl.cleankod.exchange.core.service.CurrencyConversionService;
 import pl.cleankod.exchange.core.util.Preconditions;
 
 import java.math.BigDecimal;
@@ -21,7 +20,7 @@ public record Money(BigDecimal amount, Currency currency) {
     }
 
     // Suggestion: remove following code
-    public Money convert(CurrencyConversionService currencyConverter, Currency targetCurrency) {
-        return currencyConverter.convert(this, targetCurrency);
-    }
+    //public Money convert(CurrencyConversionService currencyConverter, Currency targetCurrency) {
+    //    return currencyConverter.convert(this, targetCurrency);
+    //}
 }

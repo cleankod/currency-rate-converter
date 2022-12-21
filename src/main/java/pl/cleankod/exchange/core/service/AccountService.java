@@ -4,6 +4,8 @@ import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.exchange.core.port.AccountRepositoryPort;
 import pl.cleankod.exchange.core.exception.CurrencyConversionException;
+import pl.cleankod.exchange.util.Failure;
+import pl.cleankod.exchange.util.Result;
 
 import java.util.Currency;
 import java.util.Optional;
@@ -51,7 +53,14 @@ public class AccountService {
     private Money convert(Money money, Currency targetCurrency) {
 
         if (!baseCurrency.equals(targetCurrency)) {
-            return money.convert(currencyConversionService, targetCurrency);
+            Result<Money, Failure> result = currencyConversionService.convert(money, targetCurrency);
+                if(result.isSuccessful()){
+                    return result.successfulValue();
+                }
+                else { // can be customized, for instance, to return the account balance with the original currency
+                       // and an additional end-user message stating that the conversion couldn't be performed
+                    throw new CurrencyConversionException(money.currency(), targetCurrency);
+                }
         }
 
         // Suggestion (maybe): refactor since if

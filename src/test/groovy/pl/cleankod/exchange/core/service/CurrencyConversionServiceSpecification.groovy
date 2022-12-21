@@ -2,6 +2,7 @@ package pl.cleankod.exchange.core.service
 
 import pl.cleankod.exchange.core.domain.Money
 import pl.cleankod.exchange.core.port.ExchangeRatesProviderPort
+import pl.cleankod.exchange.util.Result
 import spock.lang.Specification
 
 class CurrencyConversionServiceSpecification extends Specification {
@@ -13,13 +14,13 @@ class CurrencyConversionServiceSpecification extends Specification {
 
     def "should convert one PLN to equivalent EUR amount given by 1 over the exchange rate rounded half up"() {
         given:
-        exchangeRatesProvider.getExchangeRate(eur) >> BigDecimal.valueOf(exchangeRate as double)
+        exchangeRatesProvider.getExchangeRate(eur) >> Result.successful(BigDecimal.valueOf(exchangeRate as double))
 
         when:
-        def equivalentAmountInEUR = currencyConversionService.convert(onePln as Money, eur)
+        def equivalentAmountInEurResult = currencyConversionService.convert(onePln as Money, eur)
 
         then:
-        equivalentAmountInEUR.amount() == correctlyRoundedAmount // 0.22d which is rounded 'half up' from 1/exchangeRate = 0.22087 | 0.21505
+        equivalentAmountInEurResult.successfulValue().amount().doubleValue() == correctlyRoundedAmount // 0.22d which is rounded 'half up' from 1/exchangeRate = 0.22087 | 0.21505
 
         where:
         exchangeRate       || correctlyRoundedAmount  || onePln
