@@ -12,13 +12,13 @@ This is an example project that calculates the amount balance to a given currenc
 JSON format: 
 
 ```
-http://<host>>:8080/v3/api-docs/
+http://<host>:8080/v3/api-docs/
 ```
 
 YAML format:
 
 ```
-http://<host>>:8080/v3/api-docs.yaml
+http://<host>:8080/v3/api-docs.yaml
 ```
 
 Swagger:
