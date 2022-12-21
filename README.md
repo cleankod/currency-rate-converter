@@ -68,6 +68,7 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * Rounding when calculating the amount is not done correctly for this type of operation (we're loosing money!) and it is done in the wrong place.
   * Add scale and move logic to Money.java
 * Investigate whether it is possible to implement the value-object serialization, to avoid `value` nested field in JSON. See [#10](https://github.com/cleankod/currency-rate-converter/pull/10) as a starting point. Or maybe there is a better solution to the problem at hand?
+  * add serializer, change test
 * Move parameter-specific logic outside the controller.
 * Better error handling, especially of potential errors from NBP API.
 * Caching the NBP API results.
@@ -75,7 +76,8 @@ Also, value-objects are responsible for a little more than just plain data holdi
   * done
 * Better logging with traceability.
 * Replace exceptions with `Result` (`either`) which improves the overall methods API readability and forces error handling. Look into [cleankod/architecture-archetype](https://github.com/cleankod/architecture-archetype) as a starting point.
-* Test coverage report.
+* Test coverage report. 
+  * jacoco added
 * Auto generating REST API docs.
   * springdoc-openapi-ui dependency added, docs available at http://localhost:8080/swagger-ui/index.html
 * Integration tests with the real NBP API.
