@@ -1,6 +1,6 @@
 package pl.cleankod.exchange.adapter.provider.nbp;
 
-import org.springframework.cache.annotation.Cacheable;
+//import org.springframework.cache.annotation.Cacheable;
 import pl.cleankod.exchange.adapter.provider.nbp.client.ExchangeRatesNbpClient;
 import pl.cleankod.exchange.core.port.ExchangeRatesProviderPort;
 import pl.cleankod.exchange.util.Failure;
@@ -20,7 +20,7 @@ public class ExchangeRatesProvider implements ExchangeRatesProviderPort {
 
     // could possibly return a dedicated Rate domain object with a dedicated mapper
     // for the mapping between DTOs and domain objects
-    @Cacheable("exchangeRates")
+    //@Cacheable("exchangeRates")
     //TODO: caching makes sense in conjunction with getExchangeRateByDate implementation
     public Result<BigDecimal, Failure> getExchangeRate(Currency targetCurrency){
         try {

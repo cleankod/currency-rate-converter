@@ -24,7 +24,7 @@ public class CurrencyConversionService {
     public Result<Money, Failure> convert(Money money, Currency targetCurrency) {
         Result<BigDecimal, Failure> result = exchangeRatesProvider.getExchangeRate(targetCurrency);
         if (result.isFail()){
-            log.error(result.failValue().failureReason.toString(), result.failValue().exception.getMessage()); // can be improved
+            log.error(result.failValue().failureReason.toString() + " " + result.failValue().exception.getMessage()); // can be improved
             return Result.fail(result.failValue());
         }
         if (result.successfulValue() == null || result.successfulValue().doubleValue() <= 0d){

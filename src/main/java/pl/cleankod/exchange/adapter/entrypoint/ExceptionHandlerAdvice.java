@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.cleankod.exchange.core.exception.CurrencyConversionException;
 import pl.cleankod.exchange.adapter.entrypoint.model.ApiError;
+import pl.cleankod.exchange.core.exception.UnavailableExchangeRateException;
 
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
@@ -16,4 +17,12 @@ public class ExceptionHandlerAdvice {
     protected ResponseEntity<ApiError> handleBadRequest(CurrencyConversionException ex) {
         return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
     }
+
+    @ExceptionHandler({
+            UnavailableExchangeRateException.class
+    })
+    protected ResponseEntity<ApiError> handleUnavailableExchangeRate(UnavailableExchangeRateException ex) {
+        return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
+    }
+
 }

@@ -2,6 +2,7 @@ package pl.cleankod.exchange.core.service;
 
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.domain.Money;
+import pl.cleankod.exchange.core.exception.UnavailableExchangeRateException;
 import pl.cleankod.exchange.core.port.AccountRepositoryPort;
 import pl.cleankod.exchange.core.exception.CurrencyConversionException;
 import pl.cleankod.exchange.util.Failure;
@@ -52,6 +53,13 @@ public class AccountService {
 
     private Money convert(Money money, Currency targetCurrency) {
 
+        // this solves a bug because without this clause here and in the case where
+        // money.currency() = EUR and targetCurrency = EUR and  baseCurrency = PLN (hence != targetCurrency = EUR)
+        // the original euros get wrongly converted to PLN
+        if (money.currency().equals(targetCurrency)){
+            return money;
+        }
+
         if (!baseCurrency.equals(targetCurrency)) {
             Result<Money, Failure> result = currencyConversionService.convert(money, targetCurrency);
                 if(result.isSuccessful()){
@@ -59,17 +67,12 @@ public class AccountService {
                 }
                 else { // can be customized, for instance, to return the account balance with the original currency
                        // and an additional end-user message stating that the conversion couldn't be performed
-                    throw new CurrencyConversionException(money.currency(), targetCurrency);
+                    throw new UnavailableExchangeRateException(money.currency(), targetCurrency);
                 }
         }
 
-        // Suggestion (maybe): refactor since if
-        // baseCurrency = "PLN", targetCurrency = "PLN" and if money.currency() = "EUR",
-        // an Exception is thrown --> the inverse of the opposite exchange rate could be used
-        if (!money.currency().equals(targetCurrency)) {
-            throw new CurrencyConversionException(money.currency(), targetCurrency);
-        }
+        // Case of money.currency() !=  targetCurrency = baseCurrency
+        throw new CurrencyConversionException(money.currency(), targetCurrency);
 
-        return money;
     }
 }
