@@ -24,7 +24,7 @@ public class ExchangeRatesProvider implements ExchangeRatesProviderPort {
     //TODO: caching makes sense in conjunction with getExchangeRateByDate implementation
     public Result<BigDecimal, Failure> getExchangeRate(Currency targetCurrency){
         try {
-            BigDecimal exchangeRate =
+            BigDecimal exchangeRate =           // table "A" should be injected from properties
                     exchangeRatesNbpClient.fetch("A", targetCurrency.getCurrencyCode()).rates().get(0).mid();
             return Result.successful(exchangeRate);
         } catch (Exception ex) {
