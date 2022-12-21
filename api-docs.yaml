@@ -1,0 +1,98 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+paths:
+  /accounts/{id}:
+    get:
+      tags:
+      - account-controller
+      operationId: findAccountById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: currency
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Account'
+  /accounts/number={number}:
+    get:
+      tags:
+      - account-controller
+      operationId: findAccountByNumber
+      parameters:
+      - name: number
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: currency
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Account'
+components:
+  schemas:
+    Account:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        number:
+          $ref: '#/components/schemas/Number'
+        balance:
+          $ref: '#/components/schemas/Money'
+    Id:
+      type: object
+      properties:
+        value:
+          type: string
+          format: uuid
+    Money:
+      type: object
+      properties:
+        amount:
+          type: number
+        currency:
+          type: object
+          properties:
+            currencyCode:
+              type: string
+            defaultFractionDigits:
+              type: integer
+              format: int32
+            numericCode:
+              type: integer
+              format: int32
+            displayName:
+              type: string
+            symbol:
+              type: string
+            numericCodeAsString:
+              type: string
+    Number:
+      type: object
+      properties:
+        value:
+          type: string

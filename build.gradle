@@ -22,6 +22,9 @@ dependencies {
     implementation 'io.github.openfeign:feign-jackson:11.8'
     // https://mvnrepository.com/artifact/io.github.openfeign/feign-hystrix
     implementation  'io.github.openfeign:feign-hystrix:11.9.1'
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.9'
+
 
 
     // Use the latest Groovy version for Spock testing
