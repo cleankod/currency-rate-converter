@@ -38,6 +38,8 @@ dependencies {
     testImplementation 'org.apache.httpcomponents:httpclient:4.5.13'
     testImplementation 'com.github.tomakehurst:wiremock-jre8:2.27.2'
 
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.1'
+
 }
 
 
