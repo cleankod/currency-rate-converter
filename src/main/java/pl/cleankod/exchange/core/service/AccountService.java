@@ -19,16 +19,16 @@ public class AccountService {
         this.accountRepositoryAdapter = accountRepositoryAdapter;
     }
 
-    public Optional<Account> get(Account.Id id) {
+    private Optional<Account> get(Account.Id id) {
         return accountRepositoryAdapter.find(id);
     }
 
-    public Optional<Account> get(Account.Number number) {
+    private Optional<Account> get(Account.Number number) {
         return accountRepositoryAdapter.find(number);
     }
 
-    public Optional<Account> getById(String id, Optional<String> targetCurrency) {
-        return get(Account.Id.of(id))
+    public Optional<Account> get(Account.Id id, Optional<String> targetCurrency) {
+        return get(id)
                 .map(account -> targetCurrency
                         .map(currency -> new Account(account.id(), account.number(),
                                 currencyConversionService
@@ -38,8 +38,8 @@ public class AccountService {
 
     }
 
-    public Optional<Account> getByNumber(String number, Optional<String> targetCurrency) {
-        return get(Account.Number.of(number))
+    public Optional<Account> get(Account.Number number, Optional<String> targetCurrency) {
+        return get(number)
                 .map(account -> targetCurrency
                         .map(currency -> new Account(account.id(), account.number(),
                                 currencyConversionService

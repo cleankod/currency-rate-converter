@@ -21,7 +21,7 @@ public class AccountController {
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<Account> findAccountById(@PathVariable String id, @RequestParam(required = false) String currency) {
-        return accountService.getById(id, Optional.ofNullable(currency))
+        return accountService.get(Account.Id.of(id), Optional.ofNullable(currency))
                         .map(ResponseEntity::ok)
                         .orElse(ResponseEntity.notFound().build());
 
@@ -30,7 +30,7 @@ public class AccountController {
     @GetMapping(path = "/number={number}")
     public ResponseEntity<Account> findAccountByNumber(@PathVariable String number, @RequestParam(required = false) String currency) {
         String decodedAccountNumber = URLDecoder.decode(number, StandardCharsets.UTF_8);
-        return accountService.getByNumber(decodedAccountNumber, Optional.ofNullable(currency))
+        return accountService.get(Account.Number.of(decodedAccountNumber), Optional.ofNullable(currency))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
