@@ -67,18 +67,19 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    CurrencyConversionService currencyConversionService(ExchangeRatesProviderPort exchangeRatesProvider) {
-        return new CurrencyConversionService(exchangeRatesProvider);
+    CurrencyConversionService currencyConversionService(
+            ExchangeRatesProviderPort exchangeRatesProvider,
+            Environment environment) {
+        Currency baseCurrency = Currency.getInstance(environment.getRequiredProperty("app.base-currency"));
+        return new CurrencyConversionService(exchangeRatesProvider, baseCurrency);
     }
 
     @Bean
     AccountService accountService(
             AccountRepositoryAdapter accountRepositoryAdapter,
-            CurrencyConversionService currencyConversionService,
-            Environment environment
+            CurrencyConversionService currencyConversionService
     ) {
-        Currency baseCurrency = Currency.getInstance(environment.getRequiredProperty("app.base-currency"));
-        return new AccountService(currencyConversionService, baseCurrency, accountRepositoryAdapter);
+        return new AccountService(currencyConversionService, accountRepositoryAdapter);
     }
 
     @Bean

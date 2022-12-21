@@ -8,8 +8,8 @@ import spock.lang.Specification
 class CurrencyConversionServiceSpecification extends Specification {
 
     def exchangeRatesProvider = Mock(ExchangeRatesProviderPort)
-    def currencyConversionService = new CurrencyConversionService(exchangeRatesProvider)
     def pln = Currency.getInstance("PLN")
+    def currencyConversionService = new CurrencyConversionService(exchangeRatesProvider, pln)
     def eur = Currency.getInstance("EUR")
 
     def "should convert one PLN to equivalent EUR amount given by 1 over the exchange rate rounded half up"() {
@@ -20,7 +20,7 @@ class CurrencyConversionServiceSpecification extends Specification {
         def equivalentAmountInEurResult = currencyConversionService.convert(onePln as Money, eur)
 
         then:
-        equivalentAmountInEurResult.successfulValue().amount().doubleValue() == correctlyRoundedAmount // 0.22d which is rounded 'half up' from 1/exchangeRate = 0.22087 | 0.21505
+        equivalentAmountInEurResult.amount().doubleValue() == correctlyRoundedAmount // 0.22d which is rounded 'half up' from 1/exchangeRate = 0.22087 | 0.21505
 
         where:
         exchangeRate       || correctlyRoundedAmount  || onePln
