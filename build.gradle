@@ -3,6 +3,8 @@ plugins {
 
     // Apply the groovy plugin to also add support for Groovy (needed for Spock)
     id 'groovy'
+
+    id 'jacoco'
 }
 
 repositories {
@@ -35,9 +37,27 @@ dependencies {
 
     testImplementation 'org.apache.httpcomponents:httpclient:4.5.13'
     testImplementation 'com.github.tomakehurst:wiremock-jre8:2.27.2'
+
 }
 
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+test {
+    jacoco {
+        destinationFile = layout.buildDirectory.file('jacoco/jacocoTest.exec').get().asFile
+        classDumpDir = layout.buildDirectory.dir('jacoco/classpathdumps').get().asFile
+    }
+    finalizedBy jacocoTestReport // report is always generated after tests run
+}
+
+jacocoTestReport {
+    dependsOn test // tests are required to run before generating the report
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
 }

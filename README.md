@@ -100,3 +100,24 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * Integration tests with the real NBP API.
 * Replace Spring Framework with a different one.
 * The proposed architecture is not perfect. Suggest improvements.
+
+
+## Test reports
+
+### Basic report
+
+After build:
+
+```
+<buildDir>/reports/tests/test/index.html
+```
+
+### Test coverage with JaCoCo
+
+After build:
+
+```
+<buildDir>/jacocoHtml/index.html
+```
+
+
