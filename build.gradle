@@ -17,7 +17,7 @@ java {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.3'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.0.1'
     implementation 'org.springframework.boot:spring-boot-starter-cache:2.6.8'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
     implementation 'io.github.openfeign:feign-httpclient:11.8'
@@ -25,7 +25,7 @@ dependencies {
     // https://mvnrepository.com/artifact/io.github.openfeign/feign-hystrix
     implementation  'io.github.openfeign:feign-hystrix:11.9.1'
     // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.9'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.11'
 
 
     implementation "org.mapstruct:mapstruct:1.5.3.Final"
@@ -38,7 +38,7 @@ dependencies {
     testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
 
     testImplementation 'org.apache.httpcomponents:httpclient:4.5.13'
-    testImplementation 'com.github.tomakehurst:wiremock-jre8:2.27.2'
+    testImplementation 'com.github.tomakehurst:wiremock-jre8:2.34.0'
 
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.1'
 
