@@ -4,6 +4,7 @@ import feign.httpclient.ApacheHttpClient;
 import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import org.mapstruct.factory.Mappers;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -12,6 +13,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
+import pl.cleankod.exchange.adapter.entrypoint.mapper.DtoMapperV1;
 import pl.cleankod.exchange.adapter.persistence.AccountRepositoryAdapter;
 import pl.cleankod.exchange.adapter.persistence.repository.AccountRepository;
 
@@ -83,8 +85,13 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    AccountController accountController(AccountService accountService) {
-        return new AccountController(accountService);
+    DtoMapperV1 dtoMapperV1(){
+        return Mappers.getMapper( DtoMapperV1.class );
+    }
+
+    @Bean
+    AccountController accountController(AccountService accountService, DtoMapperV1 dtoMapperV1) {
+        return new AccountController(accountService, dtoMapperV1);
     }
 
     @Bean

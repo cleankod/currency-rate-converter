@@ -28,6 +28,8 @@ dependencies {
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.9'
 
 
+    implementation "org.mapstruct:mapstruct:1.5.3.Final"
+    annotationProcessor "org.mapstruct:mapstruct-processor:1.5.3.Final"
 
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy:3.0.9'
