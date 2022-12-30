@@ -1,15 +1,14 @@
 package pl.cleankod.exchange.core.domain
 
-import pl.cleankod.exchange.core.domain.Account
 import spock.lang.Specification
 
 class AccountNumberSpecification extends Specification {
     def "should create object for valid value"() {
         when:
-        Account.Number accountNumber = Account.Number.of(givenValue)
+        Account account = new Account(UUID.randomUUID(), givenValue, Money.of(BigDecimal.ONE, Currency.getInstance("EUR")))
 
         then:
-        accountNumber != null
+        account != null
 
         where:
         givenValue << [
@@ -26,7 +25,7 @@ class AccountNumberSpecification extends Specification {
 
     def "should not create object due to incorrect value"() {
         when:
-        Account.Number.of(givenValue)
+        new Account(UUID.randomUUID(), givenValue, Money.of(BigDecimal.ONE, Currency.getInstance("EUR")))
 
         then:
         def exception = thrown(expectedExceptionType)

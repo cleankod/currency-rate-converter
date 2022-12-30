@@ -1,8 +1,5 @@
 package pl.cleankod.exchange
 
-import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import org.apache.http.HttpResponse
 import pl.cleankod.BaseApplicationSpecification
 import pl.cleankod.exchange.core.domain.Account
@@ -11,25 +8,6 @@ import pl.cleankod.exchange.core.domain.Money
 import java.nio.charset.StandardCharsets
 
 class AccountSpecification extends BaseApplicationSpecification {
-
-    private static WireMockServer wireMockServer = new WireMockServer(
-            WireMockConfiguration.options()
-                    .port(8081)
-    )
-
-    def setupSpec() {
-        wireMockServer.start()
-
-        def body = "{\"table\":\"A\",\"currency\":\"euro\",\"code\":\"EUR\",\"rates\":[{\"no\":\"026/A/NBP/2022\",\"effectiveDate\":\"2022-02-08\",\"mid\":4.5452}]}"
-        wireMockServer.stubFor(
-                WireMock.get("/exchangerates/rates/A/EUR/2022-02-08")
-                        .willReturn(WireMock.ok(body))
-        )
-    }
-
-    def cleanupSpec() {
-        wireMockServer.stop()
-    }
 
     def "should return an account by ID"() {
         given:
@@ -40,8 +18,8 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         then:
         response == new Account(
-                Account.Id.of(accountId),
-                Account.Number.of("65 1090 1665 0000 0001 0373 7343"),
+                UUID.fromString(accountId),
+                "65 1090 1665 0000 0001 0373 7343",
                 Money.of("123.45", "PLN")
         )
     }
@@ -55,11 +33,22 @@ class AccountSpecification extends BaseApplicationSpecification {
         Account response = get("/accounts/${accountId}?currency=${currency}", Account)
 
         then:
-        response == new Account(
-                Account.Id.of(accountId),
-                Account.Number.of("65 1090 1665 0000 0001 0373 7343"),
-                Money.of("27.16", currency)
-        )
+        response.id() == UUID.fromString(accountId)
+        response.number() == "65 1090 1665 0000 0001 0373 7343"
+        response.balance().currency().toString() == currency
+        response.balance().amount() != null
+    }
+
+    def "should throw exception when wrong currency"() {
+        given:
+        def accountId = "fa07c538-8ce4-11ec-9ad5-4f5a625cd744"
+        def currency = "EU"
+
+        when:
+        HttpResponse response = getResponse("/accounts/${accountId}?currency=${currency}")
+
+        then:
+        response.getStatusLine().getStatusCode() == 500
     }
 
     def "should return an account by number"() {
@@ -72,13 +61,13 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         then:
         response == new Account(
-                Account.Id.of("78743420-8ce9-11ec-b0d0-57b77255c208"),
-                Account.Number.of(accountNumberValue),
+                UUID.fromString("78743420-8ce9-11ec-b0d0-57b77255c208"),
+                accountNumberValue,
                 Money.of("456.78", "EUR")
         )
     }
 
-    def "should return an account by number with different currency"() {
+    def "should throw exception when base currency mismatches"() {
         given:
         def accountNumberValue = "75 1240 2034 1111 0000 0306 8582"
         def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
@@ -87,8 +76,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         HttpResponse response = getResponse("/accounts/number=${accountNumberUrlEncoded}?currency=PLN")
 
         then:
-        response.getStatusLine().getStatusCode() == 400
-        transformError(response).message() == "Cannot convert currency from EUR to PLN."
+        response.getStatusLine().getStatusCode() == 500
     }
 
     def "should not find an account by ID"() {
