@@ -16,9 +16,9 @@ class MoneySpecification extends Specification {
 
         where:
         givenAmount                    | givenCurrency               || expectedAmount                 || expectedCurrency
-        "123.45"                       | "PLN"                       || BigDecimal.valueOf(123.45)     || Currency.getInstance("PLN")
-        "12345678.9"                   | "EUR"                       || BigDecimal.valueOf(12345678.9) || Currency.getInstance("EUR")
-        BigDecimal.valueOf(12345678.9) | Currency.getInstance("EUR") || BigDecimal.valueOf(12345678.9) || Currency.getInstance("EUR")
+        "123.45"                       | "PLN"                       || BigDecimal.valueOf(123.45)     || Currency.PLN
+        "12345678.9"                   | "EUR"                       || BigDecimal.valueOf(12345678.9) || Currency.EUR
+        BigDecimal.valueOf(12345678.9) | Currency.EUR                || BigDecimal.valueOf(12345678.9) || Currency.EUR
     }
 
     def "should not create object due to null value"() {

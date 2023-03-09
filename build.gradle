@@ -15,11 +15,15 @@ java {
 }
 
 dependencies {
+
     implementation 'org.springframework.boot:spring-boot-starter-web:2.6.3'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
-
+    implementation "io.github.resilience4j:resilience4j-circuitbreaker:1.7.0"
+    implementation "io.github.resilience4j:resilience4j-feign:1.7.0"
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
+    implementation 'org.slf4j:slf4j-api:1.7.25'
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy:3.0.9'
 

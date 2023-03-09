@@ -1,11 +1,11 @@
 package pl.cleankod.exchange.core.usecase;
 
 import pl.cleankod.exchange.core.domain.Account;
+import pl.cleankod.exchange.core.domain.Currency;
 import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 
-import java.util.Currency;
 import java.util.Optional;
 
 public class FindAccountAndConvertCurrencyUseCase {
@@ -33,11 +33,11 @@ public class FindAccountAndConvertCurrencyUseCase {
     }
 
     private Money convert(Money money, Currency targetCurrency) {
-        if (!baseCurrency.equals(targetCurrency)) {
+        if (baseCurrency != targetCurrency) {
             return money.convert(currencyConversionService, targetCurrency);
         }
 
-        if (!money.currency().equals(targetCurrency)) {
+        if (money.currency() != targetCurrency) {
             throw new CurrencyConversionException(money.currency(), targetCurrency);
         }
 

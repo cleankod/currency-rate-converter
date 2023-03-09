@@ -1,6 +1,7 @@
 package pl.cleankod.exchange.core.usecase;
 
-import java.util.Currency;
+
+import pl.cleankod.exchange.core.domain.Currency;
 
 public class CurrencyConversionException extends IllegalStateException {
     public CurrencyConversionException(Currency sourceCurrency, Currency targetCurrency) {

@@ -4,7 +4,6 @@ import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.util.Preconditions;
 
 import java.math.BigDecimal;
-import java.util.Currency;
 
 public record Money(BigDecimal amount, Currency currency) {
 
@@ -17,7 +16,7 @@ public record Money(BigDecimal amount, Currency currency) {
     public static Money of(String amount, String currency) {
         Preconditions.requireNonNull(amount);
         Preconditions.requireNonNull(currency);
-        return new Money(new BigDecimal(amount), Currency.getInstance(currency));
+        return new Money(new BigDecimal(amount), Currency.fromString(currency));
     }
 
     public Money convert(CurrencyConversionService currencyConverter, Currency targetCurrency) {
