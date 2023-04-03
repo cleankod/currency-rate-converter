@@ -11,8 +11,6 @@ import pl.cleankod.exchange.core.usecase.ExchangeFacade;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Currency;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/accounts")
