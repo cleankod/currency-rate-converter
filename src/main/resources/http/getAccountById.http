@@ -1,0 +1,4 @@
+GET http://localhost:8080/accounts/fa07c538-8ce4-11ec-9ad5-4f5a625cd744?currency=EUR
+Accept: application/json
+
+###

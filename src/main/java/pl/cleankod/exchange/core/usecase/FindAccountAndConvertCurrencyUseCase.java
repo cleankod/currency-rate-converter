@@ -34,7 +34,7 @@ public class FindAccountAndConvertCurrencyUseCase {
 
     private Money convert(Money money, Currency targetCurrency) {
         if (!baseCurrency.equals(targetCurrency)) {
-            return money.convert(currencyConversionService, targetCurrency);
+            return currencyConversionService.convert(money, targetCurrency);
         }
 
         if (!money.currency().equals(targetCurrency)) {
