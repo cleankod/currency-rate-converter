@@ -31,10 +31,7 @@ class ExchangeRatesNbpClientSpecification extends BaseApplicationSpecification {
     }
 
     def "should cache request to nbpApi"() {
-        wireMockServer.stubFor(
-                get("/exchangerates/rates/A/EUR/2022-02-08")
-                        .willReturn(ok(body)))
-
+        wireMockServer.stubFor(get("/exchangerates/rates/A/EUR/2022-02-08").willReturn(ok(body)))
 
         given:
         def accountId = "fa07c538-8ce4-11ec-9ad5-4f5a625cd744"
@@ -51,10 +48,8 @@ class ExchangeRatesNbpClientSpecification extends BaseApplicationSpecification {
         verify(exactly(1), getRequestedFor(urlEqualTo("/exchangerates/rates/A/EUR/2022-02-08")))
     }
 
-    def "should handle NPB API bad request error "() {
-        wireMockServer.stubFor(
-                get("/exchangerates/rates/A/GBP/2022-02-08")
-                        .willReturn(badRequest()))
+    def "should handle NBP API bad request error "() {
+        wireMockServer.stubFor(get("/exchangerates/rates/A/GBP/2022-02-08").willReturn(badRequest()))
 
         given:
         def accountId = "fa07c538-8ce4-11ec-9ad5-4f5a625cd744"
@@ -68,10 +63,8 @@ class ExchangeRatesNbpClientSpecification extends BaseApplicationSpecification {
         transformError(response).message() == "Bad request to NBP API"
     }
 
-    def "should handle NPB API Service unavailable error "() {
-        wireMockServer.stubFor(
-                get("/exchangerates/rates/A/USD/2022-02-08")
-                        .willReturn(serviceUnavailable()))
+    def "should handle NBP API Service unavailable error "() {
+        wireMockServer.stubFor(get("/exchangerates/rates/A/USD/2022-02-08").willReturn(serviceUnavailable()))
 
         given:
         def accountId = "fa07c538-8ce4-11ec-9ad5-4f5a625cd744"

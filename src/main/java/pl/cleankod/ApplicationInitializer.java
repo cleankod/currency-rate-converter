@@ -1,9 +1,13 @@
 package pl.cleankod;
 
-import feign.Feign;
 import feign.httpclient.ApacheHttpClient;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.feign.FeignDecorators;
+import io.github.resilience4j.feign.Resilience4jFeign;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -22,6 +26,7 @@ import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 
+import java.time.Duration;
 import java.util.Currency;
 
 @SpringBootConfiguration
@@ -38,14 +43,46 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    ExchangeRatesNbpClient exchangeRatesNbpClient(Environment environment) {
-        String nbpApiBaseUrl = environment.getRequiredProperty("provider.nbp-api.base-url");
-        return Feign.builder()
+    ExchangeRatesNbpClient exchangeRatesNbpClient(
+            @Value("${provider.nbp-api.base-url}") String nbpApiBaseUrl,
+            FeignDecorators feignDecorators
+    ) {
+        return Resilience4jFeign.builder(feignDecorators)
                 .client(new ApacheHttpClient())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
                 .errorDecoder(new NbpClientErrorDecoder())
                 .target(ExchangeRatesNbpClient.class, nbpApiBaseUrl);
+    }
+
+    @Bean
+    FeignDecorators feignDecorators(
+            CircuitBreakerRegistry circuitBreakerRegistry
+    ) {
+        return FeignDecorators.builder()
+                .withCircuitBreaker(circuitBreakerRegistry.circuitBreaker("nbpClientCircuitBreaker"))
+//                .withFallbackFactory(ExchangeRatesNbpClientFallback::new)
+                .build();
+    }
+
+    @Bean
+    CircuitBreakerRegistry circuitBreakerRegistry(
+            CircuitBreakerConfig circuitBreakerConfig
+    ) {
+        return CircuitBreakerRegistry.of(circuitBreakerConfig);
+    }
+
+    @Bean
+    CircuitBreakerConfig circuitBreakerConfig() {
+        return CircuitBreakerConfig.custom()
+                .failureRateThreshold(60)
+                .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
+                .slowCallRateThreshold(50)
+                .slowCallDurationThreshold(Duration.ofSeconds(5))
+                .permittedNumberOfCallsInHalfOpenState(2)
+                .waitDurationInOpenState(Duration.ofMillis(1000))
+                .slidingWindowSize(2)
+                .build();
     }
 
     @Bean
