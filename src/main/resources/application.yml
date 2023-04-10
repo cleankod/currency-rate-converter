@@ -4,3 +4,11 @@ provider:
 
 app:
   base-currency: PLN
+
+spring:
+  application:
+    name: currency-rate-converter
+
+logging:
+  level:
+    pl.cleankod: DEBUG
