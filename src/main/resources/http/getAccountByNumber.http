@@ -1,0 +1,5 @@
+GET http://localhost:8080/accounts/number=75 1240 2034 1111 0000 0306 8582?currency=PLN
+
+Accept: application/json
+
+###

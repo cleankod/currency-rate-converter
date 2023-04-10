@@ -1,8 +1,20 @@
+buildscript {
+    ext {
+        springCloudVersion = '3.1.4'
+        swaggerVersion = '2.2.8'
+        springDocVersion = '1.6.14'
+        swaggerVersion = '2.2.8'
+    }
+}
+
 plugins {
     id 'java'
 
     // Apply the groovy plugin to also add support for Groovy (needed for Spock)
     id 'groovy'
+    id 'io.spring.dependency-management' version '1.0.14.RELEASE'
+    id 'org.springframework.boot' version '2.6.3'
+    id 'jacoco'
 }
 
 repositories {
@@ -15,10 +27,14 @@ java {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.3'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
+    implementation 'io.github.resilience4j:resilience4j-feign:1.6.0'
+    implementation "org.springframework.cloud:spring-cloud-starter-sleuth:${springCloudVersion}"
+    implementation "org.springdoc:springdoc-openapi-ui:${springDocVersion}"
+    implementation "io.swagger.core.v3:swagger-annotations:${swaggerVersion}"
 
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy:3.0.9'
@@ -28,6 +44,14 @@ dependencies {
 
     testImplementation 'org.apache.httpcomponents:httpclient:4.5.13'
     testImplementation 'com.github.tomakehurst:wiremock-jre8:2.27.2'
+}
+
+test {
+    finalizedBy jacocoTestReport // report is always generated after tests run
+}
+
+jacocoTestReport {
+    dependsOn test // tests are required to run before generating the report
 }
 
 
