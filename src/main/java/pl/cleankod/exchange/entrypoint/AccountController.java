@@ -1,7 +1,12 @@
 package pl.cleankod.exchange.entrypoint;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.usecase.ExchangeFacade;
+import pl.cleankod.exchange.entrypoint.model.ApiError;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -26,6 +32,27 @@ public class AccountController {
         this.exchangeFacade = exchangeFacade;
     }
 
+    @Operation(
+            summary = "Get account by ID",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = Account.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "BAD_REQUEST",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiError.class)
+                            )
+                    )
+            }
+    )
     @GetMapping(path = "/{id}")
     public ResponseEntity<Account> findAccountById(@PathVariable String id, @RequestParam(required = false) String currency) {
         logger.debug("Invoked findAccountById({}, {})", id, currency);
@@ -35,6 +62,27 @@ public class AccountController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @Operation(
+            summary = "Get account by number",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = Account.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "BAD_REQUEST",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiError.class)
+                            )
+                    )
+            }
+    )
     @GetMapping(path = "/number={number}")
     public ResponseEntity<Account> findAccountByNumber(@PathVariable String number, @RequestParam(required = false) String currency) {
         logger.debug("Invoked findAccountByNumber({}, {})", number, currency);
