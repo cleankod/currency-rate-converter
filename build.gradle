@@ -11,6 +11,7 @@ plugins {
     id 'groovy'
     id 'io.spring.dependency-management' version '1.0.14.RELEASE'
     id 'org.springframework.boot' version '2.6.3'
+    id 'jacoco'
 }
 
 repositories {
@@ -39,6 +40,14 @@ dependencies {
 
     testImplementation 'org.apache.httpcomponents:httpclient:4.5.13'
     testImplementation 'com.github.tomakehurst:wiremock-jre8:2.27.2'
+}
+
+test {
+    finalizedBy jacocoTestReport // report is always generated after tests run
+}
+
+jacocoTestReport {
+    dependsOn test // tests are required to run before generating the report
 }
 
 
