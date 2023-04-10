@@ -26,6 +26,10 @@ class ExchangeRatesNbpClientSpecification extends BaseApplicationSpecification {
         wireMockServer.stop()
     }
 
+    def setup() {
+        wireMockServer.resetAll()
+    }
+
     def cleanup() {
         wireMockServer.resetAll()
     }
