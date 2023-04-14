@@ -62,6 +62,19 @@ class AccountSpecification extends BaseApplicationSpecification {
         )
     }
 
+    def "should not return an account by ID with non-existent currency"() {
+        given:
+        def accountId = "fa07c538-8ce4-11ec-9ad5-4f5a625cd744"
+        def currency = "USB"
+
+        when:
+        HttpResponse response = getResponse("/accounts/${accountId}?currency=${currency}")
+
+        then:
+        response.getStatusLine().getStatusCode() == 400
+        transformError(response).message() == "Unknown currency: ${currency}."
+    }
+
     def "should return an account by number"() {
         given:
         def accountNumberValue = "75 1240 2034 1111 0000 0306 8582"
@@ -79,6 +92,36 @@ class AccountSpecification extends BaseApplicationSpecification {
     }
 
     def "should return an account by number with different currency"() {
+        given:
+        def accountNumberValue = "65 1090 1665 0000 0001 0373 7343"
+        def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
+
+        when:
+        Account response = get("/accounts/number=${accountNumberUrlEncoded}?currency=EUR", Account)
+
+        then:
+        response == new Account(
+                Account.Id.of("fa07c538-8ce4-11ec-9ad5-4f5a625cd744"),
+                Account.Number.of(accountNumberValue),
+                Money.of("27.16", "EUR")
+        )
+    }
+
+    def "should not return an account by number with non-existent currency"() {
+        given:
+        def accountNumberValue = "65 1090 1665 0000 0001 0373 7343"
+        def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
+        def currency = "USB"
+
+        when:
+        HttpResponse response = getResponse("/accounts/number=${accountNumberUrlEncoded}?currency=${currency}")
+
+        then:
+        response.getStatusLine().getStatusCode() == 400
+        transformError(response).message() == "Unknown currency: ${currency}."
+    }
+
+    def "should return an error if account currency if different than base currency"() {
         given:
         def accountNumberValue = "75 1240 2034 1111 0000 0306 8582"
         def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)

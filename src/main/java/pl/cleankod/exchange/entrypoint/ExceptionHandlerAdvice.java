@@ -5,15 +5,17 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.cleankod.exchange.core.usecase.CurrencyConversionException;
 import pl.cleankod.exchange.entrypoint.model.ApiError;
+import pl.cleankod.util.UnknownCurrencyException;
 
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
 
     @ExceptionHandler({
             CurrencyConversionException.class,
-            IllegalArgumentException.class
+            UnknownCurrencyException.class,
+            IllegalArgumentException.class,
     })
-    protected ResponseEntity<ApiError> handleBadRequest(CurrencyConversionException ex) {
+    protected ResponseEntity<ApiError> handleBadRequest(Exception ex) {
         return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
     }
 }
