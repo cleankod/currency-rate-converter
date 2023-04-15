@@ -13,8 +13,8 @@ public class ExchangeRatesNbpClientFallback implements ExchangeRatesNbpClient {
     }
 
     @Override
-    public RateWrapper fetch(String table, String currency) {
-        Optional<RateWrapper> optionalRateWrapper = ratesCache.tryGet(table, currency);
+    public RateWrapper fetch(String table, String currencyCode) {
+        Optional<RateWrapper> optionalRateWrapper = ratesCache.tryGet(table, currencyCode);
         if (optionalRateWrapper.isPresent()) {
             return optionalRateWrapper.get();
         }

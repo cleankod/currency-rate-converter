@@ -1,17 +1,16 @@
 package pl.cleankod;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import feign.Feign;
 import feign.httpclient.ApacheHttpClient;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.feign.FeignDecorators;
 import io.github.resilience4j.feign.Resilience4jFeign;
-import org.springframework.boot.SpringApplication;
+import io.micronaut.context.ApplicationContext;
+import io.micronaut.runtime.Micronaut;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import pl.cleankod.exchange.core.domain.Account;
@@ -21,9 +20,6 @@ import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 import pl.cleankod.exchange.entrypoint.AccountController;
 import pl.cleankod.exchange.entrypoint.AccountService;
-import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
-import pl.cleankod.exchange.serialization.SingleJsonValueInRecordFinder;
-import pl.cleankod.exchange.serialization.SingleValueSerializer;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.CurrencyConverter;
@@ -31,6 +27,8 @@ import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClientFallback;
 import pl.cleankod.exchange.provider.nbp.RatesCache;
 import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
+import pl.cleankod.exchange.serialization.SingleJsonValueInRecordFinder;
+import pl.cleankod.exchange.serialization.SingleValueSerializer;
 
 import javax.cache.CacheManager;
 import javax.cache.Caching;
@@ -40,12 +38,13 @@ import java.util.Currency;
 @SpringBootConfiguration
 @EnableAutoConfiguration
 public class ApplicationInitializer {
+
     public static void main(String[] args) {
         run(args);
     }
 
-    public static ConfigurableApplicationContext run(String[] args) {
-        return SpringApplication.run(ApplicationInitializer.class, args);
+    public static ApplicationContext run(String[] args) {
+        return Micronaut.run(ApplicationInitializer.class, args);
     }
 
     @Bean
@@ -74,7 +73,7 @@ public class ApplicationInitializer {
 
         FeignDecorators feignDecorators = FeignDecorators.builder()
                 .withCircuitBreaker(circuitBreaker)
-                .withFallback(nbpClientFallback)
+                .withFallbackFactory(e -> nbpClientFallback)
                 .build();
 
         return Resilience4jFeign.builder(feignDecorators)
@@ -133,11 +132,6 @@ public class ApplicationInitializer {
     @Bean
     AccountController accountController(AccountService accountService) {
         return new AccountController(accountService);
-    }
-
-    @Bean
-    ExceptionHandlerAdvice exceptionHandlerAdvice() {
-        return new ExceptionHandlerAdvice();
     }
 
 }

@@ -1,13 +1,12 @@
 package pl.cleankod
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.micronaut.context.ApplicationContext
 import org.apache.http.HttpResponse
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.util.EntityUtils
-import org.springframework.context.ConfigurableApplicationContext
-import org.springframework.util.SocketUtils
 import pl.cleankod.exchange.entrypoint.model.ApiError
 
 /**
@@ -16,15 +15,18 @@ import pl.cleankod.exchange.entrypoint.model.ApiError
 class SystemUnderTest {
     private final port = getFreePort()
     private final baseUrl = "http://localhost:$port"
-    private ConfigurableApplicationContext applicationContext
+    private ApplicationContext applicationContext
     private static final ObjectMapper objectMapper = new ObjectMapper()
 
     static def getFreePort() {
-        return SocketUtils.findAvailableTcpPort()
+        def socket = new ServerSocket(0)
+        def port = socket.getLocalPort()
+        socket.close()
+        return port
     }
 
     def startWithRandomPort() {
-        applicationContext = ApplicationInitializer.run(new String[] {"--server.port=${port}"})
+        applicationContext = ApplicationInitializer.run(new String[] {"--micronaut.server.port=${port}"})
     }
 
     def stop() {

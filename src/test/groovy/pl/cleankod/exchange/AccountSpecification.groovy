@@ -80,13 +80,15 @@ class AccountSpecification extends Specification {
         sut.transformError(response).message() == "Unknown currency: ${currency}."
     }
 
+    def encodeURLPath(String path) {
+        return new URI(null, null, path, null, null).toString()
+    }
+
     def "should return an account by number"() {
         given:
         def accountNumberValue = "75 1240 2034 1111 0000 0306 8582"
-        def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
-
         when:
-        Account response = sut.get("/accounts/number=${accountNumberUrlEncoded}", Account)
+        Account response = sut.get(encodeURLPath("/accounts/number=${accountNumberValue}"), Account)
 
         then:
         response == new Account(
@@ -99,27 +101,26 @@ class AccountSpecification extends Specification {
     def "should return an account by number with different currency"() {
         given:
         def accountNumberValue = "65 1090 1665 0000 0001 0373 7343"
-        def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
+        def currency = "EUR"
 
         when:
-        Account response = sut.get("/accounts/number=${accountNumberUrlEncoded}?currency=EUR", Account)
+        Account response = sut.get("${encodeURLPath("/accounts/number=${accountNumberValue}")}?currency=$currency", Account)
 
         then:
         response == new Account(
                 Account.Id.of("fa07c538-8ce4-11ec-9ad5-4f5a625cd744"),
                 Account.Number.of(accountNumberValue),
-                Money.of("27.16", "EUR")
+                Money.of("27.16", currency)
         )
     }
 
     def "should not return an account by number with non-existent currency"() {
         given:
         def accountNumberValue = "65 1090 1665 0000 0001 0373 7343"
-        def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
         def currency = "USB"
 
         when:
-        HttpResponse response = sut.getResponse("/accounts/number=${accountNumberUrlEncoded}?currency=${currency}")
+        HttpResponse response = sut.getResponse("${encodeURLPath( "/accounts/number=${accountNumberValue}")}?currency=${currency}")
 
         then:
         response.getStatusLine().getStatusCode() == 400
@@ -129,10 +130,9 @@ class AccountSpecification extends Specification {
     def "should return an error if account currency if different than base currency"() {
         given:
         def accountNumberValue = "75 1240 2034 1111 0000 0306 8582"
-        def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
 
         when:
-        HttpResponse response = sut.getResponse("/accounts/number=${accountNumberUrlEncoded}?currency=PLN")
+        HttpResponse response = sut.getResponse("${encodeURLPath("/accounts/number=${accountNumberValue}")}?currency=PLN")
 
         then:
         response.getStatusLine().getStatusCode() == 400

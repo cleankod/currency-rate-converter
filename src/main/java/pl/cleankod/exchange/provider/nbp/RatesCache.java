@@ -12,12 +12,12 @@ public class RatesCache {
         this.innerCache = innerCache;
     }
 
-    public Optional<RateWrapper> tryGet(String table, String currency) {
-        return Optional.ofNullable(innerCache.get(createKey(table, currency)));
+    public Optional<RateWrapper> tryGet(String table, String currencyCode) {
+        return Optional.ofNullable(innerCache.get(createKey(table, currencyCode)));
     }
 
-    public void putIfAbsent(String table, String currency, RateWrapper rate) {
-        innerCache.putIfAbsent(createKey(table, currency), rate);
+    public void putIfAbsent(String table, String currencyCode, RateWrapper rate) {
+        innerCache.putIfAbsent(createKey(table, currencyCode), rate);
     }
 
     private String createKey(String table, String currency) {
