@@ -5,9 +5,13 @@ import feign.Feign;
 import feign.httpclient.ApacheHttpClient;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.feign.FeignDecorators;
+import io.github.resilience4j.feign.Resilience4jFeign;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import pl.cleankod.exchange.core.domain.Account;
@@ -24,14 +28,24 @@ import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.CurrencyConverter;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
+import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClientFallback;
+import pl.cleankod.exchange.provider.nbp.RatesCache;
+import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
 
+import javax.cache.CacheManager;
+import javax.cache.Caching;
+import javax.cache.configuration.MutableConfiguration;
 import java.util.Currency;
 
 @SpringBootConfiguration
 @EnableAutoConfiguration
 public class ApplicationInitializer {
     public static void main(String[] args) {
-        SpringApplication.run(ApplicationInitializer.class, args);
+        run(args);
+    }
+
+    public static ConfigurableApplicationContext run(String[] args) {
+        return SpringApplication.run(ApplicationInitializer.class, args);
     }
 
     @Bean
@@ -40,9 +54,30 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    ExchangeRatesNbpClient exchangeRatesNbpClient(Environment environment) {
+    RatesCache ratesCache() {
+        CacheManager cacheManager = Caching.getCachingProvider().getCacheManager();
+        MutableConfiguration<String, RateWrapper> configuration = new MutableConfiguration<String, RateWrapper>()
+                .setTypes(String.class, RateWrapper.class);
+        cacheManager.destroyCache("rates");
+        return new RatesCache(cacheManager.createCache("rates", configuration));
+    }
+
+    @Bean
+    ExchangeRatesNbpClientFallback exchangeRatesNbpClientFallback(RatesCache ratesCache) {
+        return new ExchangeRatesNbpClientFallback(ratesCache);
+    }
+
+    @Bean
+    ExchangeRatesNbpClient exchangeRatesNbpClient(Environment environment, ExchangeRatesNbpClientFallback nbpClientFallback) {
         String nbpApiBaseUrl = environment.getRequiredProperty("provider.nbp-api.base-url");
-        return Feign.builder()
+        CircuitBreaker circuitBreaker = CircuitBreaker.ofDefaults("NBP");
+
+        FeignDecorators feignDecorators = FeignDecorators.builder()
+                .withCircuitBreaker(circuitBreaker)
+                .withFallback(nbpClientFallback)
+                .build();
+
+        return Resilience4jFeign.builder(feignDecorators)
                 .client(new ApacheHttpClient())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
@@ -55,8 +90,10 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient, CurrencyConverter currencyConverter) {
-        return new CurrencyConversionNbpService(exchangeRatesNbpClient, currencyConverter);
+    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient,
+                                                        CurrencyConverter currencyConverter,
+                                                        RatesCache ratesCache) {
+        return new CurrencyConversionNbpService(exchangeRatesNbpClient, currencyConverter, ratesCache);
     }
 
     @Bean
