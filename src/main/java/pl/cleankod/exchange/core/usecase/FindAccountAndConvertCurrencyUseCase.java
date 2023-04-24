@@ -33,6 +33,7 @@ public class FindAccountAndConvertCurrencyUseCase {
     }
 
     private Money convert(Money money, Currency targetCurrency) {
+        //I moved the call of currencyConversionService here for separating business logic from the domain layer
         if (!baseCurrency.equals(targetCurrency)) {
             return currencyConversionService.convert(money, targetCurrency);
         }
