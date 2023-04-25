@@ -20,7 +20,10 @@ public class CurrencyConversionNbpService implements CurrencyConversionService {
     public Money convert(Money money, Currency targetCurrency) {
         RateWrapper rateWrapper = exchangeRatesNbpClient.fetch("A", targetCurrency.getCurrencyCode());
         BigDecimal midRate = rateWrapper.rates().get(0).mid();
-        BigDecimal calculatedRate = money.amount().divide(midRate, RoundingMode.HALF_UP);
+        //Precision can be increased so the balance amount is calculated more precisely - this can be a configurable value
+        //Change RoundingMode from HALF_UP to DOWN so we are not losing money
+        //Using HALF rounding modes can lead to UP rounding in the end and we don t want to loose money
+        BigDecimal calculatedRate = money.amount().divide(midRate,4, RoundingMode.DOWN);
         return new Money(calculatedRate, targetCurrency);
     }
 }

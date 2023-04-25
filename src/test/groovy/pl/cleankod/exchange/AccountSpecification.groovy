@@ -1,16 +1,18 @@
 package pl.cleankod.exchange
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import org.apache.http.HttpResponse
 import pl.cleankod.BaseApplicationSpecification
-import pl.cleankod.exchange.core.domain.Account
-import pl.cleankod.exchange.core.domain.Money
+import pl.cleankod.util.AccountJsonResponse
 
 import java.nio.charset.StandardCharsets
 
 class AccountSpecification extends BaseApplicationSpecification {
+
+    private static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private static WireMockServer wireMockServer = new WireMockServer(
             WireMockConfiguration.options()
@@ -36,14 +38,12 @@ class AccountSpecification extends BaseApplicationSpecification {
         def accountId = "fa07c538-8ce4-11ec-9ad5-4f5a625cd744"
 
         when:
-        Account response = get("/accounts/${accountId}", Account)
+        AccountJsonResponse response = get("/accounts/${accountId}", AccountJsonResponse)
+
 
         then:
-        response == new Account(
-                Account.Id.of(accountId),
-                Account.Number.of("65 1090 1665 0000 0001 0373 7343"),
-                Money.of("123.45", "PLN")
-        )
+        assert response == OBJECT_MAPPER.readValue(readJson("account_by_id.json"), AccountJsonResponse.class)
+
     }
 
     def "should return an account by ID with different currency"() {
@@ -52,14 +52,11 @@ class AccountSpecification extends BaseApplicationSpecification {
         def currency = "EUR"
 
         when:
-        Account response = get("/accounts/${accountId}?currency=${currency}", Account)
+        AccountJsonResponse response = get("/accounts/${accountId}?currency=${currency}", AccountJsonResponse)
 
         then:
-        response == new Account(
-                Account.Id.of(accountId),
-                Account.Number.of("65 1090 1665 0000 0001 0373 7343"),
-                Money.of("27.16", currency)
-        )
+        assert response == OBJECT_MAPPER.readValue(readJson("account_by_id_EUR_currency.json"), AccountJsonResponse.class)
+
     }
 
     def "should return an account by number"() {
@@ -68,14 +65,11 @@ class AccountSpecification extends BaseApplicationSpecification {
         def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
 
         when:
-        Account response = get("/accounts/number=${accountNumberUrlEncoded}", Account)
+        AccountJsonResponse response = get("/accounts/number=${accountNumberUrlEncoded}", AccountJsonResponse)
 
         then:
-        response == new Account(
-                Account.Id.of("78743420-8ce9-11ec-b0d0-57b77255c208"),
-                Account.Number.of(accountNumberValue),
-                Money.of("456.78", "EUR")
-        )
+        assert response == OBJECT_MAPPER.readValue(readJson("account_by_number.json"), AccountJsonResponse.class)
+
     }
 
     def "should return an account by number with different currency"() {
@@ -111,5 +105,14 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         then:
         response.getStatusLine().getStatusCode() == 404
+    }
+
+    String readJson(String fileName) throws IOException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream(fileName);
+
+        byte[] bytes = inputStream.readAllBytes();
+        return new String(bytes, StandardCharsets.UTF_8);
+
     }
 }
