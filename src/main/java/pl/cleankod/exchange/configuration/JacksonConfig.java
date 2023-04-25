@@ -11,8 +11,6 @@ public class JacksonConfig {
     @Bean
     @Primary
     public ObjectMapper objectMapper() {
-        ObjectMapper objectMapper = new CustomObjectMapper();
-        // configure your object mapper here
-        return objectMapper;
+        return new CustomObjectMapper();
     }
 }

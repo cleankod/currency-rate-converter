@@ -23,7 +23,7 @@ public class CurrencyConversionNbpService implements CurrencyConversionService {
         //Precision can be increased so the balance amount is calculated more precisely - this can be a configurable value
         //Change RoundingMode from HALF_UP to DOWN so we are not losing money
         //Using HALF rounding modes can lead to UP rounding in the end and we don t want to loose money
-        BigDecimal calculatedRate = money.amount().divide(midRate,2, RoundingMode.DOWN);
+        BigDecimal calculatedRate = money.amount().divide(midRate,4, RoundingMode.DOWN);
         return new Money(calculatedRate, targetCurrency);
     }
 }
