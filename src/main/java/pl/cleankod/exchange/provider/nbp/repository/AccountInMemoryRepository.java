@@ -1,4 +1,4 @@
-package pl.cleankod.exchange.provider;
+package pl.cleankod.exchange.provider.nbp.repository;
 
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.domain.Money;
