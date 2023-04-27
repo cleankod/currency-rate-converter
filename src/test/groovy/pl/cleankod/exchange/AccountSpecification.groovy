@@ -5,8 +5,8 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import org.apache.http.HttpResponse
 import pl.cleankod.BaseApplicationSpecification
-import pl.cleankod.exchange.core.domain.Account
-import pl.cleankod.exchange.core.domain.Money
+import pl.cleankod.exchange.entrypoint.model.AccountWrapper
+import pl.cleankod.exchange.entrypoint.model.MoneyWrapper
 
 import java.nio.charset.StandardCharsets
 
@@ -36,13 +36,13 @@ class AccountSpecification extends BaseApplicationSpecification {
         def accountId = "fa07c538-8ce4-11ec-9ad5-4f5a625cd744"
 
         when:
-        Account response = get("/accounts/${accountId}", Account)
+        AccountWrapper response = get("/accounts/${accountId}", AccountWrapper)
 
         then:
-        response == new Account(
-                Account.Id.of(accountId),
-                Account.Number.of("65 1090 1665 0000 0001 0373 7343"),
-                Money.of("123.45", "PLN")
+        response == new AccountWrapper(
+                UUID.fromString(accountId),
+                "65 1090 1665 0000 0001 0373 7343",
+                new MoneyWrapper(new BigDecimal("123.45"), Currency.getInstance("PLN"))
         )
     }
 
@@ -52,13 +52,13 @@ class AccountSpecification extends BaseApplicationSpecification {
         def currency = "EUR"
 
         when:
-        Account response = get("/accounts/${accountId}?currency=${currency}", Account)
+        AccountWrapper response = get("/accounts/${accountId}?currency=${currency}", AccountWrapper)
 
         then:
-        response == new Account(
-                Account.Id.of(accountId),
-                Account.Number.of("65 1090 1665 0000 0001 0373 7343"),
-                Money.of("27.16", currency)
+        response == new AccountWrapper(
+                UUID.fromString(accountId),
+                "65 1090 1665 0000 0001 0373 7343",
+                new MoneyWrapper(new BigDecimal("27.16"),Currency.getInstance(currency))
         )
     }
 
@@ -68,13 +68,13 @@ class AccountSpecification extends BaseApplicationSpecification {
         def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
 
         when:
-        Account response = get("/accounts/number=${accountNumberUrlEncoded}", Account)
+        AccountWrapper response = get("/accounts/number=${accountNumberUrlEncoded}", AccountWrapper)
 
         then:
-        response == new Account(
-                Account.Id.of("78743420-8ce9-11ec-b0d0-57b77255c208"),
-                Account.Number.of(accountNumberValue),
-                Money.of("456.78", "EUR")
+        response == new AccountWrapper(
+                UUID.fromString("78743420-8ce9-11ec-b0d0-57b77255c208"),
+                accountNumberValue,
+                new MoneyWrapper(new BigDecimal("456.78"), Currency.getInstance("EUR"))
         )
     }
 

@@ -6,6 +6,7 @@ This is an example project that calculates the amount balance to a given currenc
 * Gradle 7.4 (you can use the gradle wrapper instead)
 
 # REST API
+* Documentation can be found by accessing `/swagger-ui/index.html`
 ## Get account
 Endpoints:
 * `GET /accounts/{id}`

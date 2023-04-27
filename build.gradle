@@ -15,19 +15,30 @@ java {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.3'
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.0.6'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.0.6'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.0'
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.0.Final'
 
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy:3.0.9'
 
     // Use the awesome Spock testing and specification framework even with Java
     testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
-
     testImplementation 'org.apache.httpcomponents:httpclient:4.5.13'
     testImplementation 'com.github.tomakehurst:wiremock-jre8:2.27.2'
+    testImplementation 'org.springframework:spring-test:6.0.8'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.3'
+
 }
 
 
