@@ -34,8 +34,8 @@ public class FindAccountAndConvertCurrencyUseCase {
 
     private Money convert(Money money, Currency targetCurrency) {
         //TODO: is this check needed here ?
-        if (!baseCurrency.equals(money.currency()) && !baseCurrency.equals(targetCurrency)) {
-            // TODO: support these conversions ?
+        if (!baseCurrency.equals(money.currency())) {
+            // TODO: support other conversions ?
             throw new CurrencyConversionException(money.currency(), targetCurrency);
         }
         return currencyConversionService.convert(money, targetCurrency);

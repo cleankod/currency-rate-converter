@@ -22,7 +22,7 @@ public class CurrencyConversionNbpService implements CurrencyConversionService {
         //TODO: support conversion through PLN (e.g. EUR -> PLN -> GPB) ?
         String targetCurrencyCode = targetCurrency.getCurrencyCode();
         if (!"PLN".equals(currency.getCurrencyCode()) && "PLN".equals(targetCurrencyCode)) {
-            return getRateCurrencyToPln(targetCurrency);
+            return getRateCurrencyToPln(currency);
         }
         if ("PLN".equals(currency.getCurrencyCode()) && !"PLN".equals(targetCurrencyCode)) {
             return getRatePlnToCurrency(targetCurrency);
@@ -35,8 +35,8 @@ public class CurrencyConversionNbpService implements CurrencyConversionService {
         return BigDecimal.ONE.divide(midRate, 2, RoundingMode.HALF_DOWN);
     }
 
-    private BigDecimal getRateCurrencyToPln(Currency targetCurrency) {
-        RateWrapper rateWrapper = exchangeRatesNbpClient.fetch("A", targetCurrency.getCurrencyCode());
+    private BigDecimal getRateCurrencyToPln(Currency currency) {
+        RateWrapper rateWrapper = exchangeRatesNbpClient.fetch("A", currency.getCurrencyCode());
         return rateWrapper.rates().get(0).mid();
     }
 
