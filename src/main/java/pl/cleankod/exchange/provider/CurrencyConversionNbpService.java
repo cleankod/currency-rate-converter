@@ -1,7 +1,7 @@
 package pl.cleankod.exchange.provider;
 
-import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
+import pl.cleankod.exchange.core.usecase.CurrencyConversionException;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
 
@@ -10,6 +10,7 @@ import java.math.RoundingMode;
 import java.util.Currency;
 
 public class CurrencyConversionNbpService implements CurrencyConversionService {
+
     private final ExchangeRatesNbpClient exchangeRatesNbpClient;
 
     public CurrencyConversionNbpService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
@@ -17,10 +18,26 @@ public class CurrencyConversionNbpService implements CurrencyConversionService {
     }
 
     @Override
-    public Money convert(Money money, Currency targetCurrency) {
-        RateWrapper rateWrapper = exchangeRatesNbpClient.fetch("A", targetCurrency.getCurrencyCode());
-        BigDecimal midRate = rateWrapper.rates().get(0).mid();
-        BigDecimal calculatedRate = money.amount().divide(midRate, RoundingMode.HALF_UP);
-        return new Money(calculatedRate, targetCurrency);
+    public BigDecimal getRate(Currency currency, Currency targetCurrency) {
+        //TODO: support conversion through PLN (e.g. EUR -> PLN -> GPB) ?
+        String targetCurrencyCode = targetCurrency.getCurrencyCode();
+        if (!"PLN".equals(currency.getCurrencyCode()) && "PLN".equals(targetCurrencyCode)) {
+            return getRateCurrencyToPln(targetCurrency);
+        }
+        if ("PLN".equals(currency.getCurrencyCode()) && !"PLN".equals(targetCurrencyCode)) {
+            return getRatePlnToCurrency(targetCurrency);
+        }
+        throw new CurrencyConversionException(currency, targetCurrency);
     }
+
+    private BigDecimal getRatePlnToCurrency(Currency targetCurrency) {
+        BigDecimal midRate = getRateCurrencyToPln(targetCurrency);
+        return BigDecimal.ONE.divide(midRate, 2, RoundingMode.HALF_DOWN);
+    }
+
+    private BigDecimal getRateCurrencyToPln(Currency targetCurrency) {
+        RateWrapper rateWrapper = exchangeRatesNbpClient.fetch("A", targetCurrency.getCurrencyCode());
+        return rateWrapper.rates().get(0).mid();
+    }
+
 }
