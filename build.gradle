@@ -55,7 +55,7 @@ jacocoTestCoverageVerification {
             // rather than expecting the coverage to be lower than an arbitrary value.
             limit {
                 // Ideally, this should be equal to the actual coverage and should never be decreased.
-                minimum = 0.91
+                minimum = 0.96
 
                 // Empirically adjusted value to balance the coverage goal
                 // and avoid frequent updates to the minimum limit.

@@ -80,6 +80,23 @@ class AccountSpecification extends BaseApplicationSpecification {
 
     def "should return an account by number with different currency"() {
         given:
+        def accountNumber = "65 1090 1665 0000 0001 0373 7343"
+        def accountNumberUrlEncoded = URLEncoder.encode(accountNumber, StandardCharsets.UTF_8)
+        def currency = "EUR"
+
+        when:
+        Account response = get("/accounts/number=${accountNumberUrlEncoded}?currency=${currency}", Account)
+
+        then:
+        response == new Account(
+                Account.Id.of("fa07c538-8ce4-11ec-9ad5-4f5a625cd744"),
+                Account.Number.of(accountNumber),
+                Money.of("27.16", currency)
+        )
+    }
+
+    def "should NOT convert currency when source currency is different than base currency"() {
+        given:
         def accountNumberValue = "75 1240 2034 1111 0000 0306 8582"
         def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
 
