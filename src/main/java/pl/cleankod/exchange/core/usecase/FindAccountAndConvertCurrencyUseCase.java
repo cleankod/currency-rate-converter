@@ -37,10 +37,10 @@ public class FindAccountAndConvertCurrencyUseCase {
             return money;
         }
 
-        if (!baseCurrency.equals(targetCurrency)) {
-            return money.convert(currencyConversionService, targetCurrency);
+        if (!money.currency().equals(baseCurrency)){
+            throw new CurrencyConversionException(money.currency(), targetCurrency);
         }
 
-        throw new CurrencyConversionException(money.currency(), targetCurrency);
+        return money.convert(currencyConversionService, targetCurrency);
     }
 }

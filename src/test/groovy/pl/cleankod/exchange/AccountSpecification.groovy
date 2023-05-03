@@ -118,11 +118,14 @@ class AccountSpecification extends BaseApplicationSpecification {
         def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
 
         when:
-        HttpResponse response = getResponse("/accounts/number=${accountNumberUrlEncoded}?currency=PLN")
+        HttpResponse response = getResponse("/accounts/number=${accountNumberUrlEncoded}?currency=$targetCurrency")
 
         then:
         response.getStatusLine().getStatusCode() == 400
-        transformError(response).message() == "Cannot convert currency from EUR to PLN."
+        transformError(response).message() == "Cannot convert currency from EUR to $targetCurrency."
+
+        where:
+        targetCurrency << ["PLN", "USD"]
     }
 
     def "should not find an account by ID"() {
