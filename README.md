@@ -75,7 +75,6 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * Replace exceptions with `Result` (`either`) which improves the overall methods API readability and forces error handling. Look into [cleankod/architecture-archetype](https://github.com/cleankod/architecture-archetype) as a starting point.
 * Auto generating REST API docs.
 * Integration tests with the real NBP API.
-* Replace Spring Framework with a different one.
 * The proposed architecture is not perfect. Suggest improvements. 
     * What is the meaning of globally configurable app.base-currency. looks like something specific to CurrencyConversionNbpService
     * It is not clear why it is possible to convert from PLN to USD, but it is not possible to convert from USD to PLN. We could just invert the exchange rate or use table C from NBP API.

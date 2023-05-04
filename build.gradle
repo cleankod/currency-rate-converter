@@ -7,7 +7,12 @@ plugins {
     // Allows to measure code coverage
     id 'jacoco'
     id 'org.barfuin.gradle.jacocolog' version '3.1.0'
+
+    // Allows to build Micronaut-based application
+    id "io.micronaut.minimal.application" version "3.7.7"
 }
+
+group = "pl.cleankod"
 
 repositories {
     mavenCentral()
@@ -19,10 +24,11 @@ java {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.3'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
+
+    implementation 'ch.qos.logback:logback-classic:1.4.6'
 
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy:3.0.9'
@@ -34,6 +40,14 @@ dependencies {
     testImplementation 'com.github.tomakehurst:wiremock-jre8:2.27.2'
 }
 
+micronaut {
+    version = "3.7.7"
+    runtime("netty")
+    processing {
+        incremental(true)
+        annotations("${project.group}.*")
+    }
+}
 
 tasks.named('test') {
     useJUnitPlatform()
