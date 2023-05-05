@@ -31,12 +31,8 @@ Will produce:
         "amount": 27.27,
         "currency": "EUR"
     },
-    "id": {
-        "value": "fa07c538-8ce4-11ec-9ad5-4f5a625cd744"
-    },
-    "number": {
-        "value": "65 1090 1665 0000 0001 0373 7343"
-    }
+    "id": "fa07c538-8ce4-11ec-9ad5-4f5a625cd744",
+    "number": "65 1090 1665 0000 0001 0373 7343"
 }
 ```
 
@@ -66,7 +62,6 @@ Also, value-objects are responsible for a little more than just plain data holdi
 
 # To do
 * Rounding when calculating the amount is not done correctly for this type of operation (we're loosing money!) and it is done in the wrong place.
-* Investigate whether it is possible to implement the value-object serialization, to avoid `value` nested field in JSON. See [#10](https://github.com/cleankod/currency-rate-converter/pull/10) as a starting point. Or maybe there is a better solution to the problem at hand?
 * Move parameter-specific logic outside the controller.
 * Better error handling, especially of potential errors from NBP API.
 * Caching the NBP API results.

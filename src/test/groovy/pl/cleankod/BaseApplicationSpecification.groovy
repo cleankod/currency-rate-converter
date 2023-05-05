@@ -6,19 +6,21 @@ import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.util.EntityUtils
+import pl.cleankod.exchange.entrypoint.CustomAnnotationIntrospector
 import pl.cleankod.exchange.entrypoint.model.ApiError
 import spock.lang.Specification
 
 abstract class BaseApplicationSpecification extends Specification {
-  private static init = true
+  private static initialized = false
   private static final baseUrl = "http://localhost:8080"
   private static final ObjectMapper objectMapper = new ObjectMapper()
 
   @SuppressWarnings('unused')
   def setupSpec() {
-    if (init) {
+    if (!initialized) {
       ApplicationInitializer.main(new String[0])
-      init = false
+      objectMapper.setAnnotationIntrospector(new CustomAnnotationIntrospector())
+      initialized = true
     }
   }
 
