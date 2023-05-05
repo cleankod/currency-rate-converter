@@ -6,7 +6,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import org.apache.http.HttpResponse
 import pl.cleankod.BaseApplicationSpecification
 import pl.cleankod.exchange.core.domain.Account
-import pl.cleankod.exchange.core.domain.Money
+import pl.cleankod.exchange.core.domain.WholeMoney
 
 import java.nio.charset.StandardCharsets
 
@@ -42,7 +42,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         response == new Account(
                 Account.Id.of(accountId),
                 Account.Number.of("65 1090 1665 0000 0001 0373 7343"),
-                Money.of("123.45", "PLN")
+                WholeMoney.of("123.45", "PLN")
         )
     }
 
@@ -58,7 +58,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         response == new Account(
                 Account.Id.of(accountId),
                 Account.Number.of("65 1090 1665 0000 0001 0373 7343"),
-                Money.of("27.16", currency)
+                WholeMoney.of("27.16", currency)
         )
     }
 
@@ -74,7 +74,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         response == new Account(
                 Account.Id.of("78743420-8ce9-11ec-b0d0-57b77255c208"),
                 Account.Number.of(accountNumberValue),
-                Money.of("456.78", "EUR")
+                WholeMoney.of("456.78", "EUR")
         )
     }
 
@@ -91,7 +91,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         response == new Account(
                 Account.Id.of("fa07c538-8ce4-11ec-9ad5-4f5a625cd744"),
                 Account.Number.of(accountNumber),
-                Money.of("27.16", currency)
+                WholeMoney.of("27.16", currency)
         )
     }
 
@@ -108,7 +108,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         response == new Account(
                 Account.Id.of("78743420-8ce9-11ec-b0d0-57b77255c208"),
                 Account.Number.of(accountNumber),
-                Money.of("456.78", currency)
+                WholeMoney.of("456.78", currency)
         )
     }
 

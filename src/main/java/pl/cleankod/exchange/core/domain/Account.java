@@ -5,7 +5,7 @@ import pl.cleankod.util.Preconditions;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-public record Account(Id id, Number number, Money balance) {
+public record Account(Id id, Number number, WholeMoney balance) {
     public record Id(UUID value) implements SingleValueObject<UUID> {
         public Id {
             Preconditions.requireNonNull(value);

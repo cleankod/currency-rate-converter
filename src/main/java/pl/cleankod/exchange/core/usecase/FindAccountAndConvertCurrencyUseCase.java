@@ -1,7 +1,7 @@
 package pl.cleankod.exchange.core.usecase;
 
 import pl.cleankod.exchange.core.domain.Account;
-import pl.cleankod.exchange.core.domain.Money;
+import pl.cleankod.exchange.core.domain.WholeMoney;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 
@@ -32,15 +32,15 @@ public class FindAccountAndConvertCurrencyUseCase {
                 .map(account -> new Account(account.id(), account.number(), convert(account.balance(), targetCurrency)));
     }
 
-    private Money convert(Money money, Currency targetCurrency) {
+    private WholeMoney convert(WholeMoney money, Currency targetCurrency) {
         if (money.currency().equals(targetCurrency)) {
             return money;
         }
 
-        if (!money.currency().equals(baseCurrency)){
+        if (!money.currency().equals(baseCurrency)) {
             throw new CurrencyConversionException(money.currency(), targetCurrency);
         }
 
-        return money.convert(currencyConversionService, targetCurrency);
+        return money.convertAndRoundToWhole(currencyConversionService, targetCurrency);
     }
 }
