@@ -6,6 +6,7 @@
         </encoder>
     </appender>
 
+    <logger name="pl.cleankod" level="TRACE"/>
     <logger name="feign" level="WARN"/>
     <logger name="io.github.resilience4j" level="WARN"/>
 

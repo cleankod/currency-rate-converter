@@ -51,4 +51,13 @@ public record Account(Id id, Number number, Money balance) {
             return value;
         }
     }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "id=" + id +
+                ", number=" + number +
+                ", balance=" + balance +
+                '}';
+    }
 }
