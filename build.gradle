@@ -4,6 +4,7 @@ plugins {
 
     // Apply the groovy plugin to also add support for Groovy (needed for Spock)
     id 'groovy'
+    id 'org.unbroken-dome.test-sets' version '4.0.0'
 }
 
 repositories {
@@ -13,6 +14,10 @@ repositories {
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+testSets {
+    integrationTest
 }
 
 jacoco {
@@ -45,9 +50,14 @@ dependencies {
     testImplementation 'com.github.tomakehurst:wiremock-jre8:2.27.2'
 }
 
-
 tasks.named('test') {
     useJUnitPlatform()
     finalizedBy jacocoTestReport
 }
+
+tasks.named('integrationTest') {
+    useJUnitPlatform {
+    }
+}
+
 
