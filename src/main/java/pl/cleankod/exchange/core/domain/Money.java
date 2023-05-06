@@ -6,8 +6,14 @@ import pl.cleankod.util.Preconditions;
 import java.math.BigDecimal;
 import java.util.Currency;
 
+import static java.math.RoundingMode.HALF_EVEN;
+
 
 public sealed interface Money permits FractionalMoney, WholeMoney {
+    BigDecimal amount();
+
+    Currency currency();
+
     static Money of(BigDecimal amount, Currency currency) {
         Preconditions.requireNonNull(amount);
         Preconditions.requireNonNull(currency);
@@ -21,12 +27,24 @@ public sealed interface Money permits FractionalMoney, WholeMoney {
         return of(new BigDecimal(amount), Currency.getInstance(currency));
     }
 
-    BigDecimal amount();
+    default Money convert(ExchangeRate exchangeRate) {
+        Preconditions.requireNonNull(exchangeRate);
+        if (!currency().equals(exchangeRate.source())) {
+            throw new IllegalArgumentException("Exchange rate source currency does not match the money currency.");
+        }
 
-    Currency currency();
+        BigDecimal convertedAmount = amount().multiply(exchangeRate.rate());
+        return Money.of(convertedAmount, exchangeRate.target());
+    }
 
     default WholeMoney convertAndRoundToWhole(CurrencyConversionService currencyConverter, Currency targetCurrency) {
         return currencyConverter.convertAndRoundToWhole(this, targetCurrency);
+    }
+
+    default WholeMoney roundToWhole() {
+        int scale = currency().getDefaultFractionDigits();
+        BigDecimal roundedAmount = amount().setScale(scale, HALF_EVEN);
+        return WholeMoney.of(roundedAmount, currency());
     }
 }
 

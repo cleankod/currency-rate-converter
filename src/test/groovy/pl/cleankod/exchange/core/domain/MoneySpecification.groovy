@@ -130,4 +130,64 @@ class MoneySpecification extends Specification {
         "10.001"  | "BHD"
         "10.0010" | "BHD"
     }
+
+    def "should convert Money when exchange rate source currency matches money currency"() {
+        given:
+        Money money = Money.of(initialAmount, sourceCurrency)
+        ExchangeRate exchangeRate = ExchangeRate.of(sourceCurrency, targetCurrency, conversionRate)
+
+        when:
+        Money convertedMoney = money.convert(exchangeRate)
+
+        then:
+        convertedMoney.amount() == new BigDecimal(expectedAmount)
+        convertedMoney.currency() == Currency.getInstance(targetCurrency)
+
+        where:
+        initialAmount | sourceCurrency | targetCurrency | conversionRate | expectedAmount
+        "100.00"      | "USD"          | "EUR"          | "0.85"         | "85.00"
+        "100.002"     | "USD"          | "EUR"          | "0.5"          | "50.001"
+        "100.00"      | "EUR"          | "USD"          | "1.001"        | "100.10"
+    }
+
+    def "should NOT convert Money when exchange rate source currency does not match money currency"() {
+        given:
+        Money money = Money.of(amount, currency)
+        ExchangeRate exchangeRate = ExchangeRate.of(exchangeRateSource, exchangeRateTarget, exchangeRateValue)
+
+        when:
+        money.convert(exchangeRate)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        where:
+        amount   | currency | exchangeRateSource | exchangeRateTarget | exchangeRateValue
+        "100.0"  | "USD"    | "PLN"              | "USD"              | "10"
+        "50.001" | "EUR"    | "GBP"              | "EUR"              | "1"
+    }
+
+    def "should round money to whole money"() {
+        given:
+        Money money = Money.of(amount, currency)
+
+        when:
+        WholeMoney rounded = money.roundToWhole()
+
+        then:
+        rounded == WholeMoney.of(expectedAmount, currency)
+
+        where:
+        amount      | currency | expectedAmount
+        "100"       | "USD"    | "100"
+        "100.01"    | "USD"    | "100.01"
+        "100.011"   | "USD"    | "100.01"
+        "100.014"   | "USD"    | "100.01"
+        "100.015"   | "USD"    | "100.02"
+        "100.025"   | "USD"    | "100.02"
+        "10.1"      | "JPY"    | "10"
+        "10.5"      | "JPY"    | "10"
+        "11.5"      | "JPY"    | "12"
+        "1.2345678" | "BHD"    | "1.235"
+    }
 }

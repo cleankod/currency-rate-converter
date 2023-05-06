@@ -61,7 +61,6 @@ you can use: `find(Account.Id id)`, `find(Account.Number number)`), encapsulates
 Also, value-objects are responsible for a little more than just plain data holding.
 
 # To do
-* Rounding when calculating the amount is not done correctly for this type of operation (we're loosing money!) and it is done in the wrong place.
 * Move parameter-specific logic outside the controller.
 * Better error handling, especially of potential errors from NBP API.
 * Caching the NBP API results.
@@ -73,3 +72,4 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * The proposed architecture is not perfect. Suggest improvements. 
     * What is the meaning of globally configurable app.base-currency. looks like something specific to CurrencyConversionNbpService
     * It is not clear why it is possible to convert from PLN to USD, but it is not possible to convert from USD to PLN. We could just invert the exchange rate or use table C from NBP API.
+    * `CurrencyConversionService` combines 3 responsibilities: retrieving exchange rate, conversion, and rounding. As in practice it is port to external system I would limit it to retrieving the exchange rate only.
