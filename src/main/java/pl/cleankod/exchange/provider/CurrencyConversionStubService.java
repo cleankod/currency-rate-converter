@@ -2,7 +2,7 @@ package pl.cleankod.exchange.provider;
 
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.util.domain.AppErrors;
-import pl.cleankod.util.domain.Either;
+import pl.cleankod.util.Either;
 
 import java.math.BigDecimal;
 import java.util.Currency;

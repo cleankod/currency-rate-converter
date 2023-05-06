@@ -1,5 +1,7 @@
 package pl.cleankod.util.domain;
 
+import pl.cleankod.util.Either;
+
 import java.util.Currency;
 
 public class AppErrors {

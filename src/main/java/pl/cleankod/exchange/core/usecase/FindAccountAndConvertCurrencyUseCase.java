@@ -5,7 +5,7 @@ import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.util.domain.AppErrors;
-import pl.cleankod.util.domain.Either;
+import pl.cleankod.util.Either;
 
 import java.util.Currency;
 import java.util.Optional;

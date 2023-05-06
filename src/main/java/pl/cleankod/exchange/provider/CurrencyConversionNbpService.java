@@ -6,7 +6,7 @@ import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpCache;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
 import pl.cleankod.util.domain.AppErrors;
-import pl.cleankod.util.domain.Either;
+import pl.cleankod.util.Either;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

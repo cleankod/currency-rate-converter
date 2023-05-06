@@ -1,4 +1,4 @@
-package pl.cleankod.util.domain;
+package pl.cleankod.util;
 
 import java.util.Objects;
 import java.util.Optional;

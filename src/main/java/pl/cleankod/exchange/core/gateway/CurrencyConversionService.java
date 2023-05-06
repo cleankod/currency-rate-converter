@@ -2,7 +2,7 @@ package pl.cleankod.exchange.core.gateway;
 
 import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.util.domain.AppErrors;
-import pl.cleankod.util.domain.Either;
+import pl.cleankod.util.Either;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
