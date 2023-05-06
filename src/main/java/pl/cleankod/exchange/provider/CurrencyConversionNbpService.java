@@ -1,7 +1,10 @@
 package pl.cleankod.exchange.provider;
 
+import io.github.resilience4j.cache.Cache;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
+import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpCache;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
+import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
 import pl.cleankod.util.domain.AppErrors;
 import pl.cleankod.util.domain.Either;
 
@@ -12,9 +15,11 @@ import java.util.Currency;
 public class CurrencyConversionNbpService implements CurrencyConversionService {
 
     private final ExchangeRatesNbpClient exchangeRatesNbpClient;
+    private final Cache<ExchangeRatesNbpCache.Key, RateWrapper> exchangeRatesNbpCache;
 
-    public CurrencyConversionNbpService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
+    public CurrencyConversionNbpService(ExchangeRatesNbpClient exchangeRatesNbpClient, Cache<ExchangeRatesNbpCache.Key, RateWrapper> exchangeRatesNbpCache) {
         this.exchangeRatesNbpClient = exchangeRatesNbpClient;
+        this.exchangeRatesNbpCache = exchangeRatesNbpCache;
     }
 
     @Override
@@ -34,11 +39,18 @@ public class CurrencyConversionNbpService implements CurrencyConversionService {
     }
 
     private Either<AppErrors.Provider, BigDecimal> getRateCurrencyToPln(Currency currency) {
-        return Either.tryCatch(() -> exchangeRatesNbpClient.fetch("A", currency.getCurrencyCode()))
+        return Either.tryCatch(() -> fetchCached(currency.getCurrencyCode()))
                 .mapBi(
                         throwable -> AppErrors.provider(throwable.getMessage()),
                         rateWrapper -> rateWrapper.rates().get(0).mid()
                 );
+    }
+
+    private RateWrapper fetchCached(String currencyCode) {
+        return Cache.decorateSupplier(
+                        exchangeRatesNbpCache,
+                        () -> exchangeRatesNbpClient.fetch("A", currencyCode))
+                .apply(new ExchangeRatesNbpCache.Key("A", currencyCode));
     }
 
 }
