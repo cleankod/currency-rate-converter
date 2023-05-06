@@ -1,44 +1,62 @@
 package pl.cleankod.exchange.entrypoint;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
+import pl.cleankod.exchange.entrypoint.model.ApiError;
+import spark.Request;
+import spark.Response;
+import spark.Spark;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Currency;
-import java.util.Optional;
+import static pl.cleankod.exchange.entrypoint.ControllerUtil.asString;
+import static pl.cleankod.exchange.entrypoint.ControllerUtil.badRequest;
+import static pl.cleankod.exchange.entrypoint.ControllerUtil.ok;
+import static pl.cleankod.exchange.entrypoint.ControllerUtil.processError;
+import static pl.cleankod.exchange.entrypoint.ControllerUtil.strToCurrency;
+import static spark.Spark.exception;
+import static spark.Spark.get;
 
-@RestController
-@RequestMapping("/accounts")
+
 public class AccountController {
 
-    private final FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase;
+    private static final String NUMBER_PREFIX = "number=";
 
-    public AccountController(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase) {
-        this.findAccountAndConvertCurrencyUseCase = findAccountAndConvertCurrencyUseCase;
+    public AccountController(ObjectMapper objectMapper, FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase) {
+        Spark.internalServerError((request, response) -> {
+            response.type("application/json");
+            return "{\"message\":\"Internal server error\"}";
+        });
+        exception(IllegalArgumentException.class, (exception, request, response) -> {
+            response.type("application/json");
+            ApiError apiError = badRequest(response, exception.getMessage());
+            response.body(asString(objectMapper, apiError));
+        });
+        get("/accounts/:idOrNumber", (Request request, Response response) -> {
+            String idOrNumber = request.params("idOrNumber");
+            String currency = request.queryParams("currency");
+            // TODO: different solution ?
+            return idOrNumber.startsWith(NUMBER_PREFIX) ?
+                    getByNumber(findAccountAndConvertCurrencyUseCase, idOrNumber.replace(NUMBER_PREFIX, ""), currency, response) :
+                    getById(findAccountAndConvertCurrencyUseCase, idOrNumber, currency, response);
+        }, objectMapper::writeValueAsString);
     }
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<Account> findAccountById(@PathVariable String id, @RequestParam(required = false) String currency) {
-        return findAccountAndConvertCurrencyUseCase.execute(Account.Id.of(id), getCurrency(currency))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    private Record getById(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
+                           String id, String currency, Response response) {
+        return findAccountAndConvertCurrencyUseCase.execute(Account.Id.of(id), strToCurrency(currency))
+                .fold(
+                        error -> processError(response, error),
+                        account -> ok(response, account)
+                );
     }
 
-    @GetMapping(path = "/number={number}")
-    public ResponseEntity<Account> findAccountByNumber(@PathVariable String number, @RequestParam(required = false) String currency) {
-        Account.Number accountNumber = Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8));
-        return findAccountAndConvertCurrencyUseCase.execute(accountNumber, getCurrency(currency))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    private Currency getCurrency(String currency) {
-        return Optional.ofNullable(currency)
-                .map(Currency::getInstance)
-                .orElse(null);
+    private Record getByNumber(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
+                               String number, String currency, Response response) {
+        return findAccountAndConvertCurrencyUseCase.execute(Account.Number.of(number), strToCurrency(currency))
+                .fold(
+                        error -> processError(response, error),
+                        account -> ok(response, account)
+                );
     }
 
 

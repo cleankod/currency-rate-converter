@@ -4,11 +4,15 @@ import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
+import pl.cleankod.util.domain.AppErrors;
+import pl.cleankod.util.domain.Either;
 
 import java.util.Currency;
 import java.util.Optional;
 
 public class FindAccountAndConvertCurrencyUseCase {
+
+    public static final Either<AppErrors.NotFound, Account> ACCOUNT_NOT_FOUND = AppErrors.eitherNotFound("Account not found");
 
     private final AccountRepository accountRepository;
     private final CurrencyConversionService currencyConversionService;
@@ -22,32 +26,37 @@ public class FindAccountAndConvertCurrencyUseCase {
         this.baseCurrency = baseCurrency;
     }
 
-    public Optional<Account> execute(Account.Id id, Currency targetCurrency) {
-        return accountRepository.find(id)
-                .map(account -> {
-                    Money balance = Optional.ofNullable(targetCurrency)
-                            .map(tc -> convert(account.balance(), tc))
-                            .orElse(account.balance());
-                    return new Account(account.id(), account.number(), balance);
-                });
-    }
-
-    public Optional<Account> execute(Account.Number number, Currency targetCurrency) {
-        return accountRepository.find(number)
-                .map(account -> {
-                    Money balance = Optional.ofNullable(targetCurrency)
-                            .map(tc -> convert(account.balance(), tc))
-                            .orElse(account.balance());
-                    return new Account(account.id(), account.number(), balance);
-                });
-    }
-
-    private Money convert(Money money, Currency targetCurrency) {
-        //TODO: is this check needed here ?
-        if (!baseCurrency.equals(money.currency())) {
-            // TODO: support other conversions ?
-            throw new CurrencyConversionException(money.currency(), targetCurrency);
+    public Either<? extends AppErrors.Base, Account> execute(Account.Id id, Currency targetCurrency) {
+        Optional<Account> account = accountRepository.find(id);
+        if (account.isEmpty()) {
+            return ACCOUNT_NOT_FOUND;
         }
-        return currencyConversionService.convert(money, targetCurrency);
+        return convertForAccount(account.get(), targetCurrency);
     }
+
+    public Either<? extends AppErrors.Base, Account> execute(Account.Number number, Currency targetCurrency) {
+        Optional<Account> account = accountRepository.find(number);
+        if (account.isEmpty()) {
+            return ACCOUNT_NOT_FOUND;
+        }
+        return convertForAccount(account.get(), targetCurrency);
+    }
+
+    private Either<? extends AppErrors.Base, Account> convertForAccount(Account account, Currency targetCurrency) {
+        if (targetCurrency == null) {
+            return Either.right(account);
+        }
+        Money balance = account.balance();
+        if (!baseCurrency.equals(balance.currency())) {
+            return AppErrors.eitherConversion(balance.currency(), targetCurrency);
+        }
+        return convertBalance(balance, targetCurrency)
+                .mapRight(convertedBalance -> new Account(account.id(), account.number(), convertedBalance));
+    }
+
+    private Either<? extends AppErrors.Base, Money> convertBalance(Money balance, Currency targetCurrency) {
+        return currencyConversionService.convert(balance, targetCurrency);
+
+    }
+
 }
