@@ -27,30 +27,18 @@ public class AccountController {
     @Get("/{id}")
     public HttpResponse<Account> findAccountById(@PathVariable Account.Id id, @QueryValue Optional<Currency> currency) {
         return currency
-                .map(it ->
-                        findAccountAndConvertCurrencyUseCase.execute(id, it)
-                                .map(HttpResponse::ok)
-                                .orElse(HttpResponse.notFound())
-                )
-                .orElseGet(() ->
-                        findAccountUseCase.execute(id)
-                                .map(HttpResponse::ok)
-                                .orElse(HttpResponse.notFound())
-                );
+                .map(it -> findAccountAndConvertCurrencyUseCase.execute(id, it))
+                .orElseGet(() -> findAccountUseCase.execute(id))
+                .map(HttpResponse::ok)
+                .orElse(HttpResponse.notFound());
     }
 
     @Get("/number={+number}")
     public HttpResponse<Account> findAccountByNumber(@PathVariable Account.Number number, @QueryValue Optional<Currency> currency) {
         return currency
-                .map(it ->
-                        findAccountAndConvertCurrencyUseCase.execute(number, it)
-                                .map(HttpResponse::ok)
-                                .orElse(HttpResponse.notFound())
-                )
-                .orElseGet(() ->
-                        findAccountUseCase.execute(number)
-                                .map(HttpResponse::ok)
-                                .orElse(HttpResponse.notFound())
-                );
+                .map(it -> findAccountAndConvertCurrencyUseCase.execute(number, it))
+                .orElseGet(() -> findAccountUseCase.execute(number))
+                .map(HttpResponse::ok)
+                .orElse(HttpResponse.notFound());
     }
 }
