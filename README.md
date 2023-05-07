@@ -61,7 +61,6 @@ you can use: `find(Account.Id id)`, `find(Account.Number number)`), encapsulates
 Also, value-objects are responsible for a little more than just plain data holding.
 
 # To do
-* Move parameter-specific logic outside the controller.
 * Better error handling, especially of potential errors from NBP API.
 * Caching the NBP API results.
 * Circuit-breaker for the NBP API client.

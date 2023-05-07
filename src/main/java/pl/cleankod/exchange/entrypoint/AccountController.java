@@ -9,8 +9,6 @@ import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Currency;
 import java.util.Optional;
 
@@ -27,31 +25,30 @@ public class AccountController {
     }
 
     @Get("/{id}")
-    public HttpResponse<Account> findAccountById(@PathVariable String id, @QueryValue Optional<String> currency) {
+    public HttpResponse<Account> findAccountById(@PathVariable Account.Id id, @QueryValue Optional<Currency> currency) {
         return currency
-                .map(s ->
-                        findAccountAndConvertCurrencyUseCase.execute(Account.Id.of(id), Currency.getInstance(s))
+                .map(it ->
+                        findAccountAndConvertCurrencyUseCase.execute(id, it)
                                 .map(HttpResponse::ok)
                                 .orElse(HttpResponse.notFound())
                 )
                 .orElseGet(() ->
-                        findAccountUseCase.execute(Account.Id.of(id))
+                        findAccountUseCase.execute(id)
                                 .map(HttpResponse::ok)
                                 .orElse(HttpResponse.notFound())
                 );
     }
 
     @Get("/number={+number}")
-    public HttpResponse<Account> findAccountByNumber(@PathVariable String number, @QueryValue Optional<String> currency) {
-        Account.Number accountNumber = Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8));
+    public HttpResponse<Account> findAccountByNumber(@PathVariable Account.Number number, @QueryValue Optional<Currency> currency) {
         return currency
-                .map(s ->
-                        findAccountAndConvertCurrencyUseCase.execute(accountNumber, Currency.getInstance(s))
+                .map(it ->
+                        findAccountAndConvertCurrencyUseCase.execute(number, it)
                                 .map(HttpResponse::ok)
                                 .orElse(HttpResponse.notFound())
                 )
                 .orElseGet(() ->
-                        findAccountUseCase.execute(accountNumber)
+                        findAccountUseCase.execute(number)
                                 .map(HttpResponse::ok)
                                 .orElse(HttpResponse.notFound())
                 );

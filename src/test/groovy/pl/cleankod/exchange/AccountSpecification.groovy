@@ -149,4 +149,15 @@ class AccountSpecification extends BaseApplicationSpecification {
         then:
         response.getStatusLine().getStatusCode() == 404
     }
+
+    def "should treat incorrect format of account number as bad request"() {
+        given:
+        def accountNumber = URLEncoder.encode("incorrect", StandardCharsets.UTF_8)
+
+        when:
+        def response = getResponse("/accounts/number=${accountNumber}")
+
+        then:
+        response.getStatusLine().getStatusCode() == 400
+    }
 }
