@@ -7,6 +7,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.feign.FeignDecorators;
 import io.github.resilience4j.feign.Resilience4jFeign;
+import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Value;
@@ -24,10 +25,18 @@ import java.util.Currency;
 
 @Factory
 public class ApplicationInitializer {
+    private static ThreadLocal<ApplicationContext> lastApplicationContextCreatedByCurrentThread = new ThreadLocal();
+
     public static void main(String[] args) {
-        Micronaut.build(args)
+        ApplicationContext context = Micronaut.build(args)
                 .deduceEnvironment(false)
                 .start();
+        lastApplicationContextCreatedByCurrentThread.set(context);
+    }
+
+    public static ApplicationContext run(String[] args) {
+        main(args);
+        return lastApplicationContextCreatedByCurrentThread.get();
     }
 
     @Singleton

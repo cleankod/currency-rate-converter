@@ -4,14 +4,15 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import org.apache.http.HttpResponse
-import pl.cleankod.BaseApplicationSpecification
+import pl.cleankod.BlackBox
 import pl.cleankod.exchange.core.domain.Account
 import pl.cleankod.exchange.core.domain.WholeMoney
+import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
 
-class AccountSpecification extends BaseApplicationSpecification {
-
+class AccountSpecification extends Specification {
+    private static BlackBox blackBox = new BlackBox();
     private static WireMockServer wireMockServer = new WireMockServer(
             WireMockConfiguration.options()
                     .port(8081)
@@ -25,9 +26,12 @@ class AccountSpecification extends BaseApplicationSpecification {
                 WireMock.get("/exchangerates/rates/A/EUR")
                         .willReturn(WireMock.ok(body))
         )
+
+        blackBox.start()
     }
 
     def cleanupSpec() {
+        blackBox.stop()
         wireMockServer.stop()
     }
 
@@ -36,7 +40,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         def accountId = "fa07c538-8ce4-11ec-9ad5-4f5a625cd744"
 
         when:
-        Account response = get("/accounts/${accountId}", Account)
+        Account response = blackBox.get("/accounts/${accountId}", Account)
 
         then:
         response == new Account(
@@ -52,7 +56,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         def currency = "EUR"
 
         when:
-        Account response = get("/accounts/${accountId}?currency=${currency}", Account)
+        Account response = blackBox.get("/accounts/${accountId}?currency=${currency}", Account)
 
         then:
         response == new Account(
@@ -68,7 +72,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
 
         when:
-        Account response = get("/accounts/number=${accountNumberUrlEncoded}", Account)
+        Account response = blackBox.get("/accounts/number=${accountNumberUrlEncoded}", Account)
 
         then:
         response == new Account(
@@ -85,7 +89,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         def currency = "EUR"
 
         when:
-        Account response = get("/accounts/number=${accountNumberUrlEncoded}?currency=${currency}", Account)
+        Account response = blackBox.get("/accounts/number=${accountNumberUrlEncoded}?currency=${currency}", Account)
 
         then:
         response == new Account(
@@ -102,7 +106,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         def currency = "EUR"
 
         when:
-        Account response = get("/accounts/number=${accountNumberUrlEncoded}?currency=${currency}", Account)
+        Account response = blackBox.get("/accounts/number=${accountNumberUrlEncoded}?currency=${currency}", Account)
 
         then:
         response == new Account(
@@ -118,11 +122,11 @@ class AccountSpecification extends BaseApplicationSpecification {
         def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
 
         when:
-        HttpResponse response = getResponse("/accounts/number=${accountNumberUrlEncoded}?currency=$targetCurrency")
+        HttpResponse response = blackBox.getResponse("/accounts/number=${accountNumberUrlEncoded}?currency=$targetCurrency")
 
         then:
         response.getStatusLine().getStatusCode() == 400
-        transformError(response).message() == "Cannot convert currency from EUR to $targetCurrency."
+        blackBox.transformError(response).message() == "Cannot convert currency from EUR to $targetCurrency."
 
         where:
         targetCurrency << ["PLN", "USD"]
@@ -133,7 +137,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         def accountId = "ac270f3a-8d08-11ec-8b91-9bcdf6e2522a"
 
         when:
-        def response = getResponse("/accounts/${accountId}")
+        def response = blackBox.getResponse("/accounts/${accountId}")
 
         then:
         response.getStatusLine().getStatusCode() == 404
@@ -144,7 +148,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         def accountNumber = URLEncoder.encode("11 1750 0009 0000 0000 2156 6004", StandardCharsets.UTF_8)
 
         when:
-        def response = getResponse("/accounts/number=${accountNumber}")
+        def response = blackBox.getResponse("/accounts/number=${accountNumber}")
 
         then:
         response.getStatusLine().getStatusCode() == 404
@@ -155,7 +159,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         def accountNumber = URLEncoder.encode("incorrect", StandardCharsets.UTF_8)
 
         when:
-        def response = getResponse("/accounts/number=${accountNumber}")
+        def response = blackBox.getResponse("/accounts/number=${accountNumber}")
 
         then:
         response.getStatusLine().getStatusCode() == 400
