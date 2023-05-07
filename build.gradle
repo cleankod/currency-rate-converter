@@ -3,7 +3,16 @@ plugins {
 
     // Apply the groovy plugin to also add support for Groovy (needed for Spock)
     id 'groovy'
+
+    // Allows to measure code coverage
+    id 'jacoco'
+    id 'org.barfuin.gradle.jacocolog' version '3.1.0'
+
+    // Allows to build Micronaut-based application
+    id "io.micronaut.minimal.application" version "3.7.7"
 }
+
+group = "pl.cleankod"
 
 repositories {
     mavenCentral()
@@ -15,10 +24,16 @@ java {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.3'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
-    implementation 'io.github.openfeign:feign-httpclient:11.8'
-    implementation 'io.github.openfeign:feign-jackson:11.8'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.0'
+
+    implementation 'io.github.openfeign:feign-httpclient:12.2'
+    implementation 'io.github.openfeign:feign-jackson:12.2'
+    implementation 'io.github.resilience4j:resilience4j-feign:2.0.2'
+    implementation 'io.github.resilience4j:resilience4j-circuitbreaker:2.0.2'
+    implementation 'io.github.resilience4j:resilience4j-cache:2.0.2'
+    implementation 'org.ehcache:ehcache:3.10.8'
+
+    implementation 'ch.qos.logback:logback-classic:1.4.6'
 
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy:3.0.9'
@@ -30,7 +45,50 @@ dependencies {
     testImplementation 'com.github.tomakehurst:wiremock-jre8:2.27.2'
 }
 
+micronaut {
+    version = "3.7.7"
+    runtime("netty")
+    processing {
+        incremental(true)
+        annotations("${project.group}.*")
+    }
+}
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+check {
+    finalizedBy jacocoTestCoverageVerification
+}
+
+jacocoTestCoverageVerification {
+    dependsOn jacocoTestReport
+    violationRules {
+        rule {
+            // This rule ensures that code coverage does not decrease over time.
+            // This is achieved by two mechanisms:
+            // 1. Setting a minimum limit close to the actual coverage.
+            // 2. Increasing the minimum limit whenever the actual coverage improves significantly.
+            // The maximum limit is used to detect when the minimum limit should be increased,
+            // rather than expecting the coverage to be lower than an arbitrary value.
+            limit {
+                // Ideally, this should be equal to the actual coverage and should never be decreased.
+                minimum = 0.96
+
+                // Empirically adjusted value to balance the coverage goal
+                // and avoid frequent updates to the minimum limit.
+                def coverageStep = 0.03
+
+                // When the rule is violated, change the minimum or coverageStep.
+                // Do NOT remove tests or hesitate to add them.
+                def whenToIncreaseMinCoverage = minimum + coverageStep
+                maximum = whenToIncreaseMinCoverage
+            }
+        }
+    }
+}
+
+jacocoTestReport {
+    dependsOn test
 }

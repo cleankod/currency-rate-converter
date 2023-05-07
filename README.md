@@ -31,12 +31,8 @@ Will produce:
         "amount": 27.27,
         "currency": "EUR"
     },
-    "id": {
-        "value": "fa07c538-8ce4-11ec-9ad5-4f5a625cd744"
-    },
-    "number": {
-        "value": "65 1090 1665 0000 0001 0373 7343"
-    }
+    "id": "fa07c538-8ce4-11ec-9ad5-4f5a625cd744",
+    "number": "65 1090 1665 0000 0001 0373 7343"
 }
 ```
 
@@ -65,16 +61,12 @@ you can use: `find(Account.Id id)`, `find(Account.Number number)`), encapsulates
 Also, value-objects are responsible for a little more than just plain data holding.
 
 # To do
-* Rounding when calculating the amount is not done correctly for this type of operation (we're loosing money!) and it is done in the wrong place.
-* Investigate whether it is possible to implement the value-object serialization, to avoid `value` nested field in JSON. See [#10](https://github.com/cleankod/currency-rate-converter/pull/10) as a starting point. Or maybe there is a better solution to the problem at hand?
-* Move parameter-specific logic outside the controller.
 * Better error handling, especially of potential errors from NBP API.
-* Caching the NBP API results.
-* Circuit-breaker for the NBP API client.
 * Better logging with traceability.
 * Replace exceptions with `Result` (`either`) which improves the overall methods API readability and forces error handling. Look into [cleankod/architecture-archetype](https://github.com/cleankod/architecture-archetype) as a starting point.
-* Test coverage report.
 * Auto generating REST API docs.
 * Integration tests with the real NBP API.
-* Replace Spring Framework with a different one.
-* The proposed architecture is not perfect. Suggest improvements.
+* The proposed architecture is not perfect. Suggest improvements. 
+    * What is the meaning of globally configurable app.base-currency. looks like something specific to CurrencyConversionNbpService
+    * It is not clear why it is possible to convert from PLN to USD, but it is not possible to convert from USD to PLN. We could just invert the exchange rate or use table C from NBP API.
+    * `CurrencyConversionService` combines 3 responsibilities: retrieving exchange rate, conversion, and rounding. As in practice it is port to external system I would limit it to retrieving the exchange rate only.
