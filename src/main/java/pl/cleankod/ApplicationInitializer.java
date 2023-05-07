@@ -19,9 +19,18 @@ import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
+import pl.cleankod.exchange.provider.nbp.CachingExchangeRatesNbpClient;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
+import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
 
+import javax.cache.CacheManager;
+import javax.cache.Caching;
+import javax.cache.configuration.MutableConfiguration;
+import javax.cache.expiry.CreatedExpiryPolicy;
 import java.util.Currency;
+
+import static java.util.UUID.randomUUID;
+import static javax.cache.expiry.Duration.TEN_MINUTES;
 
 @Factory
 public class ApplicationInitializer {
@@ -57,11 +66,24 @@ public class ApplicationInitializer {
                 .withCircuitBreaker(CircuitBreaker.of(clientName, circuitBreakerConfig))
                 .build();
 
-        return Resilience4jFeign.builder(decorators)
+        var client = Resilience4jFeign.builder(decorators)
                 .client(new ApacheHttpClient())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
                 .target(ExchangeRatesNbpClient.class, nbpApiBaseUrl);
+
+        var cacheConfig = new MutableConfiguration<String, RateWrapper>()
+                .setExpiryPolicyFactory(CreatedExpiryPolicy.factoryOf(TEN_MINUTES))
+                .setTypes(String.class, RateWrapper.class);
+
+        CacheManager cacheManager = Caching
+                .getCachingProvider()
+                .getCacheManager();
+
+        var cacheName = String.format("%s-%s", clientName, randomUUID());
+        var cache = cacheManager.createCache(cacheName, cacheConfig);
+
+        return new CachingExchangeRatesNbpClient(client, cache);
     }
 
     @Bean
