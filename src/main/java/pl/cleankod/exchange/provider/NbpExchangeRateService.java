@@ -20,13 +20,17 @@ public class NbpExchangeRateService implements ExchangeRateService {
 
     @Override
     public Optional<ExchangeRate> getExchangeRate(Currency source, Currency target) {
-        if (!source.equals(PLN)) {
-            return Optional.empty();
+        if (source.equals(PLN)) {
+            BigDecimal rate = getExchangeRateFromPlnTo(target);
+            return Optional.of(ExchangeRate.of(target, PLN, rate).inverse());
         }
 
-        BigDecimal rate = getExchangeRateFromPlnTo(target);
-        return Optional.of(ExchangeRate.of(target, PLN, rate).inverse());
+        if (target.equals(PLN)) {
+            BigDecimal rate = getExchangeRateFromPlnTo(source);
+            return Optional.of(ExchangeRate.of(source, PLN, rate));
+        }
 
+        return Optional.empty();
     }
 
     private BigDecimal getExchangeRateFromPlnTo(Currency currency) {

@@ -99,7 +99,7 @@ class AccountSpecification extends Specification {
         )
     }
 
-    def "should return an account when requested currency is the same as account currency but different than base currency"() {
+    def "should return an account when requested currency is the same as account currency but different than PLN"() {
         given:
         def accountNumber = "75 1240 2034 1111 0000 0306 8582"
         def accountNumberUrlEncoded = URLEncoder.encode(accountNumber, StandardCharsets.UTF_8)
@@ -116,7 +116,23 @@ class AccountSpecification extends Specification {
         )
     }
 
-    def "should NOT convert currency when source currency is different than base currency"() {
+    def "should convert currency when target currency is PLN"() {
+        given:
+        def accountNumberValue = "75 1240 2034 1111 0000 0306 8582"
+        def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
+
+        when:
+        Account response = blackBox.get("/accounts/number=${accountNumberUrlEncoded}?currency=PLN", Account)
+
+        then:
+        response == new Account(
+                Account.Id.of("78743420-8ce9-11ec-b0d0-57b77255c208"),
+                Account.Number.of(accountNumberValue),
+                WholeMoney.of("2076.16", 'PLN')
+        )
+    }
+
+    def "should NOT convert currency when neither source nor target currency is PLN"() {
         given:
         def accountNumberValue = "75 1240 2034 1111 0000 0306 8582"
         def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
@@ -129,7 +145,7 @@ class AccountSpecification extends Specification {
         blackBox.transformError(response).message() == "Cannot convert currency from EUR to $targetCurrency."
 
         where:
-        targetCurrency << ["PLN", "USD"]
+        targetCurrency << ["USD"]
     }
 
     def "should not find an account by ID"() {
