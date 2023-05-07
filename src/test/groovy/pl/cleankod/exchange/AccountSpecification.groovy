@@ -22,7 +22,7 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         def body = "{\"table\":\"A\",\"currency\":\"euro\",\"code\":\"EUR\",\"rates\":[{\"no\":\"026/A/NBP/2022\",\"effectiveDate\":\"2022-02-08\",\"mid\":4.5452}]}"
         wireMockServer.stubFor(
-                WireMock.get("/exchangerates/rates/A/EUR/2022-02-08")
+                WireMock.get("/exchangerates/rates/A/EUR")
                         .willReturn(WireMock.ok(body))
         )
     }
