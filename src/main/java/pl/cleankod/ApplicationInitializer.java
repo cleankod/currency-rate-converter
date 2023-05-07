@@ -14,11 +14,11 @@ import io.micronaut.context.annotation.Value;
 import io.micronaut.runtime.Micronaut;
 import jakarta.inject.Singleton;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
-import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
+import pl.cleankod.exchange.core.gateway.ExchangeRateService;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
-import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
+import pl.cleankod.exchange.provider.NbpExchangeRateService;
 import pl.cleankod.exchange.provider.nbp.CachingExchangeRatesNbpClient;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
@@ -27,7 +27,6 @@ import javax.cache.CacheManager;
 import javax.cache.Caching;
 import javax.cache.configuration.MutableConfiguration;
 import javax.cache.expiry.CreatedExpiryPolicy;
-import java.util.Currency;
 
 import static java.util.UUID.randomUUID;
 import static javax.cache.expiry.Duration.TEN_MINUTES;
@@ -87,8 +86,8 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
-        return new CurrencyConversionNbpService(exchangeRatesNbpClient);
+    ExchangeRateService exchangeRateService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
+        return new NbpExchangeRateService(exchangeRatesNbpClient);
     }
 
     @Bean
@@ -99,10 +98,8 @@ public class ApplicationInitializer {
     @Bean
     FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase(
             AccountRepository accountRepository,
-            CurrencyConversionService currencyConversionService,
-            @Value("${app.base-currency}") String appBaseCurrency
+            ExchangeRateService exchangeRateService
     ) {
-        Currency baseCurrency = Currency.getInstance(appBaseCurrency);
-        return new FindAccountAndConvertCurrencyUseCase(accountRepository, currencyConversionService, baseCurrency);
+        return new FindAccountAndConvertCurrencyUseCase(accountRepository, exchangeRateService);
     }
 }

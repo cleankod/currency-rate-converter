@@ -1,6 +1,5 @@
 package pl.cleankod.exchange.core.domain;
 
-import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.util.Preconditions;
 
 import java.math.BigDecimal;
@@ -35,10 +34,6 @@ public sealed interface Money permits FractionalMoney, WholeMoney {
 
         BigDecimal convertedAmount = amount().multiply(exchangeRate.rate());
         return Money.of(convertedAmount, exchangeRate.target());
-    }
-
-    default WholeMoney convertAndRoundToWhole(CurrencyConversionService currencyConverter, Currency targetCurrency) {
-        return currencyConverter.convertAndRoundToWhole(this, targetCurrency);
     }
 
     default WholeMoney roundToWhole() {

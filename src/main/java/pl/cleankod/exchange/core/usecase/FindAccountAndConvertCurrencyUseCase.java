@@ -1,9 +1,10 @@
 package pl.cleankod.exchange.core.usecase;
 
 import pl.cleankod.exchange.core.domain.Account;
+import pl.cleankod.exchange.core.domain.Money;
 import pl.cleankod.exchange.core.domain.WholeMoney;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
-import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
+import pl.cleankod.exchange.core.gateway.ExchangeRateService;
 
 import java.util.Currency;
 import java.util.Optional;
@@ -11,15 +12,11 @@ import java.util.Optional;
 public class FindAccountAndConvertCurrencyUseCase {
 
     private final AccountRepository accountRepository;
-    private final CurrencyConversionService currencyConversionService;
-    private final Currency baseCurrency;
+    private final ExchangeRateService exchangeRateService;
 
-    public FindAccountAndConvertCurrencyUseCase(AccountRepository accountRepository,
-                                                CurrencyConversionService currencyConversionService,
-                                                Currency baseCurrency) {
+    public FindAccountAndConvertCurrencyUseCase(AccountRepository accountRepository, ExchangeRateService exchangeRateService) {
         this.accountRepository = accountRepository;
-        this.currencyConversionService = currencyConversionService;
-        this.baseCurrency = baseCurrency;
+        this.exchangeRateService = exchangeRateService;
     }
 
     public Optional<Account> execute(Account.Id id, Currency targetCurrency) {
@@ -37,10 +34,10 @@ public class FindAccountAndConvertCurrencyUseCase {
             return money;
         }
 
-        if (!money.currency().equals(baseCurrency)) {
-            throw new CurrencyConversionException(money.currency(), targetCurrency);
-        }
-
-        return money.convertAndRoundToWhole(currencyConversionService, targetCurrency);
+        return exchangeRateService
+                .getExchangeRate(money.currency(), targetCurrency)
+                .map(money::convert)
+                .map(Money::roundToWhole)
+                .orElseThrow(() -> new CurrencyConversionException(money.currency(), targetCurrency));
     }
 }
