@@ -25,8 +25,11 @@ java {
 
 dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.0'
-    implementation 'io.github.openfeign:feign-httpclient:11.8'
-    implementation 'io.github.openfeign:feign-jackson:11.8'
+
+    implementation 'io.github.openfeign:feign-httpclient:12.2'
+    implementation 'io.github.openfeign:feign-jackson:12.2'
+    implementation 'io.github.resilience4j:resilience4j-feign:2.0.2'
+    implementation 'io.github.resilience4j:resilience4j-circuitbreaker:2.0.2'
 
     implementation 'ch.qos.logback:logback-classic:1.4.6'
 

@@ -63,7 +63,6 @@ Also, value-objects are responsible for a little more than just plain data holdi
 # To do
 * Better error handling, especially of potential errors from NBP API.
 * Caching the NBP API results.
-* Circuit-breaker for the NBP API client.
 * Better logging with traceability.
 * Replace exceptions with `Result` (`either`) which improves the overall methods API readability and forces error handling. Look into [cleankod/architecture-archetype](https://github.com/cleankod/architecture-archetype) as a starting point.
 * Auto generating REST API docs.

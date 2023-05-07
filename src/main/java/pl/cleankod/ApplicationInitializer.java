@@ -1,9 +1,12 @@
 package pl.cleankod;
 
-import feign.Feign;
 import feign.httpclient.ApacheHttpClient;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.github.resilience4j.feign.FeignDecorators;
+import io.github.resilience4j.feign.Resilience4jFeign;
 import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Value;
@@ -34,7 +37,18 @@ public class ApplicationInitializer {
 
     @Singleton
     ExchangeRatesNbpClient exchangeRatesNbpClient(@Value("${provider.nbp-api.base-url}") String nbpApiBaseUrl) {
-        return Feign.builder()
+        var clientName = "NBP";
+        var circuitBreakerConfig = CircuitBreakerConfig.custom()
+                // TODO it is only example, it should be adjusted to reality
+                .slidingWindowSize(10)
+                .failureRateThreshold(0.5f)
+                .build();
+
+        var decorators = FeignDecorators.builder()
+                .withCircuitBreaker(CircuitBreaker.of(clientName, circuitBreakerConfig))
+                .build();
+
+        return Resilience4jFeign.builder(decorators)
                 .client(new ApacheHttpClient())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
