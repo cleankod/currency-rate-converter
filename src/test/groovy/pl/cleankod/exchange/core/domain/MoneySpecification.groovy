@@ -57,4 +57,27 @@ class MoneySpecification extends Specification {
         where:
         givenAmount << ["EUR", "\0", "123,45"]
     }
+
+    def "should convert the amount correctly based on conversion rate"() {
+        when:
+        Money converted = money.convert(conversionRate, targetCurrency)
+
+        then:
+        converted != null
+        converted.amount().scale() == targetCurrency.getDefaultFractionDigits()
+        converted.amount() == expectedAmount
+
+        where:
+        money                     | conversionRate | targetCurrency              || expectedAmount
+        Money.of("0", "PLN")      | 4.5287         | Currency.getInstance("EUR") || 0
+        Money.of("0.1", "PLN")    | 4.5287         | Currency.getInstance("EUR") || 0.02
+        Money.of("1.23", "PLN")   | 4.5287         | Currency.getInstance("EUR") || 0.27
+        Money.of("10", "PLN")     | 4.5287         | Currency.getInstance("EUR") || 2.21
+        Money.of("123.45", "PLN") | 4.5287         | Currency.getInstance("EUR") || 27.26
+
+        Money.of("0", "EUR")      | 0.2207         | Currency.getInstance("PLN") || 0
+        Money.of("10", "EUR")     | 0.2207         | Currency.getInstance("PLN") || 45.31
+        Money.of("100", "EUR")    | 0.2207         | Currency.getInstance("PLN") || 453.10
+        Money.of("123.45", "EUR") | 0.2207         | Currency.getInstance("PLN") || 559.36
+    }
 }
