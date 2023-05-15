@@ -1,9 +1,11 @@
 package pl.cleankod.exchange.core.service;
 
 import pl.cleankod.exchange.core.domain.Account;
+import pl.cleankod.exchange.core.domain.ApplicationError;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 import pl.cleankod.util.Preconditions;
+import pl.cleankod.util.domain.Result;
 
 import java.util.Currency;
 import java.util.Optional;
@@ -19,7 +21,7 @@ public class AccountService {
         this.findAccountUseCase = findAccountUseCase;
     }
 
-    public Optional<Account> find(Account.Id accountId, Currency currency) {
+    public Result<Account, ApplicationError> find(Account.Id accountId, Currency currency) {
         Preconditions.requireNonNull(accountId);
 
         return Optional.ofNullable(currency)
@@ -27,7 +29,7 @@ public class AccountService {
                 .orElseGet(() -> findAccountUseCase.execute(accountId));
     }
 
-    public Optional<Account> find(Account.Number accountNumber, Currency currency) {
+    public Result<Account, ApplicationError> find(Account.Number accountNumber, Currency currency) {
         Preconditions.requireNonNull(accountNumber);
 
         return Optional.ofNullable(currency)

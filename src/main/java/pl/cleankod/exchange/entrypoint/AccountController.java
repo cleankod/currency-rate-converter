@@ -1,18 +1,20 @@
 package pl.cleankod.exchange.entrypoint;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.service.AccountService;
+import pl.cleankod.util.ErrorTransformer;
+import pl.cleankod.util.domain.Currencies;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Currency;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/accounts")
-public class AccountController {
+public class AccountController implements AccountApi {
 
     private final AccountService accountService;
 
@@ -20,23 +22,21 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<Account> findAccountById(@PathVariable String id, @RequestParam(required = false) String currency) {
+    @Override
+    public ResponseEntity<?> findAccountById(String id, String currency) {
         Account.Id accountId = Account.Id.of(id);
-        Currency requestedCurrency = Optional.ofNullable(currency)
-                .map(s -> Currency.getInstance(currency))
-                .orElse(null);
+        Currency targetCurrency = Currencies.getOrNull(currency);
 
-        return ResponseEntity.of(accountService.find(accountId, requestedCurrency));
+        return accountService.find(accountId, targetCurrency)
+                .fold(ResponseEntity::ok, ErrorTransformer::toApiError);
     }
 
-    @GetMapping(path = "/number={number}")
-    public ResponseEntity<Account> findAccountByNumber(@PathVariable String number, @RequestParam(required = false) String currency) {
+    @Override
+    public ResponseEntity<?> findAccountByNumber(String number, String currency) {
         Account.Number accountNumber = Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8));
-        Currency requestedCurrency = Optional.ofNullable(currency)
-                .map(s -> Currency.getInstance(currency))
-                .orElse(null);
+        Currency targetCurrency = Currencies.getOrNull(currency);
 
-        return ResponseEntity.of(accountService.find(accountNumber, requestedCurrency));
+        return accountService.find(accountNumber, targetCurrency)
+                .fold(ResponseEntity::ok, ErrorTransformer::toApiError);
     }
 }
