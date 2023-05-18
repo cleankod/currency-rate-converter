@@ -100,16 +100,19 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         then:
         response.getStatusLine().getStatusCode() == 404
+        transformError(response).message() == "The account with id ${accountId} was not found."
     }
 
     def "should not find an account by number"() {
         given:
-        def accountNumber = URLEncoder.encode("11 1750 0009 0000 0000 2156 6004", StandardCharsets.UTF_8)
+        def accountNumber = "11 1750 0009 0000 0000 2156 6004"
+        def accountNumberUrlEncoded = URLEncoder.encode(accountNumber, StandardCharsets.UTF_8)
 
         when:
-        def response = getResponse("/accounts/number=${accountNumber}")
+        def response = getResponse("/accounts/number=${accountNumberUrlEncoded}")
 
         then:
         response.getStatusLine().getStatusCode() == 404
+        transformError(response).message() == "The account with number ${accountNumber} was not found."
     }
 }

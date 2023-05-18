@@ -1,59 +1,42 @@
 package pl.cleankod.exchange.entrypoint;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import pl.cleankod.exchange.core.domain.Account;
-import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
-import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
+import pl.cleankod.exchange.core.service.AccountService;
+import pl.cleankod.util.ErrorTransformer;
+import pl.cleankod.util.domain.Currencies;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Currency;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/accounts")
-public class AccountController {
+public class AccountController implements AccountApi {
 
-    private final FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase;
-    private final FindAccountUseCase findAccountUseCase;
+    private final AccountService accountService;
 
-    public AccountController(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
-                             FindAccountUseCase findAccountUseCase) {
-        this.findAccountAndConvertCurrencyUseCase = findAccountAndConvertCurrencyUseCase;
-        this.findAccountUseCase = findAccountUseCase;
+    public AccountController(AccountService accountService) {
+        this.accountService = accountService;
     }
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<Account> findAccountById(@PathVariable String id, @RequestParam(required = false) String currency) {
-        return Optional.ofNullable(currency)
-                .map(s ->
-                        findAccountAndConvertCurrencyUseCase.execute(Account.Id.of(id), Currency.getInstance(s))
-                                .map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build())
-                )
-                .orElseGet(() ->
-                        findAccountUseCase.execute(Account.Id.of(id))
-                                .map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build())
-                );
+    @Override
+    public ResponseEntity<?> findAccountById(String id, String currency) {
+        Account.Id accountId = Account.Id.of(id);
+        Currency targetCurrency = Currencies.getOrNull(currency);
+
+        return accountService.find(accountId, targetCurrency)
+                .fold(ResponseEntity::ok, ErrorTransformer::toApiError);
     }
 
-    @GetMapping(path = "/number={number}")
-    public ResponseEntity<Account> findAccountByNumber(@PathVariable String number, @RequestParam(required = false) String currency) {
+    @Override
+    public ResponseEntity<?> findAccountByNumber(String number, String currency) {
         Account.Number accountNumber = Account.Number.of(URLDecoder.decode(number, StandardCharsets.UTF_8));
-        return Optional.ofNullable(currency)
-                .map(s ->
-                        findAccountAndConvertCurrencyUseCase.execute(accountNumber, Currency.getInstance(s))
-                                .map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build())
-                )
-                .orElseGet(() ->
-                        findAccountUseCase.execute(accountNumber)
-                                .map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build())
-                );
+        Currency targetCurrency = Currencies.getOrNull(currency);
+
+        return accountService.find(accountNumber, targetCurrency)
+                .fold(ResponseEntity::ok, ErrorTransformer::toApiError);
     }
-
-
 }
