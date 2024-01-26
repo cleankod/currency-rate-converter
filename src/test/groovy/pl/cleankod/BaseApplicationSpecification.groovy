@@ -10,6 +10,7 @@ import pl.cleankod.exchange.entrypoint.model.ApiError
 import spock.lang.Specification
 
 abstract class BaseApplicationSpecification extends Specification {
+
   private static init = true
   private static final baseUrl = "http://localhost:8080"
   private static final ObjectMapper objectMapper = new ObjectMapper()
