@@ -95,11 +95,10 @@ Added NbpRateService
 
 Added correlation-id
 
+[x] Circuit-breaker for the NBP API client.
 
-* Circuit-breaker for the NBP API client.
+
 * Integration tests with the real NBP API.
-
-
 * Replace exceptions with `Result` (`either`) which improves the overall methods API readability and forces error handling. Look into [cleankod/architecture-archetype](https://github.com/cleankod/architecture-archetype) as a starting point.
 * Replace Spring Framework with a different one.
 * The proposed architecture is not perfect. Suggest improvements.
