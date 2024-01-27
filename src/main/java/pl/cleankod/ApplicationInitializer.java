@@ -4,6 +4,7 @@ import feign.Feign;
 import feign.httpclient.ApacheHttpClient;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import org.springdoc.core.GroupedOpenApi;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -72,6 +73,14 @@ public class ApplicationInitializer {
     @Bean
     AccountServiceImpl accountService(ConvertCurrencyUseCase convertCurrencyUseCase, FindAccountUseCase findAccountUseCase) {
         return new AccountServiceImpl(convertCurrencyUseCase, findAccountUseCase);
+    }
+    
+    @Bean
+    public GroupedOpenApi publicApi() {
+        return GroupedOpenApi.builder()
+            .group("public")
+            .packagesToScan("pl.cleankod.exchange.entrypoint")
+            .build();
     }
 
 }
