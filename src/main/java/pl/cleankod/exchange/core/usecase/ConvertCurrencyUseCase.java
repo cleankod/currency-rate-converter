@@ -8,15 +8,15 @@ import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import java.util.Currency;
 import java.util.Optional;
 
-public class FindAccountAndConvertCurrencyUseCase {
+public class ConvertCurrencyUseCase {
 
     private final AccountRepository accountRepository;
     private final CurrencyConversionService currencyConversionService;
     private final Currency baseCurrency;
 
-    public FindAccountAndConvertCurrencyUseCase(AccountRepository accountRepository,
-                                                CurrencyConversionService currencyConversionService,
-                                                Currency baseCurrency) {
+    public ConvertCurrencyUseCase(AccountRepository accountRepository,
+                                  CurrencyConversionService currencyConversionService,
+                                  Currency baseCurrency) {
         this.accountRepository = accountRepository;
         this.currencyConversionService = currencyConversionService;
         this.baseCurrency = baseCurrency;
