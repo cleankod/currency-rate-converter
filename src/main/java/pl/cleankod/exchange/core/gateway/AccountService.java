@@ -6,9 +6,7 @@ import java.util.Optional;
 
 public interface AccountService {
 		
-		Optional<Account> findAccountById(String accountId, Optional<String> currencyOptional);
+		Optional<Account> findAccountById(String accountId, Optional<String> currencyOpt);
 		
-		Optional<Account> findAccountByNumber(String accountNumber, Optional<String> currencyOptional);
-
-
+		Optional<Account> findAccountByNumber(String accountNumber, Optional<String> currencyOpt);
 }

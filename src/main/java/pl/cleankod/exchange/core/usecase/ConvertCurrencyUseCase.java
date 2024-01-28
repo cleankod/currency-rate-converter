@@ -28,36 +28,29 @@ public class ConvertCurrencyUseCase {
 		}
 		
 		public Optional<Account> execute(Account.Id id, Currency targetCurrency) {
-				return accountRepository.find(id)
-				.map(account -> {
-						Result<Money, String> conversionResult = convert(account.balance(), targetCurrency);
-						if (conversionResult.isSuccess()) {
-								logger.info("Conversion successful for account: " + account.id());
-								return new Account(account.id(), account.number(), conversionResult.value());
-						} else {
-								logger.warning("Conversion error for account: " + conversionResult.error());
-								return null;
-						}
-				});
+				return processAccountConversion(accountRepository.find(id), targetCurrency);
 		}
 		
 		public Optional<Account> execute(Account.Number number, Currency targetCurrency) {
-				return accountRepository.find(number)
-				.map(account -> {
+				return processAccountConversion(accountRepository.find(number), targetCurrency);
+		}
+		
+		private Optional<Account> processAccountConversion(Optional<Account> accountOpt, Currency targetCurrency) {
+				return accountOpt.flatMap(account -> {
 						Result<Money, String> conversionResult = convert(account.balance(), targetCurrency);
 						if (conversionResult.isSuccess()) {
 								logger.info("Conversion successful for account: " + account.id());
-								return new Account(account.id(), account.number(), conversionResult.value());
+								return Optional.of(new Account(account.id(), account.number(), conversionResult.value()));
 						} else {
-								logger.warning("Conversion error for account: " + conversionResult.error());
-								return null;
+								logger.warning("Conversion error for account " + account.id() + ": " + conversionResult.error());
+								return Optional.empty();
 						}
 				});
 		}
 		
 		private Result<Money, String> convert(Money money, Currency targetCurrency) {
 				if (!baseCurrency.equals(targetCurrency)) {
-						return money.convert(currencyConversionService, targetCurrency);
+						return currencyConversionService.convert(money, targetCurrency);
 				}
 				
 				if (!money.currency().equals(targetCurrency)) {

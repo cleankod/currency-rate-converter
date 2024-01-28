@@ -8,7 +8,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Currency;
 
-//Not used - consider using it when nbi server is down
+// Not used - consider using it when nbp server is down;
+// Add @Profile("stub") to this class and trigger the profile in application.properties when nbp server is down
 public class CurrencyConversionStubService implements CurrencyConversionService {
     
     private static final BigDecimal PLN_TO_EUR_RATE = BigDecimal.valueOf(0.22d);
@@ -23,6 +24,6 @@ public class CurrencyConversionStubService implements CurrencyConversionService 
 
     private Money calculate(Money money, Currency targetCurrency) {
         BigDecimal rate = "PLN".equals(targetCurrency.getCurrencyCode()) ? EUR_TO_PLN_RATE : PLN_TO_EUR_RATE;
-        return Money.of(money.amount().multiply(rate).setScale(2, RoundingMode.HALF_UP), targetCurrency);
+        return Money.of(money.amount().multiply(rate).setScale(2, RoundingMode.HALF_EVEN), targetCurrency);
     }
 }

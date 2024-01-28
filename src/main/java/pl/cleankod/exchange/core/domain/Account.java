@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public record Account(Id id, Number number, Money balance) {
 		
-		public static record Id(UUID value) {
+		public record Id(UUID value) {
 				public Id {
 						Preconditions.requireNonNull(value);
 				}
@@ -30,7 +30,7 @@ public record Account(Id id, Number number, Money balance) {
 				}
 		}
 		
-		public static record Number(String value) {
+		public record Number(String value) {
 				private static final Pattern PATTERN =
 				Pattern.compile("\\d{2}[ ]?\\d{4}[ ]?\\d{4}[ ]?\\d{4}[ ]?\\d{4}[ ]?\\d{4}[ ]?\\d{4}");
 				

@@ -19,6 +19,7 @@ import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 import pl.cleankod.exchange.entrypoint.AccountController;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
+import pl.cleankod.exchange.provider.CurrencyConversionStubService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 
 import java.util.Currency;
@@ -70,6 +71,12 @@ public class ApplicationInitializer {
         return new AccountController(accountService);
     }
 
+    //To be improved:consider adding profiles to switch between stub and real service
+    @Bean
+    CurrencyConversionStubService currencyConversionStubService() {
+        return new CurrencyConversionStubService();
+    }
+    
     @Bean
     AccountServiceImpl accountService(ConvertCurrencyUseCase convertCurrencyUseCase, FindAccountUseCase findAccountUseCase) {
         return new AccountServiceImpl(convertCurrencyUseCase, findAccountUseCase);

@@ -38,11 +38,13 @@ public class CurrencyConversionNbpService implements CurrencyConversionService {
 										logger.warning(MID_RATE_ZERO_MSG);
 										return Result.error(MID_RATE_ZERO_MSG);
 								}
-								BigDecimal calculatedRate = money.amount().divide(midRate, RoundingMode.HALF_UP);
+								BigDecimal calculatedRate = money.amount().divide(midRate, RoundingMode.HALF_EVEN);
 								return Result.success(new Money(calculatedRate, targetCurrency));
 						}
 				} catch (Exception e) {
-						return Result.error("Exception occurred during currency conversion: " + e.getMessage());
+						String errorMsg = "Exception occurred during currency conversion: " + e.getMessage();
+						logger.warning(errorMsg);
+						return Result.error(errorMsg);
 				}
 		}
 }
