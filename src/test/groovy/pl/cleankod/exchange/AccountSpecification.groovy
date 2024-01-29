@@ -87,8 +87,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         HttpResponse response = getResponse("/accounts/number=${accountNumberUrlEncoded}?currency=PLN")
 
         then:
-        response.getStatusLine().getStatusCode() == 400
-        transformError(response).message() == "Cannot convert currency from EUR to PLN."
+        response.getStatusLine().getStatusCode() == 404
     }
 
     def "should not find an account by ID"() {

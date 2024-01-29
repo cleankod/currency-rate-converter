@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'jacoco'
 
     // Apply the groovy plugin to also add support for Groovy (needed for Spock)
     id 'groovy'
@@ -14,11 +15,19 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+jacoco {
+    toolVersion = '0.8.11'
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web:2.6.3'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
+
+    //Docs for API documentation
+    implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+    implementation 'org.springdoc:springdoc-openapi-data-rest:1.7.0'
 
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy:3.0.9'
@@ -30,7 +39,16 @@ dependencies {
     testImplementation 'com.github.tomakehurst:wiremock-jre8:2.27.2'
 }
 
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.enabled true
+    }
+}
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }

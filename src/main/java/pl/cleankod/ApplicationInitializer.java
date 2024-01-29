@@ -4,19 +4,22 @@ import feign.Feign;
 import feign.httpclient.ApacheHttpClient;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import org.springdoc.core.GroupedOpenApi;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
+import pl.cleankod.exchange.core.gateway.AccountService;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
-import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
+import pl.cleankod.exchange.core.usecase.AccountServiceImpl;
+import pl.cleankod.exchange.core.usecase.ConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 import pl.cleankod.exchange.entrypoint.AccountController;
-import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
+import pl.cleankod.exchange.provider.CurrencyConversionStubService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 
 import java.util.Currency;
@@ -54,23 +57,37 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase(
+		ConvertCurrencyUseCase convertCurrencyUseCase(
             AccountRepository accountRepository,
             CurrencyConversionService currencyConversionService,
             Environment environment
     ) {
         Currency baseCurrency = Currency.getInstance(environment.getRequiredProperty("app.base-currency"));
-        return new FindAccountAndConvertCurrencyUseCase(accountRepository, currencyConversionService, baseCurrency);
+        return new ConvertCurrencyUseCase(accountRepository, currencyConversionService, baseCurrency);
     }
 
     @Bean
-    AccountController accountController(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
-                                        FindAccountUseCase findAccountUseCase) {
-        return new AccountController(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
+    AccountController accountController(AccountService accountService) {
+        return new AccountController(accountService);
     }
 
+    //To be improved:consider adding profiles to switch between stub and real service
     @Bean
-    ExceptionHandlerAdvice exceptionHandlerAdvice() {
-        return new ExceptionHandlerAdvice();
+    CurrencyConversionStubService currencyConversionStubService() {
+        return new CurrencyConversionStubService();
     }
+    
+    @Bean
+    AccountServiceImpl accountService(ConvertCurrencyUseCase convertCurrencyUseCase, FindAccountUseCase findAccountUseCase) {
+        return new AccountServiceImpl(convertCurrencyUseCase, findAccountUseCase);
+    }
+    
+    @Bean
+    public GroupedOpenApi publicApi() {
+        return GroupedOpenApi.builder()
+            .group("public")
+            .packagesToScan("pl.cleankod.exchange.entrypoint")
+            .build();
+    }
+
 }
