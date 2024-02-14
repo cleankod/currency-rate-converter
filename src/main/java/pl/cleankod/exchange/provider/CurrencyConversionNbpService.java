@@ -49,7 +49,7 @@ public class CurrencyConversionNbpService implements CurrencyConversionService {
             throw new RateRetrievalException("Could not retrieve rate for currency " + targetCurrency);
         }
         BigDecimal midRate = rateWrapper.rates().get(0).mid();
-        BigDecimal calculatedRate = money.amount().divide(midRate, RoundingMode.HALF_UP);
+        BigDecimal calculatedRate = money.amount().divide(midRate, targetCurrency.getDefaultFractionDigits(), RoundingMode.HALF_EVEN);
         return new Money(calculatedRate, targetCurrency);
     }
 }

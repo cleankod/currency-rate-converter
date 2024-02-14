@@ -10,7 +10,7 @@ import spock.lang.Specification
 import java.util.concurrent.TimeUnit
 
 class CurrencyConversionNbpServiceSpec extends Specification {
-    private static def MONEY = Money.of("123.45", "PLN")
+    private static def MONEY = Money.of('123.45', 'PLN')
     private static def EUR_CURRENCY = Currency.getInstance('EUR')
 
     private def exchangeRatesNbpClient = Mock(ExchangeRatesNbpClient.class)
@@ -22,15 +22,23 @@ class CurrencyConversionNbpServiceSpec extends Specification {
 
     def 'should convert money to new currency'() {
         given:
-        exchangeRatesNbpClient.fetch(_, _) >> createRateWrapper(4.5452d)
+        exchangeRatesNbpClient.fetch(_, _) >> createRateWrapper(rate)
         def service = createService()
 
         when:
-        Money result = service.convert(MONEY, EUR_CURRENCY)
+        Money result = service.convert(Money.of(amount, 'PLN'), EUR_CURRENCY)
 
         then:
-        result.amount() == BigDecimal.valueOf(27.16d)
+        result.amount() == new BigDecimal(expectedAmount)
         result.currency() == EUR_CURRENCY
+
+        where:
+        amount       | rate    || expectedAmount
+        '123.45'     | 4.5452d || '27.16'
+        '125.45'     | 4.5452d || '27.6'
+        '125.4'      | 4.5452d || '27.59'
+        '125.400'    | 4.5452d || '27.59'
+        '1256789.44' | 4.5329d || '277259.47'
     }
 
     def 'should cache result of fetched rates'() {
@@ -45,7 +53,7 @@ class CurrencyConversionNbpServiceSpec extends Specification {
         Money result = service.convert(MONEY, EUR_CURRENCY)
 
         then:
-        result.amount() == BigDecimal.valueOf(12.35d)
+        result.amount() == BigDecimal.valueOf(12.34d)
 
         when:
         Money result2 = service.convert(MONEY, EUR_CURRENCY)
@@ -55,7 +63,7 @@ class CurrencyConversionNbpServiceSpec extends Specification {
 
         where:
         currencyExpirationDuration | currencyExpirationTimeUnit   || expectedAmount
-        null                       | null                         || 12.35d
+        null                       | null                         || 12.34d
         "0"                        | TimeUnit.MICROSECONDS.name() || 27.16d
     }
 
