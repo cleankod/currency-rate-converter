@@ -17,7 +17,8 @@ class CurrencyConversionNbpServiceSpec extends Specification {
 
     private CurrencyConversionNbpService createService(String currencyExpirationDuration = null,
                                                        String currencyExpirationTimeUnit = null) {
-        new CurrencyConversionNbpService(exchangeRatesNbpClient, currencyExpirationDuration, currencyExpirationTimeUnit)
+        new CurrencyConversionNbpService(exchangeRatesNbpClient, currencyExpirationDuration, currencyExpirationTimeUnit,
+        "100", TimeUnit.MILLISECONDS.name())
     }
 
     def 'should convert money to new currency'() {
@@ -79,7 +80,6 @@ class CurrencyConversionNbpServiceSpec extends Specification {
         then:
         def exception = thrown(RateRetrievalException.class)
         exception.message == "Could not fetch rates for currency EUR"
-
     }
 
     def 'should throw exception for null rate'() {
@@ -96,7 +96,22 @@ class CurrencyConversionNbpServiceSpec extends Specification {
         exception.message == "Could not retrieve rate for currency EUR"
     }
 
-    private def createRateWrapper(double value) {
+    def 'should throw exception for timeout reach on NBP fetch call'() {
+        given:
+        exchangeRatesNbpClient.fetch(_, _) >> sleep(150)
+
+        def service = createService()
+
+        when:
+        service.convert(MONEY, EUR_CURRENCY)
+
+        then:
+        def exception = thrown(RateRetrievalException.class)
+        exception.message == "Could not retrieve rate for currency EUR"
+
+    }
+
+    private static def createRateWrapper(double value) {
         return new RateWrapper('table', 'EUR', 'code',
                 List.of(new Rate('', '', BigDecimal.valueOf(value))))
     }
