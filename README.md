@@ -78,3 +78,24 @@ Also, value-objects are responsible for a little more than just plain data holdi
 * Integration tests with the real NBP API.
 * Replace Spring Framework with a different one.
 * The proposed architecture is not perfect. Suggest improvements.
+
+
+- for
+  - replacing Spring Framework,
+    - the idea is to use spring related annotation in as few components as possible,
+      components used when the application is started. 
+      One idea would be from a server argument or system env to decide which framework to use for dependency 
+      injection
+      (or maybe idea of custom annotations)
+  - auto generating  REST API:
+    - I saw there are multiple implementations, like swagger spring boot, but I did not have time to set it
+  - The proposed architecture is not perfect. Suggest improvements.
+    - I possible improvement would be to create executors which can execute task separately from the
+      controller's main thread. Like this, the controller can take more request and delegate the processing
+      to these executors to perform the corresponding task
+  - Circuit-breaker:
+    - with proposed MR, the calls for NBP fetch are encapsulating the exception into custom exception
+      and will not let the controller wait for long time in case the execution of the fetch is blocked
+    - I saw also examples from spring-cloud-circuitbreaker
+  - Integration tests with the real NBP API.
+    - did not have time to investigate this problem

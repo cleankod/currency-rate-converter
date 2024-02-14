@@ -8,6 +8,11 @@ import java.util.Currency;
 
 public record Money(BigDecimal amount, Currency currency) {
 
+    @Override
+    public String toString() {
+        return new StringBuilder().append("{").append("\"amount\":\"").append(amount)
+                .append("\",\"currency\":\"").append(currency.getCurrencyCode()).append("\"}").toString();
+    }
     public static Money of(BigDecimal amount, Currency currency) {
         Preconditions.requireNonNull(amount);
         Preconditions.requireNonNull(currency);

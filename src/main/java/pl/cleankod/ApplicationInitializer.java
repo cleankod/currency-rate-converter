@@ -1,5 +1,9 @@
 package pl.cleankod;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import feign.Feign;
 import feign.httpclient.ApacheHttpClient;
 import feign.jackson.JacksonDecoder;
@@ -9,16 +13,19 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
+import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
 import pl.cleankod.exchange.core.usecase.FindAccountUseCase;
 import pl.cleankod.exchange.entrypoint.AccountController;
+import pl.cleankod.exchange.entrypoint.AccountService;
 import pl.cleankod.exchange.entrypoint.ExceptionHandlerAdvice;
 import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 
+import java.io.IOException;
 import java.util.Currency;
 
 @SpringBootConfiguration
@@ -44,8 +51,13 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
-        return new CurrencyConversionNbpService(exchangeRatesNbpClient);
+    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient, Environment environment) {
+        return new CurrencyConversionNbpService(exchangeRatesNbpClient,
+                environment.getProperty("nbp.currency.expiration.duration"),
+                environment.getProperty("nbp.currency.expiration.timeunit"),
+                environment.getProperty("nbp.fetch.timeout.duration"),
+                environment.getProperty("nbp.fetch.timeout.unit")
+                );
     }
 
     @Bean
@@ -64,13 +76,36 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    AccountController accountController(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
-                                        FindAccountUseCase findAccountUseCase) {
-        return new AccountController(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
+    AccountService findAccountService(FindAccountAndConvertCurrencyUseCase findAccountAndConvertCurrencyUseCase,
+                                      FindAccountUseCase findAccountUseCase) {
+        return  new AccountService(findAccountAndConvertCurrencyUseCase, findAccountUseCase);
+    }
+    @Bean
+    AccountController accountController(AccountService accountService) {
+        return new AccountController(accountService);
     }
 
     @Bean
     ExceptionHandlerAdvice exceptionHandlerAdvice() {
         return new ExceptionHandlerAdvice();
+    }
+
+    @Bean
+    public SimpleModule singleValueObjectModule() {
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(Account.class, new JsonSerializer<>() {
+
+            @Override
+            public void serialize(Account account, JsonGenerator jsonGenerator,
+                                  SerializerProvider serializerProvider) throws IOException {
+
+                jsonGenerator.writeStartObject();
+                jsonGenerator.writeStringField("id", account.id().value().toString());
+                jsonGenerator.writeStringField("number", account.number().value());
+                jsonGenerator.writeStringField("money", account.balance().toString());
+                jsonGenerator.writeEndObject();
+            }
+        });
+        return module;
     }
 }
