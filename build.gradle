@@ -21,6 +21,9 @@ dependencies {
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
     implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.16.0'
+
+    implementation 'com.google.code.gson:gson:2.8.8'
 
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy:3.0.9'

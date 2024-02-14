@@ -7,6 +7,7 @@ import org.apache.http.HttpResponse
 import pl.cleankod.BaseApplicationSpecification
 import pl.cleankod.exchange.core.domain.Account
 import pl.cleankod.exchange.core.domain.Money
+import pl.cleankod.util.JsonTransformer
 
 import java.nio.charset.StandardCharsets
 
@@ -36,7 +37,8 @@ class AccountSpecification extends BaseApplicationSpecification {
         def accountId = "fa07c538-8ce4-11ec-9ad5-4f5a625cd744"
 
         when:
-        Account response = get("/accounts/${accountId}", Account)
+        Account response = get("/accounts/${accountId}", this::convertToAccount,
+                AccountWrapper)
 
         then:
         response == new Account(
@@ -52,7 +54,10 @@ class AccountSpecification extends BaseApplicationSpecification {
         def currency = "EUR"
 
         when:
-        Account response = get("/accounts/${accountId}?currency=${currency}", Account)
+        Account response = get("/accounts/${accountId}?currency=${currency}",
+                this::convertToAccount,
+                AccountWrapper
+        )
 
         then:
         response == new Account(
@@ -62,13 +67,23 @@ class AccountSpecification extends BaseApplicationSpecification {
         )
     }
 
+    def convertToAccount(AccountWrapper wrapper) {
+        MoneyWrapper moneyWrapper = JsonTransformer.fromJson(wrapper.money, MoneyWrapper.class)
+        return new Account(
+                Account.Id.of(wrapper.id),
+                new Account.Number(wrapper.number),
+                new Money(new BigDecimal(moneyWrapper.amount), Currency.getInstance(moneyWrapper.currency))
+        )
+    }
+
     def "should return an account by number"() {
         given:
         def accountNumberValue = "75 1240 2034 1111 0000 0306 8582"
         def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
 
         when:
-        Account response = get("/accounts/number=${accountNumberUrlEncoded}", Account)
+        Account response = get("/accounts/number=${accountNumberUrlEncoded}", this::convertToAccount,
+                AccountWrapper)
 
         then:
         response == new Account(
@@ -111,5 +126,27 @@ class AccountSpecification extends BaseApplicationSpecification {
 
         then:
         response.getStatusLine().getStatusCode() == 404
+    }
+
+    class MoneyWrapper {
+        private String amount
+        private String currency
+
+        MoneyWrapper(String amount, String currency) {
+            this.amount = amount
+            this.currency = currency
+        }
+    }
+
+    class AccountWrapper {
+        private String id
+        private String number
+        private String money
+
+        AccountWrapper(String id, String number, String money) {
+            this.id = id
+            this.number = number
+            this.money = money
+        }
     }
 }

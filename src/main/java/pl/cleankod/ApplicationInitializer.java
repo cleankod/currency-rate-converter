@@ -1,5 +1,9 @@
 package pl.cleankod;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import feign.Feign;
 import feign.httpclient.ApacheHttpClient;
 import feign.jackson.JacksonDecoder;
@@ -9,6 +13,7 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
+import pl.cleankod.exchange.core.domain.Account;
 import pl.cleankod.exchange.core.gateway.AccountRepository;
 import pl.cleankod.exchange.core.gateway.CurrencyConversionService;
 import pl.cleankod.exchange.core.usecase.FindAccountAndConvertCurrencyUseCase;
@@ -20,6 +25,7 @@ import pl.cleankod.exchange.provider.AccountInMemoryRepository;
 import pl.cleankod.exchange.provider.CurrencyConversionNbpService;
 import pl.cleankod.exchange.provider.nbp.ExchangeRatesNbpClient;
 
+import java.io.IOException;
 import java.util.Currency;
 
 @SpringBootConfiguration
@@ -79,5 +85,24 @@ public class ApplicationInitializer {
     @Bean
     ExceptionHandlerAdvice exceptionHandlerAdvice() {
         return new ExceptionHandlerAdvice();
+    }
+
+    @Bean
+    public SimpleModule singleValueObjectModule() {
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(Account.class, new JsonSerializer<>() {
+
+            @Override
+            public void serialize(Account account, JsonGenerator jsonGenerator,
+                                  SerializerProvider serializerProvider) throws IOException {
+
+                jsonGenerator.writeStartObject();
+                jsonGenerator.writeStringField("id", account.id().value().toString());
+                jsonGenerator.writeStringField("number", account.number().value());
+                jsonGenerator.writeStringField("money", account.balance().toString());
+                jsonGenerator.writeEndObject();
+            }
+        });
+        return module;
     }
 }
