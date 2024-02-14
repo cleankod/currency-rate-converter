@@ -45,8 +45,10 @@ public class ApplicationInitializer {
     }
 
     @Bean
-    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient) {
-        return new CurrencyConversionNbpService(exchangeRatesNbpClient);
+    CurrencyConversionService currencyConversionService(ExchangeRatesNbpClient exchangeRatesNbpClient, Environment environment) {
+        return new CurrencyConversionNbpService(exchangeRatesNbpClient,
+                environment.getProperty("nbp.currency.expiration.duration"),
+                environment.getProperty("nbp.currency.expiration.timeunit"));
     }
 
     @Bean
