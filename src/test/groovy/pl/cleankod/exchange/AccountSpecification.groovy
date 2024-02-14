@@ -93,7 +93,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         )
     }
 
-    def "should return an account by number with different currency"() {
+    def "should return error msg for an account by number with different currency"() {
         given:
         def accountNumberValue = "75 1240 2034 1111 0000 0306 8582"
         def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
@@ -104,6 +104,19 @@ class AccountSpecification extends BaseApplicationSpecification {
         then:
         response.getStatusLine().getStatusCode() == 400
         transformError(response).message() == "Cannot convert currency from EUR to PLN."
+    }
+
+    def "should return error msg for unknown currency"() {
+        given:
+        def accountNumberValue = "75 1240 2034 1111 0000 0306 8582"
+        def accountNumberUrlEncoded = URLEncoder.encode(accountNumberValue, StandardCharsets.UTF_8)
+
+        when:
+        HttpResponse response = getResponse("/accounts/number=${accountNumberUrlEncoded}?currency=other")
+
+        then:
+        response.getStatusLine().getStatusCode() == 400
+        transformError(response).message() == "Currency with id other does not exist."
     }
 
     def "should not find an account by ID"() {
