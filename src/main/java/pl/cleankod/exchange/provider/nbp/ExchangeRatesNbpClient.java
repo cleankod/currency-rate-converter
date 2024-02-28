@@ -2,6 +2,7 @@ package pl.cleankod.exchange.provider.nbp;
 
 import feign.Param;
 import feign.RequestLine;
+import org.springframework.cache.annotation.Cacheable;
 import pl.cleankod.exchange.provider.nbp.model.RateWrapper;
 
 public interface ExchangeRatesNbpClient {

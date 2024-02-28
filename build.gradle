@@ -3,6 +3,8 @@ plugins {
 
     // Apply the groovy plugin to also add support for Groovy (needed for Spock)
     id 'groovy'
+
+    id 'jacoco'
 }
 
 repositories {
@@ -19,7 +21,11 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     implementation 'io.github.openfeign:feign-jackson:11.8'
-
+    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.0.3.RELEASE'
+    implementation group: 'org.springframework', name: 'spring-aspects', version: '3.2.4.RELEASE'
+    testImplementation("org.mock-server:mockserver-netty-no-dependencies:5.14.0")
+    testImplementation("org.mock-server:mockserver-client-java-no-dependencies:5.14.0")
+    testImplementation 'junit:junit:4.4'
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy:3.0.9'
 
@@ -33,4 +39,17 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+test {
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test // tests are required to run before generating the report
+}
+
+jacoco {
+    toolVersion = "0.8.11"
+    reportsDirectory = layout.buildDirectory.dir('currencyConversionTestsResults')
 }

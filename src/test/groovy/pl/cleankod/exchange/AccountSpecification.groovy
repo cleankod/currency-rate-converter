@@ -58,7 +58,7 @@ class AccountSpecification extends BaseApplicationSpecification {
         response == new Account(
                 Account.Id.of(accountId),
                 Account.Number.of("65 1090 1665 0000 0001 0373 7343"),
-                Money.of("27.16", currency)
+                Money.of("27.13", currency)
         )
     }
 
